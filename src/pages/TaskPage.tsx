@@ -1,6 +1,8 @@
 // src/pages/TaskPage.tsx
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { SUPABASE_URL } from '@/integrations/supabase/constants';
 import Header from '@/components/Header';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/Card';
 import { PrimaryButton, GlowButton } from '@/components/Button';
@@ -24,6 +26,8 @@ export default function TaskPage() {
   const [showCompleted, setShowCompleted] = useState(false);
   const [hasLearningContent, setHasLearningContent] = useState(false);
   const [quizPassed, setQuizPassed] = useState(false);
+  const [savingProgress, setSavingProgress] = useState(false);
+  const [progressSaved, setProgressSaved] = useState(false);
 
   // compute required resource IDs based on normalized task.resources
   const requiredResourceIds = useMemo(() => {
@@ -151,23 +155,79 @@ export default function TaskPage() {
     });
   };
   const navigate = useNavigate();
-  const handleTaskCompleted = () => {
-    if (courseId && taskId) {
-      const completedKey = `course_${courseId}_completed_tasks`;
-      const completed = sessionStorage.getItem(completedKey);
-      const arr = completed ? JSON.parse(completed) as string[] : [];
-      if (!arr.includes(taskId)) {
-        arr.push(taskId);
-        sessionStorage.setItem(completedKey, JSON.stringify(arr));
+  
+  const handleTaskCompleted = async () => {
+    setSavingProgress(true);
+    setProgressSaved(false);
+
+    try {
+      // Get current authenticated user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (authError || !user || !session) {
+        console.error('User not authenticated');
+        return;
       }
-    }
-    
-    // Navigate to the LessonPage using React Router navigation
-    if (task?.lessonId) {
-      navigate(`/courses/${courseId}/chapters/${chapterId}/lessons/${task.lessonId}`);
-    } else {
-      // Fallback to chapter page if no lessonId
-      navigate(`/courses/${courseId}/chapters/${chapterId}`);
+
+      // Prepare progress data using route params and task data
+      const progressData = {
+        CourseId: courseId || 'course-1',
+        ChapterId: chapterId || 'chapter-1', 
+        LessonId: task?.lessonId || '',
+        TaskId: taskId || 'task-1',
+        TaskCompleted: true,
+        LessonCompleted: true,
+        SimulationUnlocked: hasLearningContent ? quizPassed : true,
+        LastActivity: new Date().toISOString()
+      };
+
+      console.log('Saving progress:', progressData);
+
+      // Call the Google Sheets Edge Function using full URL
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/sheets-progress/api/progress/${user.id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(progressData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save progress');
+      }
+
+      const result = await response.json();
+      console.log('Progress saved successfully:', result);
+      setProgressSaved(true);
+
+      // Keep existing sessionStorage logic for UI consistency
+      if (courseId && taskId) {
+        const completedKey = `course_${courseId}_completed_tasks`;
+        const completed = sessionStorage.getItem(completedKey);
+        const arr = completed ? JSON.parse(completed) as string[] : [];
+        if (!arr.includes(taskId)) {
+          arr.push(taskId);
+          sessionStorage.setItem(completedKey, JSON.stringify(arr));
+        }
+      }
+
+      // Navigate after short delay to show success state
+      setTimeout(() => {
+        if (task?.lessonId) {
+          navigate(`/courses/${courseId}/chapters/${chapterId}/lessons/${task.lessonId}`);
+        } else {
+          navigate(`/courses/${courseId}/chapters/${chapterId}`);
+        }
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Failed to save progress:', error);
+      alert('Failed to save progress. Please try again.');
+    } finally {
+      setSavingProgress(false);
     }
   };
 
@@ -449,8 +509,22 @@ export default function TaskPage() {
                     transition-all duration-300 ease-out
                     ${showCompleted ? 'opacity-100 transform-none' : 'opacity-0 translate-y-2 pointer-events-none'}
                   `}>
-                    <GlowButton className="w-full" icon={<CheckCircle className="w-5 h-5" />} onClick={handleTaskCompleted}>
-                      Task Completed
+                    <GlowButton 
+                      className={`w-full ${progressSaved ? 'bg-green-500 hover:bg-green-600' : ''}`}
+                      icon={progressSaved ? <CheckCircle className="w-5 h-5" /> : <CheckCircle className="w-5 h-5" />} 
+                      onClick={handleTaskCompleted}
+                      disabled={savingProgress || progressSaved}
+                    >
+                      {savingProgress ? (
+                        <>
+                          <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+                          Saving Progress...
+                        </>
+                      ) : progressSaved ? (
+                        '✓ Progress Saved!'
+                      ) : (
+                        'Task Completed'
+                      )}
                     </GlowButton>
                   </div>
 

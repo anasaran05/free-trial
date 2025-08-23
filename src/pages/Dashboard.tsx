@@ -120,7 +120,7 @@ export default function Dashboard() {
         throw new Error('Not authenticated');
       }
 
-      const response = await fetch(`/functions/v1/sheets-progress/api/progress/${userId}`, {
+      const response = await fetch(`https://orcusrkjjpdxtxkjefki.supabase.co/functions/v1/sheets-progress/api/progress/${userId}`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'
@@ -150,7 +150,7 @@ export default function Dashboard() {
       throw new Error('Not authenticated');
     }
 
-    const response = await fetch(`/functions/v1/sheets-progress/api/progress/${userId}`, {
+    const response = await fetch(`https://orcusrkjjpdxtxkjefki.supabase.co/functions/v1/sheets-progress/api/progress/${userId}`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${session.access_token}`,
