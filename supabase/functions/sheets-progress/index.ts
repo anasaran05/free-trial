@@ -338,9 +338,14 @@ serve(async (req) => {
     const url = new URL(req.url);
     const pathParts = url.pathname.split('/').filter(Boolean);
     
-    // Route: GET /api/progress/:userId
-    if (req.method === 'GET' && pathParts[0] === 'api' && pathParts[1] === 'progress' && pathParts[2]) {
-      const requestedUserId = pathParts[2];
+    console.log('Request URL:', req.url);
+    console.log('Path parts:', pathParts);
+    
+    // Route: GET /api/progress/:userId  
+    // Expected path: /functions/v1/sheets-progress/api/progress/:userId
+    // So pathParts should be: ['functions', 'v1', 'sheets-progress', 'api', 'progress', userId]
+    if (req.method === 'GET' && pathParts.length >= 6 && pathParts[3] === 'api' && pathParts[4] === 'progress' && pathParts[5]) {
+      const requestedUserId = pathParts[5];
       
       // Ensure user can only access their own data
       if (user.id !== requestedUserId) {
@@ -369,8 +374,8 @@ serve(async (req) => {
     }
 
     // Route: POST /api/progress/:userId
-    if (req.method === 'POST' && pathParts[0] === 'api' && pathParts[1] === 'progress' && pathParts[2]) {
-      const requestedUserId = pathParts[2];
+    if (req.method === 'POST' && pathParts.length >= 6 && pathParts[3] === 'api' && pathParts[4] === 'progress' && pathParts[5]) {
+      const requestedUserId = pathParts[5];
       
       // Ensure user can only update their own data
       if (user.id !== requestedUserId) {
@@ -412,7 +417,7 @@ serve(async (req) => {
     }
 
     // Route: POST /api/progress/batch
-    if (req.method === 'POST' && pathParts[0] === 'api' && pathParts[1] === 'progress' && pathParts[2] === 'batch') {
+    if (req.method === 'POST' && pathParts.length >= 6 && pathParts[3] === 'api' && pathParts[4] === 'progress' && pathParts[5] === 'batch') {
       const body = await req.json();
       
       if (!Array.isArray(body) || body.length === 0) {
