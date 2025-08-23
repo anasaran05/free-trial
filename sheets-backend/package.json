@@ -1,4 +1,3 @@
-cat > server.js <<'EOF'
 {
   "name": "sheets-backend",
   "version": "0.1.0",
@@ -14,4 +13,3 @@ cat > server.js <<'EOF'
     "googleapis": "^120.0.0"
   }
 }
-EOF
