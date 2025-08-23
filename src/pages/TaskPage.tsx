@@ -11,11 +11,8 @@ import { fetchTasks, organizeTasks, findTask, Task } from '@/lib/csv';
 import { fetchTopics, organizeTopics, getTopicsForLesson, isQuizPassed } from '@/lib/learning';
 import { BookOpen, ChevronRight, Award, CheckCircle, FileText, Lock, GraduationCap } from 'lucide-react';
 
-
-
 const CSV_URL = import.meta.env.VITE_CSV_URL
   || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRrzHdNL8FRSooYojNPyBU2f66Tgr-DgwA6xB_HAK-azRx_s8PvbKUwzO5OzjzVdPGw-qeNOl68Asx6/pub?output=csv';
-const WIX_RETURN_URL = import.meta.env.VITE_WIX_RETURN_URL || 'https://example.com/return';
 
 export default function TaskPage() {
   const { courseId, chapterId, taskId } = useParams<{ courseId: string; chapterId: string; taskId: string }>();
@@ -39,6 +36,8 @@ export default function TaskPage() {
     forms.forEach((_, i) => set.add(`form_${i}`));
     return set;
   }, [task]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadTask();
@@ -154,19 +153,82 @@ export default function TaskPage() {
       return next;
     });
   };
-  const navigate = useNavigate();
-  
+
+  const checkUserAuth = async () => {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    
+    console.log('🔍 Auth check:');
+    console.log('- Session exists:', !!session);
+    console.log('- User ID:', session?.user?.id);
+    console.log('- Email:', session?.user?.email);
+    
+    return { isAuthenticated: !!session, session, error };
+  };
+
+  const saveProgress = async (progressData: any) => {
+    try {
+      console.log('🔄 Checking user session...');
+      
+      // Get the current authenticated user session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('❌ Session error:', sessionError);
+        return { success: false, error: 'Session error' };
+      }
+      
+      if (!session || !session.user) {
+        console.error('❌ No active session found - user needs to login');
+        return { success: false, error: 'User not authenticated' };
+      }
+      
+      console.log('✅ User authenticated:', session.user.id);
+      
+      const userId = session.user.id;
+      const url = `${SUPABASE_URL}/functions/v1/sheets-progress/api/progress/${userId}`;
+      
+      console.log('🚀 Making request to:', url);
+      console.log('📤 Progress data:', progressData);
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`, // This is the key fix!
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(progressData)
+      });
+      
+      console.log('📡 Response status:', response.status);
+      
+      const responseData = await response.json();
+      console.log('📥 Response data:', responseData);
+      
+      if (!response.ok) {
+        console.error('❌ API Error:', responseData);
+        return { success: false, error: responseData.error || 'Unknown error' };
+      }
+      
+      console.log('✅ Progress saved successfully!');
+      return { success: true, data: responseData };
+      
+    } catch (error) {
+      console.error('❌ Failed to save progress:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  };
+
   const handleTaskCompleted = async () => {
     setSavingProgress(true);
     setProgressSaved(false);
 
     try {
-      // Get current authenticated user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      const { data: { session } } = await supabase.auth.getSession();
+      // Check authentication first
+      const { isAuthenticated, session } = await checkUserAuth();
       
-      if (authError || !user || !session) {
-        console.error('User not authenticated');
+      if (!isAuthenticated) {
+        console.error('❌ User not authenticated, cannot save progress');
+        alert('Please log in to save your progress');
         return;
       }
 
@@ -184,23 +246,14 @@ export default function TaskPage() {
 
       console.log('Saving progress:', progressData);
 
-      // Call the Google Sheets Edge Function using full URL
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/sheets-progress/api/progress/${user.id}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(progressData)
-      });
+      // Save progress using the updated function
+      const result = await saveProgress(progressData);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to save progress');
+      if (!result.success) {
+        throw new Error(result.error);
       }
 
-      const result = await response.json();
-      console.log('Progress saved successfully:', result);
+      console.log('Progress saved successfully:', result.data);
       setProgressSaved(true);
 
       // Keep existing sessionStorage logic for UI consistency
@@ -225,7 +278,13 @@ export default function TaskPage() {
       
     } catch (error) {
       console.error('Failed to save progress:', error);
-      alert('Failed to save progress. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      if (errorMessage.includes('not authenticated')) {
+        alert('Please log in to save your progress');
+      } else {
+        alert('Failed to save progress. Please try again.');
+      }
     } finally {
       setSavingProgress(false);
     }
