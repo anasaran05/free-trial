@@ -12,6 +12,7 @@ import ChapterPage from "./pages/ChapterPage";
 import LessonPage from "./pages/LessonPage";
 import LearningPage from "./pages/LearningPage";
 import TaskPage from "./pages/TaskPage";
+import Dashboard from "./pages/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/courses" element={<CoursesIndex />} />
           <Route path="/courses/:courseId" element={<CoursePage />} />
           <Route path="/courses/:courseId/chapters/:chapterId" element={<ChapterPage />} />
