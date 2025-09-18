@@ -111,6 +111,13 @@ function CTAPage() {
   useScrollRiseAnimation(ctaRef);
   useScrollRiseAnimation(recommendedRef);
 
+  // Scroll to Hero Section on mount or location change
+  useEffect(() => {
+    if (heroRef.current) {
+      heroRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [location.pathname]); // Trigger on location change
+
   useEffect(() => {
     setMounted(true);
     loadCourses();
@@ -201,22 +208,21 @@ function CTAPage() {
         )}
 
         {/* Hero Section */}
-       <section 
-  ref={heroRef}
-  className="w-full h-screen flex flex-col items-center justify-center text-center px-4"
->
-  <h1 className="text-4xl sm:text-6xl md:text-9xl font-extrabold text-white mb-12 tracking-tight animate-rise-from-bottom">
-    Congratulations!
-  </h1>
-  <p className="text-lg sm:text-3xl text-gray-300 mb-12 leading-relaxed animate-rise-from-bottom animate-delay-300">
-    You've completed your Free Trial with{" "}
-    <span className="text-primary font-semibold">ΩMEGA</span>!
-  </p>
-  <p className="text-base sm:text-2xl text-gray-400 max-w-2xl mx-auto mt-6 animate-rise-from-bottom animate-delay-600">
-    We hope you enjoyed mastering your healthcare skills. Ready to take the
-    next step?
-  </p>
-</section>
+        <section 
+          ref={heroRef}
+          className="w-full h-screen flex flex-col items-center justify-center text-center px-4"
+        >
+          <h1 className="text-4xl sm:text-6xl md:text-9xl font-extrabold text-white mb-12 tracking-tight animate-rise-from-bottom">
+            Congratulations!
+          </h1>
+          <p className="text-lg sm:text-3xl text-gray-300 mb-10 leading-relaxed animate-rise-from-bottom animate-delay-300">
+            You've completed your Free Trial with{" "}
+            <span className="text-primary font-semibold">ΩMEGA</span>!
+          </p>
+          <p className="text-base sm:text-2xl text-gray-400 max-w-2xl mx-auto mt-4 animate-rise-from-bottom animate-delay-600">
+            It’s time to turn your skills into a career!
+          </p>
+        </section>
 
       {/* Upgrade Section */}
 <motion.section
@@ -227,16 +233,16 @@ function CTAPage() {
   transition={{ duration: 0.6 }}
 >
   <div className="max-w-6xl mx-auto">
-    {/* Heading */}
-    <motion.h2
-      className="text-8xl font-bold bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent text-center"
-      initial={{ scale: 0.9 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 0.4 }}
-    >
-       Take the Next Step – Go Pro
-    </motion.h2>
-
+   {/* Heading */}
+<motion.h2
+  className="text-8xl font-bold bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent text-center 
+             animate-gradient-x"
+  initial={{ scale: 0.9 }}
+  animate={{ scale: 1 }}
+  transition={{ duration: 0.4 }}
+>
+  Take the Next Step.
+</motion.h2>
     {/* Subheading */}
     <motion.p
   className="text-lg text-center text-gray-300 max-w-2xl mx-auto mt-3"
@@ -249,183 +255,192 @@ function CTAPage() {
 </motion.p>
 
     {/* Feature Cards Grid */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-      {[
-        {
-          title: "1-on-1 Mentorship",
-          description: "Guidance from industry experts to fast-track your career.",
-          icon: <Users className="w-8 h-8 text-purple-400" />,
-        },
-        {
-          title: "Exclusive LMS Dashboard",
-          description: "Track your progress, view analytics, and measure skill growth.",
-          icon: <BarChart className="w-8 h-8 text-purple-400" />,
-        },
-        {
-          title: "Real-World Simulations",
-          description: "Experience how the job really feels — before Day 1.",
-          icon: <FlaskConical className="w-8 h-8 text-purple-400" />,
-        },
-        {
-          title: "Skill Challenges & Quizzes",
-          description: "Practice solving real industry problems.",
-          icon: <Target className="w-8 h-8 text-purple-400" />,
-        },
-        {
-          title: "Certifications & Portfolio Proof",
-          description: "Showcase your growth and attract recruiters.",
-          icon: <Trophy className="w-8 h-8 text-purple-400" />,
-        },
-        {
-          title: "6 Self-Paced Courses",
-          description: "Learn at your own speed with mentorship support.",
-          icon: <BookOpen className="w-8 h-8 text-purple-400" />,
-        },
-      ].map((feature, index) => (
-        <motion.div
-          key={index}
-          className="p-6 bg-gray-800/30 border border-gray-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-opacity-50"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 * index }}
-          whileHover={{ y: -8, transition: { duration: 0.2 } }}
-        >
-          <div className="flex items-center gap-3 mb-3">
-            {feature.icon}
-            <h3 className="font-semibold text-lg text-white">{feature.title}</h3>
-          </div>
-          <p className="text-gray-300 text-sm">{feature.description}</p>
-        </motion.div>
-      ))}
-    </div>
-
-    {/* Discount & Social Proof */}
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+  {[
+    {
+      title: "1-on-1 Mentorship",
+      description: "Guidance from industry experts to fast-track your career.",
+      icon: <Users className="w-8 h-8 text-purple-400 transition-colors duration-300" />,
+    },
+    {
+      title: "Exclusive LMS Dashboard",
+      description: "Track your progress, view analytics, and measure skill growth.",
+      icon: <BarChart className="w-8 h-8 text-purple-400 transition-colors duration-300" />,
+    },
+    {
+      title: "Real-World Simulations",
+      description: "Experience how the job really feels — before Day 1.",
+      icon: <FlaskConical className="w-8 h-8 text-purple-400 transition-colors duration-300" />,
+    },
+    {
+      title: "Skill Challenges & Quizzes",
+      description: "Practice solving real industry problems.",
+      icon: <Target className="w-8 h-8 text-purple-400 transition-colors duration-300" />,
+    },
+    {
+      title: "Certifications & Portfolio Proof",
+      description: "Showcase your growth and attract recruiters.",
+      icon: <Trophy className="w-8 h-8 text-purple-400 transition-colors duration-300" />,
+    },
+    {
+      title: "6 Self-Paced Courses",
+      description: "Learn at your own speed with mentorship support.",
+      icon: <BookOpen className="w-8 h-8 text-purple-400 transition-colors duration-300" />,
+    },
+  ].map((feature, index) => (
     <motion.div
-      className="text-white rounded-xl p-6 text-center shadow-lg mt-8 bg-gray-800/30 bg-opacity-50 border border-gray-700"
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
-    >
-      <h3 className="text-2xl font-semibold">🎁 Bonus Offer</h3>
-      <p className="mt-2">Drop a 5 star google review & get a chance to avail a scholarship of up to <span className="font-bold">50% on any</span> pro training course!</p>
-    </motion.div>
-
-    {/* CTA Button */}
-    <motion.div
-      className="text-center mt-8"
+      key={index}
+      className="p-6 bg-gray-800/30 border border-gray-700 rounded-2xl shadow-lg bg-opacity-50 transition-all duration-300 group hover:shadow-xl"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.2 }}
+      transition={{ duration: 0.4, delay: 0.1 * index }}
+      whileHover={{ y: -8, scale: 1.03, transition: { duration: 0.3 } }}
     >
-      <a
-        href="https://wa.me/message/FPKJUYH7SPHQE1"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-block text-lg px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition-transform hover:shadow-[0_0_20px_rgba(139,92,246,0.5)] focus:outline-none focus:ring-2 focus:ring-purple-400"
-        aria-label="Upgrade to ProTraining"
-      >
-        ✨ Upgrade Now
-      </a>
+      <div className="flex items-center gap-3 mb-3">
+        {React.cloneElement(feature.icon, {
+          className: feature.icon.props.className + " group-hover:text-red-800",
+        })}
+        <h3 className="font-semibold text-lg text-white transition-colors duration-300 group-hover:text-green-400">
+          {feature.title}
+        </h3>
+      </div>
+      <p className="text-gray-300 text-sm transition-colors duration-300 group-hover:text-gray-100">
+        {feature.description}
+      </p>
     </motion.div>
+  ))}
+</div>
+{/* Discount & Social Proof */}
+<motion.div
+  className="text-white rounded-xl p-6 shadow-lg mt-8 bg-gray-800/30 bg-opacity-50 border border-gray-700 flex flex-col sm:flex-row items-center justify-between"
+  initial={{ opacity: 0, scale: 0.8 }}
+  animate={{ opacity: 1, scale: 1 }}
+  transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
+>
+  {/* Left side - text */}
+  <div className="text-center sm:text-left mb-4 sm:mb-0">
+    <h3 className="text-2xl text-green-600 font-semibold">AVAIL UPTO 50% SCHOLARSHIP!!</h3>
+    <p className="mt-2">
+      Drop a 5 star google review & get a chance to avail a scholarship of up to <span className= "text-blue-600 font-bold">50% on any</span> pro training course!
+    </p>
   </div>
-</motion.section>
 
-        {/* Review Buttons - Scroll Rise */}
-        <section ref={reviewRef} className="opacity-0 translate-y-10 flex flex-col sm:flex-row gap-4 justify-center mb-16">
-          <a
-            href="https://www.google.com/search?sca_esv=fed2f1198a559411&rlz=1C5MACD_enIN1164IN1164&sxsrf=AE3TifNMXX6HD5eZlXH_ynjNTHaVhkfZEw:1758167283249&si=AMgyJEtREmoPL4P1I5IDCfuA8gybfVI2d5Uj7QMwYCZHKDZ-E5QJkKLwyRzatmMuzKz9qcHJvnQ1ED2zh5Af_v6kgvLNIcHG0_5eirBWOthtY0FkHJOwegXvLezGoUJekP_77tUAac6w&q=ZANE+ProEd+Reviews&sa=X&ved=2ahUKEwi_v_7Cs-GPAxXAoGMGHbuXKccQ0bkNegQIHxAD&cshid=1758167286614497&biw=1960&bih=1108&dpr=1.5#lrd=0x2546bc9aff207035:0x8247e94bc20e966a,3,,,,"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Leave a Google Review"
-          >
-            Google Review
+  {/* Right side - Google Review Button */}
+  <a
+    href="https://www.google.com/search?sca_esv=fed2f1198a559411&rlz=1C5MACD_enIN1164IN1164&sxsrf=AE3TifNMXX6HD5eZlXH_ynjNTHaVhkfZEw:1758167283249&si=AMgyJEtREmoPL4P1I5IDCfuA8gybfVI2d5Uj7QMwYCZHKDZ-E5QJkKLwyRzatmMuzKz9qcHJvnQ1ED2zh5Af_v6kgvLNIcHG0_5eirBWOthtY0FkHJOwegXvLezGoUJekP_77tUAac6w&q=ZANE+ProEd+Reviews&sa=X&ved=2ahUKEwi_v_7Cs-GPAxXAoGMGHbuXKccQ0bkNegQIHxAD&cshid=1758167286614497&biw=1960&bih=1108&dpr=1.5#lrd=0x2546bc9aff207035:0x8247e94bc20e966a,3,,,,"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-medium shadow-md border border-gray-300 transition-all duration-300 hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+    aria-label="Leave a Google Review">
+             <img src="https://img.icons8.com/color/48/google-logo.png"
+            alt="google-logo"
+            className="w-6 h-6"
+             />
+           Google Review
           </a>
-        </section>
-
+        </motion.div>   
+       </div>
+     </motion.section> 
+        
         {/* ProTraining Features - Scroll Rise */}
-        <section ref={featuresRef} className="opacity-0 translate-y-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mb-16 px-4">
-          {[
-            {
-              title: "Advanced Simulations",
-              description: "Immerse yourself in realistic healthcare scenarios and assessments.",
-            },
-            {
-              title: "Certification",
-              description: "Earn credentials recognized by top healthcare organizations.",
-            },
-            {
-              title: "Career Advisory",
-              description: "Personalized guidance to accelerate your healthcare career.",
-            },
-            {
-              title: "Exclusive Community",
-              description: "Join a network of peers and mentors on LinkedIn & Instagram.",
-            },
-          ].map((feature, index) => (
-            <div
-              key={index}
-              className="p-6 bg-gray-800/50 border border-gray-700 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-            >
-              <h3 className="font-semibold text-lg text-white mb-2">
-                {feature.title}
-              </h3>
-              <p className="text-gray-300 text-sm">{feature.description}</p>
-            </div>
-          ))}
-        </section>
+<section
+  ref={featuresRef}
+  className="opacity-0 translate-y-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mb-16 px-4"
+>
+  {[
+    {
+      title: "Advanced Simulations",
+      description: "Immerse yourself in realistic healthcare scenarios and assessments.",
+    },
+    {
+      title: "Certification",
+      description: "Earn credentials recognized by top healthcare organizations.",
+    },
+    {
+      title: "Career Advisory",
+      description: "Personalized guidance to accelerate your healthcare career.",
+    },
+    {
+      title: "Exclusive Community",
+      description: "Join a network of peers and mentors on LinkedIn & Instagram.",
+    },
+  ].map((feature, index) => (
+    <div
+      key={index}
+      className="group p-6 bg-gray-800/50 border border-gray-700 rounded-lg shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+    >
+      <h3 className="font-semibold text-lg text-white mb-2 transition-colors duration-300 group-hover:text-blue-600">
+        {feature.title}
+      </h3>
+      <p className="text-gray-300 text-sm transition-colors duration-300 group-hover:text-white">
+        {feature.description}
+      </p>
+    </div>
+  ))}
+</section>
 
-        {/* Social Links - Scroll Rise */}
-        <section ref={socialRef} className="opacity-0 translate-y-10 flex flex-col sm:flex-row gap-4 justify-center mb-16">
-          {[
-            {
-              href: "https://www.linkedin.com/company/zanelearning",
-              icon: <Linkedin className="w-5 h-5" />,
-              label: "LinkedIn",
-              color: "hover:bg-blue-600",
-              focusRing: "focus:ring-blue-500",
-            },
-            {
-              href: "https://www.instagram.com/zaneproed",
-              icon: <Instagram className="w-5 h-5" />,
-              label: "Instagram",
-              color: "hover:bg-pink-600",
-              focusRing: "focus:ring-pink-500",
-            },
-            {
-              href: "https://zaneproed.com",
-              icon: <Globe className="w-5 h-5" />,
-              label: "Website",
-              color: "hover:bg-gray-700",
-              focusRing: "focus:ring-gray-500",
-            },
-          ].map((social, index) => (
-            <a
-              key={index}
-              href={social.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`flex items-center gap-2 px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-gray-200 ${social.color} hover:text-white transition-all duration-300 hover:shadow-md focus:outline-none focus:ring-2 ${social.focusRing}`}
-              aria-label={`Visit our ${social.label}`}
-            >
-              {social.icon}
-              <span>{social.label}</span>
-            </a>
-          ))}
-        </section>
+ {/* CTA Button */}
+<motion.div
+  className="text-center mt-8"
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.4, delay: 0.2 }}
+>
+  <a
+    href="https://wa.me/message/FPKJUYH7SPHQE1"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block text-lg px-8 py-4 rounded-2xl bg-white text-black font-semibold shadow-lg 
+               border border-gray-300 transition-all duration-300
+               hover:bg-black hover:text-white hover:shadow-xl hover:scale-105
+               focus:outline-none focus:ring-2 focus:ring-gray-400"
+    aria-label="Upgrade to ProTraining"
+  >
+    Upgrade Now
+  </a>
+</motion.div>
 
-        {/* Call to Action - Scroll Rise */}
-        <section ref={ctaRef} className="opacity-0 translate-y-10 mb-16">
-          <a
-            href="https://zaneproed.com/protraining"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-blue-500 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:bg-blue-600 transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            aria-label="Enroll in ProTraining"
-          >
-            Enroll in ProTraining
-          </a>
-        </section>
+{/* Social Links - Scroll Rise */}
+<section
+  ref={socialRef}
+  className="opacity-0 translate-y-10 flex flex-col sm:flex-row gap-4 justify-center mb-16 mt-12" // <-- added mt-12 for spacing
+>
+  {[
+    {
+      href: "https://www.linkedin.com/company/zanelearning",
+      icon: <Linkedin className="w-5 h-5" />,
+      label: "LinkedIn",
+      color: "hover:bg-blue-600",
+      focusRing: "focus:ring-blue-500",
+    },
+    {
+      href: "https://www.instagram.com/zaneproed",
+      icon: <Instagram className="w-5 h-5" />,
+      label: "Instagram",
+      color: "hover:bg-pink-600",
+      focusRing: "focus:ring-pink-500",
+    },
+    {
+      href: "https://zaneproed.com",
+      icon: <Globe className="w-5 h-5" />,
+      label: "Website",
+      color: "hover:bg-gray-700",
+      focusRing: "focus:ring-gray-500",
+    },
+  ].map((social, index) => (
+    <a
+      key={index}
+      href={social.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`flex items-center gap-2 px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-gray-200 ${social.color} hover:text-white transition-all duration-300 hover:shadow-md focus:outline-none focus:ring-2 ${social.focusRing}`}
+      aria-label={`Visit our ${social.label}`}
+    >
+      {social.icon}
+      <span>{social.label}</span>
+    </a>
+  ))}
+</section>
 
         {/* Recommended Free Trial Courses - Infinite Horizontal Scroll */}
         <section ref={recommendedRef} className="opacity-0 translate-y-10 max-w-6xl mx-auto mb-16 px-4 w-full">
@@ -457,7 +472,7 @@ function CTAPage() {
                     >
                       <CardHeader>
                         <div className="flex items-start justify-between mb-4">
-                          <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                          <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
                             <Award className="w-6 h-6 text-white" />
                           </div>
                           <div className="text-right">
@@ -472,9 +487,9 @@ function CTAPage() {
                         <CardTitle className="text-xl text-white">
                           {course.name}
                         </CardTitle>
-                        <CardDescription className="text-gray-300">
-                          Comprehensive training program covering essential healthcare administration skills.
-                        </CardDescription>
+                        <CardDescription className="text-gray-300 break-words whitespace-normal">
+  Comprehensive training program covering essential healthcare administration skills.
+</CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-6">
                         <div>
@@ -505,12 +520,12 @@ function CTAPage() {
                           </div>
                         </div>
                         <div className="pt-4">
-                          <a href={`/courses/${course.id}`} className="block">
-                            <PrimaryButton className="w-full">
-                              {stats.completedTasks > 0 ? 'Continue Course' : 'Start Course'}
-                            </PrimaryButton>
-                          </a>
-                        </div>
+  <a href={`/courses/${course.id}`} className="block">
+    <button className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded">
+      {stats.completedTasks > 0 ? 'Continue Course' : 'Start Course'}
+    </button>
+  </a>
+</div>
                       </CardContent>
                     </Card>
                   </div>
