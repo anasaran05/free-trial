@@ -11,7 +11,13 @@ import ChapterPage from "./pages/ChapterPage";
 import LessonPage from "./pages/LessonPage";
 import LearningPage from "./pages/LearningPage";
 import TaskPage from "./pages/TaskPage";
+
 import CTAPage from "../src/pages/ctapage.tsx";
+
+import Dashboard from "./pages/Dashboard";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
+
 
 const queryClient = new QueryClient();
 
@@ -23,6 +29,9 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/courses" element={<CoursesIndex />} />
           <Route path="/courses/:courseId" element={<CoursePage />} />
           <Route path="/courses/:courseId/chapters/:chapterId" element={<ChapterPage />} />

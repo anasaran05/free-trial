@@ -1,1 +1,4 @@
 project_id = "orcusrkjjpdxtxkjefki"
+
+[functions.sheets-progress]
+verify_jwt = true

@@ -1,6 +1,7 @@
 import { MdDone } from "react-icons/md";
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { GlowButton } from '@/components/Button';
 import { Play, BookOpen, Award, BarChart3, Zap } from 'lucide-react';
 
@@ -29,10 +30,24 @@ const features = [
 
 export default function Index() {
   const [mounted, setMounted] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleStartTraining = async () => {
+    // Check if user is authenticated
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session) {
+      // User is logged in - redirect to dashboard
+      navigate('/dashboard');
+    } else {
+      // User not logged in - redirect to sign in
+      navigate('/signin');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,15 +79,14 @@ export default function Index() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in">
-              <Link to="/courses">
-                <GlowButton
-                  size="lg"
-                  icon={<Play className="w-5 h-5" />}
-                  className="bg-[#b00610] hover:bg-[#b00900] text-white"
-                >
-                  Start Training
-                </GlowButton>
-              </Link>
+              <GlowButton
+                size="lg"
+                icon={<Play className="w-5 h-5" />}
+                className="bg-[#b00610] hover:bg-[#b00900] text-white"
+                onClick={handleStartTraining}
+              >
+                Start Training
+              </GlowButton>
             </div>
           </div>
         </div>

@@ -1,0 +1,2 @@
+export const SUPABASE_URL = "https://orcusrkjjpdxtxkjefki.supabase.co";
+export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yY3VzcmtqanBkeHR4a2plZmtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3NTc2ODEsImV4cCI6MjA3MTMzMzY4MX0.0IyPMlNCaTw78PwlQX3yMUGe0fp86HAfiSEJxTpWEpE";
