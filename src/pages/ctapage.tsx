@@ -201,132 +201,134 @@ function CTAPage() {
         )}
 
         {/* Hero Section */}
-        <section 
-          ref={heroRef}
-          className="w-full h-screen flex flex-col items-center justify-center text-center px-4"
-        >
-          <h1 className="text-4xl sm:text-5xl md:text-9xl font-extrabold text-white mb-4 tracking-tight animate-rise-from-bottom">
-            Congratulations!
-          </h1>
-          <p className="text-lg sm:text-2xl text-gray-300 mb-6 leading-relaxed animate-rise-from-bottom animate-delay-300">
-            You've completed your Free Trial with{" "}
-            <span className="text-primary font-semibold">ΩMEGA</span>!
-          </p>
-          <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto animate-rise-from-bottom animate-delay-600">
-            We hope you enjoyed mastering your healthcare skills. Ready to take the
-            next step?
-          </p>
-        </section>
+       <section 
+  ref={heroRef}
+  className="w-full h-screen flex flex-col items-center justify-center text-center px-4"
+>
+  <h1 className="text-4xl sm:text-6xl md:text-9xl font-extrabold text-white mb-12 tracking-tight animate-rise-from-bottom">
+    Congratulations!
+  </h1>
+  <p className="text-lg sm:text-3xl text-gray-300 mb-12 leading-relaxed animate-rise-from-bottom animate-delay-300">
+    You've completed your Free Trial with{" "}
+    <span className="text-primary font-semibold">ΩMEGA</span>!
+  </p>
+  <p className="text-base sm:text-2xl text-gray-400 max-w-2xl mx-auto mt-6 animate-rise-from-bottom animate-delay-600">
+    We hope you enjoyed mastering your healthcare skills. Ready to take the
+    next step?
+  </p>
+</section>
 
-        {/* Upgrade Section */}
-        <motion.section
-          ref={upgradeSectionRef}
-          className="opacity-0 translate-y-10 w-full py-12 px-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-opacity-10"
-          initial={{ opacity: 0, y: 30 }}
+      {/* Upgrade Section */}
+<motion.section
+  ref={upgradeSectionRef}
+  className="opacity-0 translate-y-10 w-full py-12 px-6"
+  initial={{ opacity: 0, y: 30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6 }}
+>
+  <div className="max-w-6xl mx-auto">
+    {/* Heading */}
+    <motion.h2
+      className="text-8xl font-bold bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent text-center"
+      initial={{ scale: 0.9 }}
+      animate={{ scale: 1 }}
+      transition={{ duration: 0.4 }}
+    >
+       Take the Next Step – Go Pro
+    </motion.h2>
+
+    {/* Subheading */}
+    <motion.p
+  className="text-lg text-center text-gray-300 max-w-2xl mx-auto mt-3"
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.4, delay: 0.2 }}
+>
+  Unlock the full experience with{" "}
+  <span className="text-2xl text-primary font-semibold">Zane ProEd</span>’s Pro-Training Courses – your next move to upskill, gain industry exposure, and become job-ready.
+</motion.p>
+
+    {/* Feature Cards Grid */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+      {[
+        {
+          title: "1-on-1 Mentorship",
+          description: "Guidance from industry experts to fast-track your career.",
+          icon: <Users className="w-8 h-8 text-purple-400" />,
+        },
+        {
+          title: "Exclusive LMS Dashboard",
+          description: "Track your progress, view analytics, and measure skill growth.",
+          icon: <BarChart className="w-8 h-8 text-purple-400" />,
+        },
+        {
+          title: "Real-World Simulations",
+          description: "Experience how the job really feels — before Day 1.",
+          icon: <FlaskConical className="w-8 h-8 text-purple-400" />,
+        },
+        {
+          title: "Skill Challenges & Quizzes",
+          description: "Practice solving real industry problems.",
+          icon: <Target className="w-8 h-8 text-purple-400" />,
+        },
+        {
+          title: "Certifications & Portfolio Proof",
+          description: "Showcase your growth and attract recruiters.",
+          icon: <Trophy className="w-8 h-8 text-purple-400" />,
+        },
+        {
+          title: "6 Self-Paced Courses",
+          description: "Learn at your own speed with mentorship support.",
+          icon: <BookOpen className="w-8 h-8 text-purple-400" />,
+        },
+      ].map((feature, index) => (
+        <motion.div
+          key={index}
+          className="p-6 bg-gray-800/30 border border-gray-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 bg-opacity-50"
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.4, delay: 0.1 * index }}
+          whileHover={{ y: -8, transition: { duration: 0.2 } }}
         >
-          <div className="max-w-6xl mx-auto">
-            {/* Heading */}
-            <motion.h2
-              className="text-8xl font-bold bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent text-center"
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.4 }}
-            >
-              🚀 Take the Next Step – Go Pro
-            </motion.h2>
-
-            {/* Subheading */}
-            <motion.p
-              className="text-lg text-center text-gray-300 max-w-2xl mx-auto mt-3"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            >
-              Unlock the full experience with Zane ProEd’s Pro-Training Courses – your next move to upskill, gain industry exposure, and become job-ready.
-            </motion.p>
-
-            {/* Feature Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-              {[
-                {
-                  title: "1-on-1 Mentorship",
-                  description: "Guidance from industry experts to fast-track your career.",
-                  icon: <Users className="w-8 h-8 text-purple-400" />,
-                },
-                {
-                  title: "Exclusive LMS Dashboard",
-                  description: "Track your progress, view analytics, and measure skill growth.",
-                  icon: <BarChart className="w-8 h-8 text-purple-400" />,
-                },
-                {
-                  title: "Real-World Simulations",
-                  description: "Experience how the job really feels — before Day 1.",
-                  icon: <FlaskConical className="w-8 h-8 text-purple-400" />,
-                },
-                {
-                  title: "Skill Challenges & Quizzes",
-                  description: "Practice solving real industry problems.",
-                  icon: <Target className="w-8 h-8 text-purple-400" />,
-                },
-                {
-                  title: "Certifications & Portfolio Proof",
-                  description: "Showcase your growth and attract recruiters.",
-                  icon: <Trophy className="w-8 h-8 text-purple-400" />,
-                },
-                {
-                  title: "6 Self-Paced Courses",
-                  description: "Learn at your own speed with mentorship support.",
-                  icon: <BookOpen className="w-8 h-8 text-purple-400" />,
-                },
-              ].map((feature, index) => (
-                <motion.div
-                  key={index}
-                  className="p-6 bg-gray-800/50 border border-gray-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.1 * index }}
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    {feature.icon}
-                    <h3 className="font-semibold text-lg text-white">{feature.title}</h3>
-                  </div>
-                  <p className="text-gray-300 text-sm">{feature.description}</p>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Discount & Social Proof */}
-            <motion.div
-              className="bg-gradient-to-r from-green-400 to-emerald-600 text-white rounded-xl p-6 text-center shadow-lg mt-8"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
-            >
-              <h3 className="text-2xl font-semibold">🎁 Bonus Offer</h3>
-              <p className="mt-2">Drop a 5 star google review & get a chance to avail a scholarship of upto<span className="font-bold"> 50% on any</span> pro training course !</p>
-            </motion.div>
-
-            {/* CTA Button */}
-            <motion.div
-              className="text-center mt-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            >
-              <a
-                href="https://wa.me/message/FPKJUYH7SPHQE1"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block text-lg px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition-transform hover:shadow-[0_0_20px_rgba(139,92,246,0.5)] focus:outline-none focus:ring-2 focus:ring-purple-400"
-                aria-label="Upgrade to ProTraining"
-              >
-                ✨ Upgrade Now
-              </a>
-            </motion.div>
+          <div className="flex items-center gap-3 mb-3">
+            {feature.icon}
+            <h3 className="font-semibold text-lg text-white">{feature.title}</h3>
           </div>
-        </motion.section>
+          <p className="text-gray-300 text-sm">{feature.description}</p>
+        </motion.div>
+      ))}
+    </div>
+
+    {/* Discount & Social Proof */}
+    <motion.div
+      className="text-white rounded-xl p-6 text-center shadow-lg mt-8 bg-gray-800/30 bg-opacity-50 border border-gray-700"
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
+    >
+      <h3 className="text-2xl font-semibold">🎁 Bonus Offer</h3>
+      <p className="mt-2">Drop a 5 star google review & get a chance to avail a scholarship of up to <span className="font-bold">50% on any</span> pro training course!</p>
+    </motion.div>
+
+    {/* CTA Button */}
+    <motion.div
+      className="text-center mt-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.2 }}
+    >
+      <a
+        href="https://wa.me/message/FPKJUYH7SPHQE1"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block text-lg px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold shadow-lg hover:scale-105 transition-transform hover:shadow-[0_0_20px_rgba(139,92,246,0.5)] focus:outline-none focus:ring-2 focus:ring-purple-400"
+        aria-label="Upgrade to ProTraining"
+      >
+        ✨ Upgrade Now
+      </a>
+    </motion.div>
+  </div>
+</motion.section>
 
         {/* Review Buttons - Scroll Rise */}
         <section ref={reviewRef} className="opacity-0 translate-y-10 flex flex-col sm:flex-row gap-4 justify-center mb-16">
