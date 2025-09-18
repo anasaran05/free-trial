@@ -9,7 +9,7 @@ import { fetchTasks, organizeTasks, Course, Chapter, Lesson, calculateProgress }
 import { fetchTopics, organizeTopics, getTopicsForLesson, getWatchedTopics, isQuizPassed } from '@/lib/learning';
 import { BookOpen, ChevronRight, Award, Clock, Play, Lock } from 'lucide-react';
 
-const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRrzHdNL8FRSooYojNPyBU2f66Tgr-DgwA6xB_HAK-azRx_s8PvbKUwzO5OzjzVdPGw-qeNOl68Asx6/pub?output=csv';
+const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
 
 export default function LessonPage() {
   const { courseId, chapterId, lessonId } = useParams<{ courseId: string; chapterId: string; lessonId: string }>();

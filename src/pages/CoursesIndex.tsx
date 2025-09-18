@@ -5,11 +5,11 @@ import Card, { CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { PrimaryButton } from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import { fetchTasks, organizeTasks, Course, calculateProgress } from '@/lib/csv';
-import { BookOpen, Clock, Award, Users, Lock, } from 'lucide-react';
+import { BookOpen, Clock, Award } from 'lucide-react';
 import Footer from "../components/Footer";
 
 // Use environment variable or fallback to sample data
-const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRrzHdNL8FRSooYojNPyBU2f66Tgr-DgwA6xB_HAK-azRx_s8PvbKUwzO5OzjzVdPGw-qeNOl68Asx6/pub?output=csv';
+const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
 
 export default function CoursesIndex() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -26,7 +26,7 @@ export default function CoursesIndex() {
       const tasks = await fetchTasks(CSV_URL);
       const organizedCourses = organizeTasks(tasks);
       
-      // Filter out dummy courses - you can adjust these conditions based on your data
+      // Filter out dummy courses
       const filteredCourses = organizedCourses.filter(course => {
         return (
           course.name && // Has a name
@@ -136,23 +136,14 @@ export default function CoursesIndex() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {courses.map((course, index) => {
               const stats = getCourseStats(course);
-              const isUnlocked = course.name.toLowerCase().includes('qa/qc'); // Only unlock QA/QC
 
               return (
                 <Card 
                   key={course.id}
                   variant="interactive"
-                  className="h-full animate-fade-in relative"
+                  className="h-full animate-fade-in"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  {/* Lock overlay for locked courses */}
-                  {!isUnlocked && (
-                    <div className="absolute inset-0 bg-background/20 backdrop-blur-[2px] flex flex-col items-center justify-center z-10 rounded-xl">
-                      <Lock className="w-10 h-10 text-muted-foreground mb-2" />
-                      <p className="text-muted-foreground font-medium">Locked</p>
-                    </div>
-                  )}
-
                   <CardHeader>
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
@@ -212,17 +203,11 @@ export default function CoursesIndex() {
                     
                     {/* Action Button */}
                     <div className="pt-4">
-                      {isUnlocked ? (
-                        <Link to={`/courses/${course.id}`} className="block">
-                          <PrimaryButton className="w-full">
-                            {stats.completedTasks > 0 ? 'Continue Course' : 'Start Course'}
-                          </PrimaryButton>
-                        </Link>
-                      ) : (
-                        <PrimaryButton className="w-full" disabled>
-                          Locked
+                      <Link to={`/courses/${course.id}`} className="block">
+                        <PrimaryButton className="w-full">
+                          {stats.completedTasks > 0 ? 'Continue Course' : 'Start Course'}
                         </PrimaryButton>
-                      )}
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>
@@ -230,8 +215,7 @@ export default function CoursesIndex() {
             })}
           </div>
         )}
-        </div>
+      </div>
     </div>
-    
   ); 
 }

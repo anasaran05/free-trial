@@ -1,0 +1,127 @@
+courseId,courseName,chapterId,chapterName,lessonId,lessonName,taskId,taskTitle,scenario,pdfUrls,tallyUrls,answerKeyUrl,xp,instructions,topicId,topicTitle,videoUrl,description,order,questionId,question,options,correct
+course_1,QA/QC,ch_1_01,Foundations of Quality Warfare,les_1_01_01,Entering the Battlefield – QMS Basics & SOP Gap Review,task_1_01_01_1,QMS Compliance Check,"Welcome to your first mission as a Junior Quality Control Analyst at Zenith Pharma Labs! Your supervisor, Ms. Rhea Patel, Quality Assurance Supervisor, needs you to ensure the lab’s Quality Management System (QMS) is on point. You’ve been tasked with checking if the lab’s batch record-keeping follows the QMS rules outlined in the SOP. Your job is to review the SOP, compare it to a lab observation, and fill out a Compliance Verification Form to confirm if the process is compliant or flag any issues. This keeps the lab’s operations safe and reliable, like a well-coordinated army following its playbook.
+
+CheckList:
+1. Review the SOP for batch record-keeping.
+2. Compare it to a lab observation to check compliance.
+3. Complete the Compliance Verification Form (100–150 words) to report your findings.
+
+Why This Matters: Checking QMS compliance ensures every pill is safe and meets standards, protecting patients and avoiding costly mistakes.",https://drive.google.com/file/d/1K0SDr6xPtfcQr_pH3YUCjAMVTI1it8zd/view?usp=sharing,https://tally.so/r/m6Bzeo,https://drive.google.com/file/d/1mFO3hiotOq3pHMEYGQtq--sIUvUq-OjA/view?usp=sharing,10,"Open SOP: Click “Reference Documents” → read Batch Record-Keeping Procedure (requires date, batch number, operator’s initials).
+Review Observation: From Reference Documents → note issue: Some batch records missing operator’s initials.
+Check Compliance: Compare SOP vs. observation → ask: Is the lab following the rule? What’s the gap?
+Open Form: Click “Fillable Document” → Compliance Verification Form.
+Complete Form:
+Compliance Status: State if compliant or non-compliant.
+Observation: Briefly describe the issue.
+Recommendation: Suggest one practical fix (100–150 words).
+Verify: Ensure findings are clear and solution is realistic.
+Check Answer: Click “Answer Portal” → review correct Compliance Verification Form.",topic_1_01_01_1,Entering the Battlefield – QMS Basics & SOP Gap Review,https://www.youtube.com/watch?v=rAfeJBhGwYQ,Unlock the essentials of Quality Management Systems (QMS) and discover how to identify and fix SOP gaps. This video provides quick practical insights to boost your organization’s quality and compliance. Perfect for beginners and quality professionals!,1,quiz_1_01_01_1_1,What are the four critical elements that a Quality Management System (QMS) coordinates in an organization?,"A) Planning, execution, monitoring, and reporting. | B) Quality standards, procedures, roles, and corrective actions. | C) Documentation, training, auditing, and compliance. | D) Policies, processes, people, and performance.",B
+course_1,QA/QC,ch_1_01,Foundations of Quality Warfare,les_1_01_01,Entering the Battlefield – QMS Basics & SOP Gap Review,,,,,,,,,,,,,,quiz_1_01_01_1_2, what does operating without QMS resemble?,A) A well-organized military unit | B) A disciplined army with clear command structure | C) A military unit without command structure | D) A strategic command center,C
+course_1,QA/QC,ch_1_01,Foundations of Quality Warfare,les_1_01_01,Entering the Battlefield – QMS Basics & SOP Gap Review,,,,,,,,,,,,,,quiz_1_01_01_1_3,What is the primary purpose of a Standard Operating Procedure (SOP) in a QMS?,A) To provide optional guidelines | B) To enforce consistent processes | C) To track employee performance | D) To handle customer complaints,B
+course_1,QA/QC,ch_1_01,Foundations of Quality Warfare,les_1_01_01,Entering the Battlefield – QMS Basics & SOP Gap Review,,,,,,,,,,,,,,quiz_1_01_01_1_4,Which standard is commonly associated with QMS in pharmaceuticals?,A) ISO 9001 | B) ISO 14001 | C) ISO 27001 | D) ISO 45001,A
+course_1,QA/QC,ch_1_01,Foundations of Quality Warfare,les_1_01_01,Entering the Battlefield – QMS Basics & SOP Gap Review,,,,,,,,,,,,,,quiz_1_01_01_1_5,What is a common gap in SOP implementation?,A) Overly detailed procedures | B) Lack of training | C) Too many audits | D) Excessive documentation,B
+course_2,Manufacturing,ch_2_01,Basics of Production Excellence,les_2_01_01,Intro to Manufacturing Processes,task_2_01_01_1,Process Optimization Check,"As a Junior Manufacturing Engineer at Apex Industries, your manager, Mr. Alex Thompson, assigns you to review the assembly line process. Identify inefficiencies in the workflow by comparing the current setup to the standard procedure and propose optimizations using a Process Improvement Form.
+
+Checklist:
+1. Review the standard manufacturing SOP.
+2. Observe the current assembly line.
+3. Fill out the Process Improvement Form (100-150 words).
+
+Why This Matters: Optimizing processes reduces waste and increases efficiency, ensuring high-quality output.",https://drive.google.com/file/d/dummy_pdf2/view?usp=sharing,https://tally.so/r/dummy_form2,https://drive.google.com/file/d/dummy_answer2/view?usp=sharing,10,"Open SOP: Click “Reference Documents” → read Assembly Line Procedure.
+Review Observation: Note delays in material handling.
+Check Efficiency: Compare SOP vs. observation.
+Open Form: Click “Fillable Document” → Process Improvement Form.
+Complete Form: Status, Observation, Recommendation (100-150 words).
+Verify and Check Answer.",topic_2_01_01_1,Intro to Manufacturing Processes,https://www.youtube.com/watch?v=cn9nxCZpIvM,Learn the fundamentals of manufacturing processes and how to optimize them for better efficiency. Ideal for new engineers!,1,quiz_2_01_01_1_1,What is the main goal of lean manufacturing?,A) Increase inventory | B) Eliminate waste | C) Maximize workforce | D) Reduce quality checks,B
+course_2,Manufacturing,ch_2_01,Basics of Production Excellence,les_2_01_01,Intro to Manufacturing Processes,,,,,,,10,"Open SOP: Click “Reference Documents” → read Assembly Line Procedure.
+Review Observation: Note delays in material handling.
+Check Efficiency: Compare SOP vs. observation.
+Open Form: Click “Fillable Document” → Process Improvement Form.
+Complete Form: Status, Observation, Recommendation (100-150 words).
+Verify and Check Answer.",,,,,,quiz_2_01_01_1_2,Which tool is used for root cause analysis in manufacturing?,A) Pareto Chart | B) Fishbone Diagram | C) Gantt Chart | D) Pie Chart,B
+course_2,Manufacturing,ch_2_01,Basics of Production Excellence,les_2_01_01,Intro to Manufacturing Processes,,,,,,,10,"Open SOP: Click “Reference Documents” → read Assembly Line Procedure.
+Review Observation: Note delays in material handling.
+Check Efficiency: Compare SOP vs. observation.
+Open Form: Click “Fillable Document” → Process Improvement Form.
+Complete Form: Status, Observation, Recommendation (100-150 words).
+Verify and Check Answer.",,,,,,quiz_2_01_01_1_3,What does GMP stand for in manufacturing?,A) Good Management Practices | B) Good Manufacturing Practices | C) General Maintenance Protocol | D) Global Market Policies,B
+course_2,Manufacturing,ch_2_01,Basics of Production Excellence,les_2_01_01,Intro to Manufacturing Processes,,,,,,,10,"Open SOP: Click “Reference Documents” → read Assembly Line Procedure.
+Review Observation: Note delays in material handling.
+Check Efficiency: Compare SOP vs. observation.
+Open Form: Click “Fillable Document” → Process Improvement Form.
+Complete Form: Status, Observation, Recommendation (100-150 words).
+Verify and Check Answer.",,,,,,quiz_2_01_01_1_4,Which is a key principle of Six Sigma?,A) Reduce variation | B) Increase speed | C) Lower costs only | D) Expand inventory,A
+course_2,Manufacturing,ch_2_01,Basics of Production Excellence,les_2_01_01,Intro to Manufacturing Processes,,,,,,,10,"Open SOP: Click “Reference Documents” → read Assembly Line Procedure.
+Review Observation: Note delays in material handling.
+Check Efficiency: Compare SOP vs. observation.
+Open Form: Click “Fillable Document” → Process Improvement Form.
+Complete Form: Status, Observation, Recommendation (100-150 words).
+Verify and Check Answer.",,,,,,quiz_2_01_01_1_5,What is JIT in manufacturing?,A) Just In Time | B) Job Instruction Training | C) Joint Improvement Team | D) Justified Inventory Tracking,A
+course_3,Regulatory Affairs,ch_3_01,Compliance Fundamentals,les_3_01_01,Understanding Regulatory Submissions,task_3_01_01_1,Submission Review,"You are a Regulatory Affairs Associate at BioReg Corp. Your lead, Dr. Elena Vasquez, tasks you with reviewing a drug submission dossier for completeness against FDA guidelines. Flag any missing sections and complete a Submission Checklist Form.
+
+Checklist:
+1. Review FDA guidelines.
+2. Check dossier contents.
+3. Complete Submission Checklist Form (100-150 words).
+
+Why This Matters: Accurate submissions prevent delays in drug approvals.",https://drive.google.com/file/d/dummy_pdf3/view?usp=sharing,https://tally.so/r/dummy_form3,https://drive.google.com/file/d/dummy_answer3/view?usp=sharing,10,"Open Guidelines: Click “Reference Documents” → read FDA Submission Requirements.
+Review Dossier: Note missing toxicology data.
+Check Completeness: Compare vs. guidelines.
+Open Form: Click “Fillable Document” → Submission Checklist Form.
+Complete Form: Status, Missing Items, Recommendations (100-150 words).
+Verify and Check Answer.",topic_3_01_01_1,Understanding Regulatory Submissions,https://www.youtube.com/watch?v=cn9nxCZpIvM,Dive into the world of regulatory submissions and learn how to ensure compliance with authorities. Great for regulatory beginners!,1,quiz_3_01_01_1_1,What does FDA stand for?,A) Food and Drug Administration | B) Federal Drug Agency | C) Food Development Association | D) Federal Directive Authority,A
+course_3,Regulatory Affairs,ch_3_01,Compliance Fundamentals,les_3_01_01,Understanding Regulatory Submissions,,,,,,,,,,,,,,quiz_3_01_01_1_2,What is IND in regulatory terms?,A) Investigational New Drug | B) International Drug Network | C) Initial Drug Notification | D) Investigational Drug Notice,A
+course_3,Regulatory Affairs,ch_3_01,Compliance Fundamentals,les_3_01_01,Understanding Regulatory Submissions,,,,,,,,,,,,,,quiz_3_01_01_1_3,Which phase tests drug safety in humans?,A) Phase 1 | B) Phase 2 | C) Phase 3 | D) Phase 4,A
+course_3,Regulatory Affairs,ch_3_01,Compliance Fundamentals,les_3_01_01,Understanding Regulatory Submissions,,,,,,,,,,,,,,quiz_3_01_01_1_4,What is EMA?,A) European Medicines Agency | B) Environmental Management Authority | C) Electronic Medical Association | D) Emergency Medical Aid,A
+course_3,Regulatory Affairs,ch_3_01,Compliance Fundamentals,les_3_01_01,Understanding Regulatory Submissions,,,,,,,,,,,,,,quiz_3_01_01_1_5,What document is submitted for market approval?,A) NDA | B) SOP | C) QMS | D) DCR,A
+course_4,Clinical Trials,ch_4_01,Ethics and Protocols,les_4_01_01,Basics of Trial Design,task_4_01_01_1,Protocol Deviation Report,"As a Clinical Research Coordinator at TrialTech Inc., your supervisor, Ms. Sarah Lee, asks you to identify deviations in a trial protocol from patient records and submit a Deviation Report Form.
+
+Checklist:
+1. Review trial protocol.
+2. Compare with patient records.
+3. Complete Deviation Report Form (100-150 words).
+
+Why This Matters: Reporting deviations maintains trial integrity and patient safety.",https://drive.google.com/file/d/dummy_pdf4/view?usp=sharing,https://tally.so/r/dummy_form4,https://drive.google.com/file/d/dummy_answer4/view?usp=sharing,10,"Open Protocol: Click “Reference Documents” → read Clinical Trial Protocol.
+Review Records: Note unauthorized dosage change.
+Check Deviation: Compare protocol vs. records.
+Open Form: Click “Fillable Document” → Deviation Report Form.
+Complete Form: Type, Description, Corrective Action (100-150 words).
+Verify and Check Answer.",topic_4_01_01_1,Basics of Trial Design,https://www.youtube.com/watch?v=cn9nxCZpIvM,Explore the basics of designing clinical trials including ethics and protocols. Essential for clinical researchers!,1,quiz_4_01_01_1_1,What is ICH GCP?,A) International Council for Harmonisation Good Clinical Practice | B) Internal Clinical Health Guidelines | C) International Clinical Harmony Protocol | D) Integrated Care Health Policy,A
+course_4,Clinical Trials,ch_4_01,Ethics and Protocols,les_4_01_01,Basics of Trial Design,,,,,,,,,,,,,,quiz_4_01_01_1_2,What is the purpose of informed consent?,A) To inform participants of risks and benefits | B) To collect payment | C) To assign treatments | D) To schedule visits,A
+course_4,Clinical Trials,ch_4_01,Ethics and Protocols,les_4_01_01,Basics of Trial Design,,,,,,,,,,,,,,quiz_4_01_01_1_3,Which committee reviews trial ethics?,A) IRB/IEC | B) FDA | C) EMA | D) WHO,A
+course_4,Clinical Trials,ch_4_01,Ethics and Protocols,les_4_01_01,Basics of Trial Design,,,,,,,,,,,,,,quiz_4_01_01_1_4,What is a placebo in trials?,A) Inactive substance | B) Active drug | C) Surgical tool | D) Data analysis method,A
+course_4,Clinical Trials,ch_4_01,Ethics and Protocols,les_4_01_01,Basics of Trial Design,,,,,,,,,,,,,,quiz_4_01_01_1_5,What is blinding in clinical trials?,A) Masking treatment assignment | B) Closing eyes | C) Data encryption | D) Trial termination,A
+course_5,Pharmacovigilance,ch_5_01,Adverse Event Monitoring,les_5_01_01,Intro to Drug Safety,task_5_01_01_1,AE Reporting,"You are a Pharmacovigilance Officer at SafePharma Ltd. Your manager, Mr. John Kim, requires you to review an adverse event report and complete an AE Assessment Form based on causality guidelines.
+
+Checklist:
+1. Review ICH guidelines on AE.
+2. Assess the report.
+3. Complete AE Assessment Form (100-150 words).
+
+Why This Matters: Proper AE reporting ensures drug safety post-market.",https://drive.google.com/file/d/dummy_pdf5/view?usp=sharing,https://tally.so/r/dummy_form5,https://drive.google.com/file/d/dummy_answer5/view?usp=sharing,10,"Open Guidelines: Click “Reference Documents” → read ICH AE Guidelines.
+Review Report: Note patient symptoms after drug intake.
+Assess Causality: Use Naranjo algorithm.
+Open Form: Click “Fillable Document” → AE Assessment Form.
+Complete Form: Causality, Severity, Recommendations (100-150 words).
+Verify and Check Answer.",topic_5_01_01_1,Intro to Drug Safety,https://www.youtube.com/watch?v=cn9nxCZpIvM,Understand the basics of pharmacovigilance and adverse event monitoring. Crucial for drug safety professionals!,1,quiz_5_01_01_1_1,What is pharmacovigilance?,A) Monitoring drug safety | B) Drug manufacturing | C) Clinical testing | D) Marketing drugs,A
+course_5,Pharmacovigilance,ch_5_01,Adverse Event Monitoring,les_5_01_01,Intro to Drug Safety,,,,,,,,,,,,,,quiz_5_01_01_1_2,What is an adverse event?,A) Any undesirable medical occurrence | B) Only serious injuries | C) Drug approval delays | D) Manufacturing defects,A
+course_5,Pharmacovigilance,ch_5_01,Adverse Event Monitoring,les_5_01_01,Intro to Drug Safety,,,,,,,,,,,,,,quiz_5_01_01_1_3,Which algorithm assesses drug causality?,A) Naranjo | B) Pareto | C) Fishbone | D) Gantt,A
+course_5,Pharmacovigilance,ch_5_01,Adverse Event Monitoring,les_5_01_01,Intro to Drug Safety,,,,,,,,,,,,,,quiz_5_01_01_1_4,What is PSUR?,A) Periodic Safety Update Report | B) Patient Safety Usage Record | C) Product Safety User Review | D) Post-Market Surveillance Report,A
+course_5,Pharmacovigilance,ch_5_01,Adverse Event Monitoring,les_5_01_01,Intro to Drug Safety,,,,,,,,,,,,,,quiz_5_01_01_1_5,Who reports AEs to authorities?,A) Pharmacovigilance teams | B) Manufacturing leads | C) Sales reps | D) Patients directly,A
+course_6,Supply Chain,ch_6_01,Logistics and Distribution,les_6_01_01,Supply Chain Basics,task_6_01_01_1,Inventory Audit,"As a Supply Chain Analyst at LogiPharm, your boss, Ms. Tina Wong, tasks you with auditing inventory levels against forecasts and completing an Inventory Adjustment Form.
+
+Checklist:
+1. Review inventory records.
+2. Compare with demand forecasts.
+3. Complete Inventory Adjustment Form (100-150 words).
+
+Why This Matters: Accurate inventory prevents shortages and overstock.",https://drive.google.com/file/d/dummy_pdf6/view?usp=sharing,https://tally.so/r/dummy_form6,https://drive.google.com/file/d/dummy_answer6/view?usp=sharing,10,"Open Records: Click “Reference Documents” → read Inventory Logs.
+Review Forecasts: Note higher demand than stock.
+Audit Levels: Compare records vs. forecasts.
+Open Form: Click “Fillable Document” → Inventory Adjustment Form.
+Complete Form: Discrepancies, Adjustments, Rationale (100-150 words).
+Verify and Check Answer.",topic_6_01_01_1,Supply Chain Basics,https://www.youtube.com/watch?v=cn9nxCZpIvM,Get started with supply chain management in pharma focusing on logistics and distribution. Perfect for analysts!,1,quiz_6_01_01_1_1,What is SCM?,A) Supply Chain Management | B) Sales Cycle Monitoring | C) Stock Control Method | D) Supplier Contract Maintenance,A
+course_6,Supply Chain,ch_6_01,Logistics and Distribution,les_6_01_01,Supply Chain Basics,,,,,,,,,,,,,,quiz_6_01_01_1_2,What is cold chain in pharma?,A) Temperature-controlled logistics | B) Fast delivery service | C) Inventory freezing | D) Supplier negotiations,A
+course_6,Supply Chain,ch_6_01,Logistics and Distribution,les_6_01_01,Supply Chain Basics,,,,,,,,,,,,,,quiz_6_01_01_1_3,What is FIFO in inventory?,A) First In First Out | B) Fast Inventory Flow Out | C) Final Inspection For Orders | D) Fixed Inventory For Operations,A
+course_6,Supply Chain,ch_6_01,Logistics and Distribution,les_6_01_01,Supply Chain Basics,,,,,,,,,,,,,,quiz_6_01_01_1_4,Which is a key risk in supply chain?,A) Disruption from suppliers | B) Overproduction | C) Low demand | D) High profits,A
+course_6,Supply Chain,ch_6_01,Logistics and Distribution,les_6_01_01,Supply Chain Basics,,,,,,,,,,,,,,quiz_6_01_01_1_5,What is ERP in supply chain?,A) Enterprise Resource Planning | B) Efficient Resource Processing | C) External Risk Prevention | D) Extended Revenue Projection,A

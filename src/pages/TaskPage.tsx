@@ -1,4 +1,3 @@
-// src/pages/TaskPage.tsx
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -9,14 +8,13 @@ import { fetchTasks, organizeTasks, findTask, Task } from '@/lib/csv';
 import { fetchTopics, organizeTopics, getTopicsForLesson, isQuizPassed } from '@/lib/learning';
 import { BookOpen, ChevronRight, Award, CheckCircle, FileText, Lock, GraduationCap } from 'lucide-react';
 
-
-
 const CSV_URL = import.meta.env.VITE_CSV_URL
-  || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRrzHdNL8FRSooYojNPyBU2f66Tgr-DgwA6xB_HAK-azRx_s8PvbKUwzO5OzjzVdPGw-qeNOl68Asx6/pub?output=csv';
+  || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
 const WIX_RETURN_URL = import.meta.env.VITE_WIX_RETURN_URL || 'https://example.com/return';
 
 export default function TaskPage() {
   const { courseId, chapterId, taskId } = useParams<{ courseId: string; chapterId: string; taskId: string }>();
+  const navigate = useNavigate(); // Initialize useNavigate
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +23,7 @@ export default function TaskPage() {
   const [hasLearningContent, setHasLearningContent] = useState(false);
   const [quizPassed, setQuizPassed] = useState(false);
 
-  // compute required resource IDs based on normalized task.resources
+  // Compute required resource IDs based on normalized task.resources
   const requiredResourceIds = useMemo(() => {
     const set = new Set<string>();
     if (!task?.resources) return set;
@@ -66,7 +64,7 @@ export default function TaskPage() {
     }
   };
 
-  // load visited flags for required resources
+  // Load visited flags for required resources
   useEffect(() => {
     if (!taskId || requiredResourceIds.size === 0) {
       setVisitedResources(new Set());
@@ -80,7 +78,7 @@ export default function TaskPage() {
     setVisitedResources(v);
   }, [taskId, requiredResourceIds]);
 
-  // completion check
+  // Completion check
   useEffect(() => {
     if (requiredResourceIds.size === 0) {
       setShowCompleted(true);
@@ -150,26 +148,26 @@ export default function TaskPage() {
       return next;
     });
   };
-  const navigate = useNavigate();
+
   const handleTaskCompleted = () => {
-    if (courseId && taskId) {
+  if (courseId && taskId) {
+    try {
       const completedKey = `course_${courseId}_completed_tasks`;
       const completed = sessionStorage.getItem(completedKey);
-      const arr = completed ? JSON.parse(completed) as string[] : [];
+      const arr = completed ? (JSON.parse(completed) as string[]) : [];
+
       if (!arr.includes(taskId)) {
         arr.push(taskId);
         sessionStorage.setItem(completedKey, JSON.stringify(arr));
       }
+
+      console.log('Navigating to /cta with courseId:', courseId);
+      navigate('/cta', { state: { courseId } }); // Pass courseId in state
+    } catch (error) {
+      console.error('Error in handleTaskCompleted:', error);
     }
-    
-    // Navigate to the LessonPage using React Router navigation
-    if (task?.lessonId) {
-      navigate(`/courses/${courseId}/chapters/${chapterId}/lessons/${task.lessonId}`);
-    } else {
-      // Fallback to chapter page if no lessonId
-      navigate(`/courses/${courseId}/chapters/${chapterId}`);
-    }
-  };
+  }
+};
 
   if (loading) {
     return (
@@ -313,12 +311,11 @@ export default function TaskPage() {
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
             <Card>
-            <CardHeader>
-            <CardTitle>
-    <span className="text-4xl font-bold text-red-800">Scenario</span>
-  </CardTitle>
-            </CardHeader>
-
+              <CardHeader>
+                <CardTitle>
+                  <span className="text-4xl font-bold text-white">Scenario</span>
+                </CardTitle>
+              </CardHeader>
               <CardContent>
                 <p className="text-foreground leading-relaxed whitespace-pre-line">{task.scenario}</p>
               </CardContent>
@@ -328,7 +325,7 @@ export default function TaskPage() {
               {task.resources?.pdfs?.length > 0 && (
                 <Card>
                   <CardHeader>
-                  <CardTitle className="!text-2xl !font-bold text-red-800">Reference Documents</CardTitle>
+                    <CardTitle className="!text-2xl !font-bold text-white">Reference Documents</CardTitle>
                     <p className="text-muted-foreground">Review these documents before proceeding with the task.</p>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -352,10 +349,10 @@ export default function TaskPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>
-                    <span className="text-2xl font-bold text-red-800">
-                      Fillable Documents
+                      <span className="text-2xl font-bold text-white">
+                        Fillable Documents
                       </span>
-                      </CardTitle>
+                    </CardTitle>
                     <p className="text-muted-foreground">Complete these forms as part of your task.</p>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -400,7 +397,7 @@ export default function TaskPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 !text-2xl !font-bold text-red-800">
+                <CardTitle className="flex items-center gap-2 !text-2xl !font-bold text-white">
                   <FileText className="w-5 h-5" /> Instructions for Completion
                 </CardTitle>
               </CardHeader>
@@ -433,11 +430,11 @@ export default function TaskPage() {
             <Card>
               <CardHeader>
                 <CardTitle>
-                <span className="text-2xl font-bold text-red-800">
-                Task Progress
-                </span>
+                  <span className="text-2xl font-bold text-white">
+                    Task Progress
+                  </span>
                 </CardTitle>
-                </CardHeader>
+              </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="text-center">
@@ -458,14 +455,6 @@ export default function TaskPage() {
                     <p className="text-xs text-muted-foreground text-center">Complete all required resources to finish this task</p>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader><CardTitle>Navigation</CardTitle></CardHeader>
-              <CardContent className="space-y-3">
-                <Link to={`/courses/${courseId}`} className="block"><PrimaryButton className="w-full">Back to Course</PrimaryButton></Link>
-                <Link to={`/courses/${courseId}/chapters/${chapterId}/lessons/${task.lessonId}`} className="block"><PrimaryButton className="w-full">View Lesson</PrimaryButton></Link>
               </CardContent>
             </Card>
           </div>

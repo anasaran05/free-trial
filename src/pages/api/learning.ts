@@ -2,9 +2,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const TOPICS_CSV_URL =
-  'https://docs.google.com/spreadsheets/d/e/2PACX-XXXX/pub?output=csv';
+  'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-topic%20-%20Sheet1.csv';
 const QUIZ_CSV_URL =
-  'https://docs.google.com/spreadsheets/d/e/2PACX-YYYY/pub?output=csv';
+  'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-quiz%20-%20Sheet1.csv';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

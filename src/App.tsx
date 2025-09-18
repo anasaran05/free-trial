@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +11,7 @@ import ChapterPage from "./pages/ChapterPage";
 import LessonPage from "./pages/LessonPage";
 import LearningPage from "./pages/LearningPage";
 import TaskPage from "./pages/TaskPage";
+import CTAPage from "../src/pages/ctapage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -29,7 +29,8 @@ const App = () => (
           <Route path="/courses/:courseId/chapters/:chapterId/lessons/:lessonId" element={<LessonPage />} />
           <Route path="/courses/:courseId/chapters/:chapterId/lessons/:lessonId/learning/:topicId?" element={<LearningPage />} />
           <Route path="/courses/:courseId/chapters/:chapterId/tasks/:taskId" element={<TaskPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/cta" element={<CTAPage />} />
+          {/* Catch-all route for unmatched paths */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
