@@ -1,7 +1,6 @@
 import { MdDone } from "react-icons/md";
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { GlowButton } from '@/components/Button';
 import { Play, BookOpen, Award, BarChart3, Zap } from 'lucide-react';
 
@@ -36,25 +35,16 @@ export default function Index() {
     setMounted(true);
   }, []);
 
-  const handleStartTraining = async () => {
-    // Check if user is authenticated
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (session) {
-      // User is logged in - redirect to dashboard
-      navigate('/dashboard');
-    } else {
-      // User not logged in - redirect to sign in
-      navigate('/signin');
-    }
+  const handleStartTraining = () => {
+    navigate('/courses'); // Direct navigation to courses
   };
 
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-   <div className="absolute inset-0 bg-gradient-to-br from-background via-surface to-surface-elevated" />
-   <div className="relative theme-container text-center py-24 lg:py-32">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-surface to-surface-elevated" />
+        <div className="relative theme-container text-center py-24 lg:py-32">
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-surface-elevated px-4 py-2 rounded-full mb-8 animate-fade-in">
               <span className="text-2xl text-muted-foreground">WELCOME 👋🏻</span>
@@ -66,16 +56,15 @@ export default function Index() {
             </h1>
             
             <div className="text-lg text-muted-foreground mb-4 animate-fade-in">
-             by ZaneProEd 
+              by ZaneProEd 
             </div>
             
             <h2 className="text-3xl lg:text-4xl font-heading font-semibold text-foreground mb-8 animate-fade-in">
-            Next-Gen Healthcare Training Simulation
+              Next-Gen Healthcare Training Simulation
             </h2>
             
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed animate-fade-in">
-              Master Your skills through 
-              immersive simulations and expert-guided training programs.
+              Master Your skills through immersive simulations and expert-guided training programs.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in">
