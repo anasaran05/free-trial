@@ -392,7 +392,7 @@ const Index: React.FC = () => {
             <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/20 to-transparent opacity-40 rounded-t-2xl pointer-events-none" />
             <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/10 to-transparent rounded-b-2xl pointer-events-none" />
 
-            <h3 className="text-lg font-semibold mb-4 transition-colors duration-300 group-hover:text-primary">
+            <h3 className="text-2xl text-blue-500 font-bold mb-4 transition-colors duration-300 group-hover:text-primary">
               {item.step}
             </h3>
 
@@ -447,35 +447,37 @@ const Index: React.FC = () => {
   </div>
 </section>
 
-    {/* Platform Specifications & Features - Hover Effect */}
+   {/* Platform Specifications & Features - Infinite Scroll Left Column */}
 <section className="relative py-24 bg-black text-white">
   <div className="theme-container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
     
-    {/* Left Section - Feature Cards */}
-    <div className="space-y-6 order-2 lg:order-1">
-      {platformFeatures.map((feature, index) => (
-        <div
-          key={index}
-          className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg transition-all transform hover:-translate-y-2 hover:shadow-2xl group"
-        >
-          <h3 className="text-2xl font-semibold text-white mb-3 transition-colors duration-300 group-hover:text-blue-600">
-            {feature.title}
-          </h3>
-          <ul className="space-y-2 text-gray-300 text-sm">
-            {feature.items.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
-        </div>
-      ))}
+    {/* Left Section - Auto Scrolling Feature Cards */}
+    <div className="relative h-[500px] overflow-hidden order-2 lg:order-1">
+      <div className="absolute w-full animate-scroll-vertical space-y-6">
+        {[...platformFeatures, ...platformFeatures].map((feature, index) => (
+          <div
+            key={index}
+            className="p-6 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg transition-all transform hover:-translate-y-2 hover:shadow-2xl group"
+          >
+            <h3 className="text-2xl font-semibold text-blue-500 mb-3 transition-colors duration-300 group-hover:text-red-800">
+              {feature.title}
+            </h3>
+            <ul className="space-y-2 text-gray-300 text-sm">
+              {feature.items.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
     </div>
 
-    {/* Right Section - Headline & Description (Vertically Centered) */}
-<div className="flex flex-col justify-center space-y-6 text-center lg:text-left order-1 lg:order-2">
-  <h2 className="text-4xl lg:text-5xl font-heading font-bold text-blue-500">
-    <MorphingText texts={["Specifications", "Features"]} />
-  </h2>
-</div>
+    {/* Right Section - Headline & Description */}
+    <div className="flex flex-col justify-center space-y-6 text-center lg:text-left order-1 lg:order-2">
+      <h2 className="text-4xl lg:text-5xl font-heading font-bold text-blue-500">
+        <MorphingText texts={["Specifications", "Features"]} />
+      </h2>
+    </div>
   </div>
 </section>
 
@@ -523,13 +525,14 @@ const Index: React.FC = () => {
       Ready to <span className="text-primary">Stop Pretending</span> and Do the Work?
     </h2>
     
-{/* Start Training Button */}
+    {/* Start Training Button */}
 <div className="text-center mt-8">
   <button
     onClick={handleStartTraining}
-    className="bg-white text-black px-12 py-5 rounded-full font-semibold shadow-lg transition-colors duration-300 hover:bg-black hover:text-white"
+    className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-white text-black font-medium transition-all duration-300 hover:bg-black hover:text-white hover:shadow-md"
   >
     Start Training
+    <span className="transform transition-transform duration-300 group-hover:translate-x-1">→</span>
   </button>
 </div>
     

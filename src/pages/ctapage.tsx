@@ -8,6 +8,7 @@ import Card, { CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PrimaryButton } from "@/components/Button";
 import ProgressBar from "@/components/ProgressBar";
 import { fetchTasks, organizeTasks, Course, calculateProgress } from "@/lib/csv";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
 
@@ -192,6 +193,21 @@ function CTAPage() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  if (loading) {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black z-50">
+      <div className="text-center">
+        <DotLottieReact
+          src="/animations/animation.lottie"
+          loop
+          autoplay
+          style={{ width: 400, height: 400 }}
+        />
+       
+      </div>
+    </div>
+  );
+}
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-[#0d1117] via-[#1b1f28] to-[#0d1117] flex flex-col items-center px-4 sm:px-6 lg:px-8">

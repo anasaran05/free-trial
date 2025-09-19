@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Card, { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/Card';
-import { PrimaryButton } from '@/components/Button';
+import Button, { PrimaryButton } from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import { fetchTasks, organizeTasks, Course, calculateProgress } from '@/lib/csv';
 import { BookOpen, Clock, Award } from 'lucide-react';
 import Footer from "../components/Footer";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 // Use environment variable or fallback to sample data
 const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
@@ -17,36 +18,48 @@ export default function CoursesIndex() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadCourses();
-  }, []);
+    const loadCourses = async () => {
+      try {
+        const tasks = await fetchTasks(CSV_URL);
+        const organizedCourses = organizeTasks(tasks);
+        
+        // Filter out dummy courses
+        const filteredCourses = organizedCourses.filter(course => {
+          return (
+            course.name && // Has a name
+            course.name.trim() !== '' && // Name is not empty
+            !course.name.toLowerCase().includes('dummy') && // Doesn't contain 'dummy'
+            !course.name.toLowerCase().includes('test') && // Doesn't contain 'test'
+            !course.name.toLowerCase().includes('sample') && // Doesn't contain 'sample'
+            course.id && course.id.trim() !== '' && // Has a valid ID
+            course.chapters && course.chapters.length > 0 // Has actual content
+          );
+        });
+        
+        setCourses(filteredCourses);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load courses');
+        console.error('Error loading courses:', err);
+      }
+    };
 
-  const loadCourses = async () => {
-    try {
-      setLoading(true);
-      const tasks = await fetchTasks(CSV_URL);
-      const organizedCourses = organizeTasks(tasks);
-      
-      // Filter out dummy courses
-      const filteredCourses = organizedCourses.filter(course => {
-        return (
-          course.name && // Has a name
-          course.name.trim() !== '' && // Name is not empty
-          !course.name.toLowerCase().includes('dummy') && // Doesn't contain 'dummy'
-          !course.name.toLowerCase().includes('test') && // Doesn't contain 'test'
-          !course.name.toLowerCase().includes('sample') && // Doesn't contain 'sample'
-          course.id && course.id.trim() !== '' && // Has a valid ID
-          course.chapters && course.chapters.length > 0 // Has actual content
-        );
-      });
-      
-      setCourses(filteredCourses);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load courses');
-      console.error('Error loading courses:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Ensure loading screen shows for at least 5 seconds
+    const startTime = Date.now();
+    Promise.all([
+      loadCourses(),
+      new Promise(resolve => setTimeout(resolve, 5000)) // Minimum 5-second delay
+    ]).finally(() => {
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = 5000 - elapsedTime;
+
+      // If fetching took less than 5 seconds, wait for the remaining time
+      if (remainingTime > 0) {
+        setTimeout(() => setLoading(false), remainingTime);
+      } else {
+        setLoading(false);
+      }
+    });
+  }, []);
 
   const getCompletedTasks = (courseId: string): string[] => {
     const completedKey = `course_${courseId}_completed_tasks`;
@@ -71,20 +84,49 @@ export default function CoursesIndex() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-24">
-          <div className="text-center">
-            <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4" />
-            <p className="text-muted-foreground">Loading courses...</p>
-          </div>
-        </div>
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black z-50">
+      <div className="text-center">
+        <DotLottieReact
+  src="/animations/animation.lottie"
+  loop
+  autoplay
+  className="w-40 h-40 sm:w-60 sm:h-60 md:w-72 md:h-72"
+/>
+       
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   if (error) {
+    async function loadCourses() {
+      try {
+      const tasks = await fetchTasks(CSV_URL);
+      const organizedCourses = organizeTasks(tasks);
+
+      // Filter out dummy courses
+      const filteredCourses = organizedCourses.filter(course => {
+        return (
+        course.name &&
+        course.name.trim() !== '' &&
+        !course.name.toLowerCase().includes('dummy') &&
+        !course.name.toLowerCase().includes('test') &&
+        !course.name.toLowerCase().includes('sample') &&
+        course.id && course.id.trim() !== '' &&
+        course.chapters && course.chapters.length > 0
+        );
+      });
+
+      setCourses(filteredCourses);
+      setError(null);
+      } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load courses');
+      console.error('Error loading courses:', err);
+      } finally {
+      setLoading(false);
+      }
+    }
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -96,7 +138,10 @@ export default function CoursesIndex() {
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">Unable to Load Courses</h3>
               <p className="text-muted-foreground mb-4">{error}</p>
-              <PrimaryButton onClick={loadCourses}>
+              <PrimaryButton onClick={() => {
+                setLoading(true);
+                loadCourses();
+              }}>
                 Try Again
               </PrimaryButton>
             </CardContent>
@@ -141,12 +186,12 @@ export default function CoursesIndex() {
                 <Card 
                   key={course.id}
                   variant="interactive"
-                  className="h-full animate-fade-in"
+                  className="h-full animate-fade-in bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg transition-transform hover:scale-[1.02] hover:shadow-2xl"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <CardHeader>
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                      <div className="w-12 h-12 bg-primary/80 backdrop-blur-md rounded-lg flex items-center justify-center">
                         <Award className="w-6 h-6 text-primary-foreground" />
                       </div>
                       <div className="text-right">
@@ -202,14 +247,13 @@ export default function CoursesIndex() {
                     </div>
                     
                     {/* Action Button */}
-<div className="pt-4">
-  <button
-    className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg shadow"
-  >
-    {stats.completedTasks > 0 ? 'Continue Course' : 'Start Course'}
-  </button>
-</div>
-
+                    <div className="pt-4">
+                      <Link to={`/courses/${course.id}`} className="block">
+                        <Button className="w-full bg-green-700 hover:bg-blue-500 text-white">
+                          {stats.completedTasks > 0 ? 'Continue Course' : 'Start Course'}
+                        </Button>
+                      </Link>
+                    </div>
                   </CardContent>
                 </Card>
               );
@@ -217,6 +261,6 @@ export default function CoursesIndex() {
           </div>
         )}
       </div>
-    </div>
+    </div>  
   ); 
 }

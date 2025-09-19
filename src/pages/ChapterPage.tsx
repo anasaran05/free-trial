@@ -6,6 +6,7 @@ import { PrimaryButton } from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import { fetchTasks, organizeTasks, Course, Chapter, calculateProgress, getCompletedTasks } from '@/lib/csv';
 import { BookOpen, ChevronRight, Award, Clock } from 'lucide-react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
 
@@ -59,32 +60,15 @@ export default function ChapterPage() {
 
 if (loading) {
   return (
-    <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
-      <Header />
-      
-      {/* Floating particles background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-blue-400 rounded-full animate-bounce opacity-60" style={{animationDelay: '0s', animationDuration: '3s'}}></div>
-        <div className="absolute top-1/3 right-1/4 w-1 h-1 bg-pink-400 rounded-full animate-bounce opacity-40" style={{animationDelay: '1s', animationDuration: '4s'}}></div>
-        <div className="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce opacity-50" style={{animationDelay: '2s', animationDuration: '3.5s'}}></div>
-        <div className="absolute bottom-1/4 right-1/3 w-1 h-1 bg-yellow-400 rounded-full animate-bounce opacity-45" style={{animationDelay: '0.5s', animationDuration: '2.8s'}}></div>
-      </div>
-      
-      <div className="flex flex-1 items-center justify-center">
-        <div className="flex flex-col items-center gap-8">
-          {/* Large spinning ring with gradient effect */}
-          <div className="relative w-32 h-32">
-            <div className="absolute inset-0 rounded-full border-8 border-muted opacity-20"></div>
-            <div className="absolute inset-0 rounded-full border-8 border-transparent border-t-blue-500 border-r-pink-500 animate-spin"></div>
-            <div className="absolute inset-4 rounded-full border-6 border-transparent border-b-purple-500 border-l-yellow-500 animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
-            <div className="absolute inset-8 rounded-full border-4 border-transparent border-t-green-500 animate-spin" style={{animationDuration: '0.8s'}}></div>
-          </div>
-          
-          <div className="text-center">
-            <p className="text-xl font-bold text-foreground mb-2 animate-pulse">Loading your courses...</p>
-            <p className="text-sm text-muted-foreground animate-bounce">🎌 Preparing your anime learning adventure!</p>
-          </div>
-        </div>
+    <div className="fixed inset-0 flex items-center justify-center bg-black z-50">
+      <div className="text-center">
+        <DotLottieReact
+          src="/animations/animation.lottie"
+          loop
+          autoplay
+          style={{ width: 400, height: 400 }}
+        />
+       
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/Card';
 import { PrimaryButton } from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import {
   fetchTasks,
   organizeTasks,
@@ -51,6 +52,22 @@ export default function CoursePage() {
       }
     })();
   }, [courseId]);
+  /** Initial Loading Animation **/ 
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black z-50">
+        <div className="text-center">
+          <DotLottieReact
+            src="/animations/animation.lottie"
+            loop
+            autoplay
+            style={{ width: 400, height: 400 }}
+          />
+         
+        </div>
+      </div>
+    );
+  }
 
   /** Render states **/
   if (loading) {
@@ -129,6 +146,8 @@ function LoadingState() {
   );
 }
 
+
+
 function ErrorState({ message }: { message: string | null }) {
   return (
     <Card className="max-w-md mx-auto text-center">
@@ -162,12 +181,15 @@ function Breadcrumb({ courseName }: { courseName: string }) {
   );
 }
 
+
+
 function CourseHeader({
   course,
   progress,
 }: {
   course: Course;
   progress: ReturnType<typeof calculateProgress>;
+
 }) {
   return (
     <>
