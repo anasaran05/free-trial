@@ -8,7 +8,8 @@ import Card, { CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { PrimaryButton } from "@/components/Button";
 import ProgressBar from "@/components/ProgressBar";
 import { fetchTasks, organizeTasks, Course, calculateProgress } from "@/lib/csv";
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react'; 
+
 const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
 
 class ErrorBoundary extends React.Component<
@@ -90,7 +91,7 @@ function useScrollRiseAnimation(targetRef: React.RefObject<HTMLElement>) {
 function CTAPage() {
   const [mounted, setMounted] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(true);
   const location = useLocation();
@@ -119,39 +120,51 @@ function CTAPage() {
   }, [location.pathname]); // Trigger on location change
 
   useEffect(() => {
-    setMounted(true);
-    loadCourses();
-  }, []);
-
-  const loadCourses = async () => {
-    try {
+    const loadWithMinimumDelay = async () => {
+      const minimumLoadingTime = 4000; // 4 seconds
       setLoading(true);
-      const tasks = await fetchTasks(CSV_URL);
-      const organizedCourses = organizeTasks(tasks);
-      
-      const filteredCourses = organizedCourses.filter(course => {
-        return (
-          course.name &&
-          course.name.trim() !== '' &&
-          !course.name.toLowerCase().includes('dummy') &&
-          !course.name.toLowerCase().includes('test') &&
-          !course.name.toLowerCase().includes('sample') &&
-          course.id &&
-          course.id.trim() !== '' &&
-          course.id !== completedCourseId &&
-          course.chapters &&
-          course.chapters.length > 0
-        );
-      });
-      
-      setCourses(filteredCourses);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load courses');
-      console.error('Error loading courses:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+
+      try {
+        const startTime = Date.now();
+        const tasks = await fetchTasks(CSV_URL);
+        const organizedCourses = organizeTasks(tasks);
+
+        const filteredCourses = organizedCourses.filter(course => {
+          return (
+            course.name &&
+            course.name.trim() !== '' &&
+            !course.name.toLowerCase().includes('dummy') &&
+            !course.name.toLowerCase().includes('test') &&
+            !course.name.toLowerCase().includes('sample') &&
+            course.id &&
+            course.id.trim() !== '' &&
+            course.id !== completedCourseId &&
+            course.chapters &&
+            course.chapters.length > 0
+          );
+        });
+
+        // Calculate elapsed time
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = minimumLoadingTime - elapsedTime;
+
+        // Ensure loading screen is shown for at least 4 seconds
+        if (remainingTime > 0) {
+          await new Promise(resolve => setTimeout(resolve, remainingTime));
+        }
+
+        setCourses(filteredCourses);
+        setMounted(true);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load courses');
+        console.error('Error loading courses:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadWithMinimumDelay();
+  }, []);
 
   const getCompletedTasks = (courseId: string): string[] => {
     const completedKey = `course_${courseId}_completed_tasks`;
@@ -192,34 +205,24 @@ function CTAPage() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  if (loading) {
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black z-50">
-      <div className="text-center">
-        <DotLottieReact
-          src="/animations/animation.lottie"
-          loop
-          autoplay
-          style={{ width: 400, height: 400 }}
-        />
-       
-      </div>
-    </div>
-  );
-}
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-gradient-to-br from-[#0d1117] via-[#1b1f28] to-[#0d1117] flex flex-col items-center px-4 sm:px-6 lg:px-8">
-        
         {/* Confetti Overlay */}
         {showConfetti && (
-          <Confetti
-            width={windowSize.width}
-            height={windowSize.height}
-            numberOfPieces={2000}
-            recycle={false}
-            colors={['#3bf648ff', '#EF4444', '#6400c8ff', '#c77e00ff']}
-          />
+          <div className="fixed inset-0 z-50">
+            <Confetti
+              width={windowSize.width}
+              height={windowSize.height}
+              numberOfPieces={1000}
+              recycle={false}
+              colors={['#3bf648ff', '#EF4444', '#6400c8ff', '#c77e00ff']}
+             
+              initialVelocityX={-10} // Move leftward
+              initialVelocityY={-10} // Move upward initially
+              gravity={0.5} // Moderate downward pull
+            />
+          </div>
         )}
 
         {/* Hero Section */}
@@ -255,16 +258,16 @@ function CTAPage() {
       {/* Upgrade Section */}
 <motion.section
   ref={upgradeSectionRef}
-  className="opacity-0 translate-y-10 w-full py-12 px-6"
+  className="opacity-0 translate-y-10 w-full py-20 px-4 lg:px-8"
   initial={{ opacity: 0, y: 30 }}
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.6 }}
 >
-  <div className="max-w-6xl mx-auto">
+  <div className="max-w-7xl mx-auto">
    {/* Heading */}
 <motion.h2
-  className="text-8xl font-bold bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent text-center 
-             animate-gradient-x"
+  className="text-7xl lg:text-8xl font-bold bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent text-center 
+             animate-gradient-x mb-8"
   initial={{ scale: 0.9 }}
   animate={{ scale: 1 }}
   transition={{ duration: 0.4 }}
@@ -273,72 +276,73 @@ function CTAPage() {
 </motion.h2>
     {/* Subheading */}
     <motion.p
-  className="text-lg text-center text-gray-300 max-w-2xl mx-auto mt-3"
+  className="text-xl lg:text-2xl text-center text-gray-200 max-w-4xl mx-auto mt-6 mb-16 leading-relaxed"
   initial={{ opacity: 0, y: 20 }}
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.4, delay: 0.2 }}
 >
   Unlock the full experience with{" "}
-  <span className="text-2xl text-red-700 font-semibold">Zane ProEd</span>’s Pro-Training Courses → Your next move to upskill, gain industry exposure, and become job-ready.
+  <span className="text-3xl lg:text-4xl text-red-700 font-bold">Zane ProEd</span>’s Pro-Training Courses → Your next move to upskill, gain industry exposure, and become job-ready.
 </motion.p>
 
     {/* Feature Cards Grid */}
-<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
   {[
     {
       title: "1-on-1 Mentorship",
       description: "Guidance from industry experts to fast-track your career.",
-      icon: <Users className="w-8 h-8 text-purple-400 transition-colors duration-300" />,
+      icon: <Users className="w-10 h-10 text-purple-400 transition-colors duration-300" />,
     },
     {
       title: "Exclusive LMS Dashboard",
       description: "Track your progress, view analytics, and measure skill growth.",
-      icon: <BarChart className="w-8 h-8 text-purple-400 transition-colors duration-300" />,
+      icon: <BarChart className="w-10 h-10 text-purple-400 transition-colors duration-300" />,
     },
     {
       title: "Real-World Simulations",
       description: "Experience how the job really feels-before Day 1.",
-      icon: <FlaskConical className="w-8 h-8 text-purple-400 transition-colors duration-300" />,
+      icon: <FlaskConical className="w-10 h-10 text-purple-400 transition-colors duration-300" />,
     },
     {
       title: "Skill Challenges & Quizzes",
       description: "Practice solving real industry problems.",
-      icon: <Target className="w-8 h-8 text-purple-400 transition-colors duration-300" />,
+      icon: <Target className="w-10 h-10 text-purple-400 transition-colors duration-300" />,
     },
     {
       title: "Certifications & Portfolio Proof",
       description: "Showcase your growth and attract recruiters.",
-      icon: <Trophy className="w-8 h-8 text-purple-400 transition-colors duration-300" />,
+      icon: <Trophy className="w-10 h-10 text-purple-400 transition-colors duration-300" />,
     },
     {
       title: "6 Self-Paced Courses",
       description: "Learn at your own speed with mentorship support.",
-      icon: <BookOpen className="w-8 h-8 text-purple-400 transition-colors duration-300" />,
+      icon: <BookOpen className="w-10 h-10 text-purple-400 transition-colors duration-300" />,
     },
   ].map((feature, index) => (
     <motion.div
       key={index}
-      className="p-6 bg-gray-800/30 border border-gray-700 rounded-2xl shadow-lg bg-opacity-50 transition-all duration-300 group hover:shadow-xl"
-      initial={{ opacity: 0, y: 20 }}
+      className="p-8 bg-gray-800/20 backdrop-blur-sm border border-gray-700/50 rounded-3xl shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 group hover:bg-gray-800/30"
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.1 * index }}
-      whileHover={{ y: -8, scale: 1.03, transition: { duration: 0.3 } }}
+      transition={{ duration: 0.5, delay: 0.15 * index }}
+      whileHover={{ y: -12, scale: 1.02, transition: { duration: 0.4 } }}
     >
-      <div className="flex items-center gap-3 mb-3">
+      <div className="flex items-start gap-4 mb-6">
         {React.cloneElement(feature.icon, {
-          className: feature.icon.props.className + " group-hover:text-blue-800",
+          className: feature.icon.props.className + " group-hover:text-blue-400 shrink-0",
         })}
-        <h3 className="font-semibold text-lg text-white transition-colors duration-300 group-hover:text-blue-400">
-          {feature.title}
-        </h3>
+        <div>
+          <h3 className="font-bold text-xl text-white mb-2 transition-colors duration-300 group-hover:text-blue-300">
+            {feature.title}
+          </h3>
+          <p className="text-gray-300 text-base leading-relaxed transition-colors duration-300 group-hover:text-gray-100">
+            {feature.description}
+          </p>
+        </div>
       </div>
-      <p className="text-gray-300 text-sm transition-colors duration-300 group-hover:text-gray-100">
-        {feature.description}
-      </p>
     </motion.div>
   ))}
 </div>
-
 
 {/* Discount & Social Proof */}
 <motion.div
@@ -421,7 +425,7 @@ function CTAPage() {
       href: "https://zaneproed.com",
       icon: (
         <img
-          src="https://static.wixstatic.com/media/6abdd9_d0e031399dad4c0caf608d0a6407ac4c~mv2.png" // <-- your hosted logo
+          src="https://static.wixstatic.com/media/6abdd9_d0e031399dad4c0caf608d0a6407ac4c~mv2.png"
           alt="ZANE ProEd logo"
           className="w-6 h-6"
         />
@@ -451,9 +455,16 @@ function CTAPage() {
             Recommended Free Trial Courses
           </h2>
           {loading ? (
-            <div className="text-center">
-              <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4" />
-              <p className="text-gray-400">Loading courses...</p>
+            <div className="fixed inset-0 flex items-center justify-center bg-black/80 z-50">
+              <div className="text-center">
+                <DotLottieReact
+                  src="/animations/animation.lottie"
+                  loop
+                  autoplay
+                  style={{ width: 200, height: 200 }}
+                />
+                <p className="text-gray-400 mt-4">Loading courses...</p>
+              </div>
             </div>
           ) : error ? (
             <div className="text-center text-gray-400">
@@ -539,7 +550,7 @@ function CTAPage() {
         </section>
       </div>
 
-      <style >{`
+      <style>{`
         @keyframes rise-from-bottom {
           0% {
             opacity: 0;

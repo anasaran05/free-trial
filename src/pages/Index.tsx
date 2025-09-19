@@ -8,6 +8,7 @@ import { ChevronDown } from "lucide-react";
 import LiquidEther from '@/components/Reactbits/LiquidEther';
 import { WordRotate } from "@/components/Reactbits/word-rotate";
 import { MorphingText } from "@/components/Reactbits/morphing-text";
+import { motion } from 'framer-motion';
 import { Globe } from "../components/ui/globe";
 // Define types for custom components
 interface GlowButtonProps {
@@ -258,43 +259,78 @@ const Index: React.FC = () => {
         {/* Fade Overlay starting halfway through the "Why Choose ZANE ΩMEGA?" section */}
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-b from-transparent to-black z-5 pointer-events-none" />
 
-        {/* Hero Section */}
-        <section className="relative min-h-screen flex flex-col justify-between overflow-hidden">
-          <div className="relative z-10 theme-container flex flex-col justify-center flex-grow py-24 lg:py-32">
-            <div className="max-w-4xl">
-              <h1 className="text-6xl lg:text-7xl font-heading font-bold mb-6">
-                <span className="text-white">ZANE</span>{' '}
-                <span className="text-primary">ΩMEGA</span>
-              </h1>
-              <h2 className="text-3xl lg:text-4xl font-heading font-semibold mb-6">
-                World’s 1st and most advanced AI-powered learning platform.
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed">
-                Blends real industry workflows, tools & mentorship all in one place.
-              </p>
-              <button
-                onClick={handleStartTraining}
-                className="group relative inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold rounded-full border border-white bg-white text-black shadow-lg transition-all duration-300 hover:bg-black hover:text-white hover:shadow-xl"
-              >
-                Get started, for free
-                <span className="transition-transform duration-300 group-hover:translate-x-1">
-                  →
-                </span>
-              </button>
-            </div>
-          </div>
-          <div className="relative z-2 flex justify-center pb-2">
-            <div className="relative w-24 h-24">
-              <CircularText
-                text="SCROLL*DOWN*"
-                className="w-24 h-24 animate-spin-slow text-white"
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <ChevronDown className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </div>
-        </section>
+       {/* Hero Section */}
+<section className="relative min-h-screen flex flex-col justify-between overflow-hidden">
+  <div className="relative z-10 theme-container flex flex-col justify-center flex-grow py-24 lg:py-32">
+    <motion.div 
+      className="max-w-4xl"
+      initial={{ opacity: 0, y: 50 }} // Start faded and shifted down
+      animate={{ opacity: 1, y: 0 }}  // Rise to position and fade in
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} // Smooth cubic-bezier easing
+    >
+      <motion.h1 
+        className="text-6xl lg:text-7xl font-heading font-bold mb-6"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <span className="text-white">ZANE</span>{' '}
+        <span className="text-primary">ΩMEGA</span>
+      </motion.h1>
+      
+      <motion.h2 
+        className="text-3xl lg:text-4xl font-heading font-semibold mb-6"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      >
+        World’s 1st and most advanced AI-powered learning platform.
+      </motion.h2>
+      
+      <motion.p 
+        className="text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      >
+        Blends real industry workflows, tools & mentorship all in one place.
+      </motion.p>
+      
+      <motion.button
+        onClick={handleStartTraining}
+        className="group relative inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold rounded-full border border-white bg-white text-black shadow-lg transition-all duration-300 hover:bg-black hover:text-white hover:shadow-xl"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        whileHover={{ scale: 1.05 }} // Bonus: subtle scale on hover
+      >
+        Get started, for free
+        <motion.span 
+          className="transition-transform duration-300 group-hover:translate-x-1"
+          initial={{ x: 0 }}
+          animate={{ x: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          →
+        </motion.span>
+      </motion.button>
+    </motion.div>
+  </div>
+  
+  <div className="relative z-2 flex justify-center pb-2">
+    <div className="relative w-24 h-24">
+      <CircularText
+        text="SCROLL*DOWN*"
+        className="w-24 h-24 animate-spin-slow text-white"
+      />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <ChevronDown className="w-6 h-6 text-white" />
+      </div>
+    </div>
+  </div>
+</section>
+
+
 {/* What ZANE ΩMEGA Really Is */}
 <section className="relative py-40 text-white">
   <div className="theme-container max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
