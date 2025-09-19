@@ -209,7 +209,7 @@ export default function CoursesIndex() {
                     </CardTitle>
                     
                     <CardDescription>
-                      Comprehensive training program covering essential healthcare administration skills.
+                      {course.description || "No description available."}
                     </CardDescription>
                   </CardHeader>
                   

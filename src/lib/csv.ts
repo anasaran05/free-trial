@@ -7,6 +7,7 @@
 export interface TaskRow {
   courseId: string;
   courseName: string;
+  coursedescription?: string;
   chapterId: string;
   chapterName: string;
   lessonId: string;
@@ -22,7 +23,7 @@ export interface TaskRow {
 }
 
 export interface Course {
-  description: string;
+  description?: string;
   id: string;
   name: string;
   chapters: Chapter[];
@@ -220,6 +221,7 @@ export function organizeTasks(tasks: TaskRow[]): Course[] {
       courseMap.set(taskRow.courseId, {
         id: taskRow.courseId,
         name: taskRow.courseName,
+        description: taskRow.coursedescription,
         chapters: []
       });
     }
