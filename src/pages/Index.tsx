@@ -267,17 +267,16 @@ const Index: React.FC = () => {
                 <span className="text-primary">ΩMEGA</span>
               </h1>
               <h2 className="text-3xl lg:text-4xl font-heading font-semibold mb-6">
-                Next-Gen Healthcare Workplace Simulator
+                World’s 1st and most advanced AI-powered learning platform.
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed">
-                Run real workflows. Solve real problems. Build a portfolio that makes
-                employers hit “hire.”
+                Blends real industry workflows, tools & mentorship all in one place.
               </p>
               <button
                 onClick={handleStartTraining}
                 className="group relative inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold rounded-full border border-white bg-white text-black shadow-lg transition-all duration-300 hover:bg-black hover:text-white hover:shadow-xl"
               >
-                Start Training
+                Get started, for free
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   →
                 </span>
@@ -303,12 +302,12 @@ const Index: React.FC = () => {
     {/* Left Column */}
     <div className="space-y-6">
       <h2 className="text-5xl font-extrabold tracking-tight text-gray-100">
-        What ZANE ΩMEGA Really Is
+        What ZANE ΩMEGA Really Is ?
       </h2>
       <p className="text-2xl leading-relaxed text-gray-300">
-        Forget boring courses — <span className="font-semibold text-white">ZANE <span className="font-bold text-red-600">ΩMEGA</span></span> is a 
+        Forget boring courses — <span className="font-semibold text-white">ZANE <span className="font-bold text-red-600">ΩMEGA</span></span> is the 
         <span className="text-2xl text-gray-600 font-bold"> world’s first and most advanced AI-powered learning platform </span> 
-        & <span className="text-gray-400 font-semibold">that seamlessly blends real industry workflows, tools, and mentorship all in one place</span>.
+         <span className="text-gray-400 font-semibold"> that seamlessly blends real industry workflows, tools, and mentorship all in one place</span>.
       </p>
     </div>
 
@@ -356,28 +355,23 @@ const Index: React.FC = () => {
         </section>
       </div>
 
-  {/* How It Works - Full-Page Pinned Section with Scrollable Steps + Hover Title Color */}
-<section ref={sectionRef} className="relative h-screen bg-black text-white">
-  <div className="theme-container grid grid-cols-1 md:grid-cols-2 h-full gap-8">
+ {/* How It Works - Static Left / Scrollable Right */}
+<section ref={sectionRef} className="relative py-24 bg-black text-white">
+  <div className="theme-container grid grid-cols-1 md:grid-cols-2 gap-8">
     
-    {/* Left Column */}
-    <div className="flex flex-col justify-center sticky top-0 h-screen">
+    {/* Left Column (static on scroll) */}
+    <div className="flex flex-col justify-center sticky top-24 self-start">
       <h2 className="text-3xl lg:text-5xl font-heading font-semibold leading-tight flex flex-col">
-        {/* How */}
         <span>How</span>
-
-        {/* Rotating Word */}
         <div className="min-h-[3rem] lg:min-h-[4rem] flex items-center">
           <WordRotate
-  words={["Industry Training", "ZANE ΩMEGA"]}
-  className="text-3xl lg:text-5xl font-bold"
-  getClassName={(word) =>
-    word.includes("ZANE") ? "text-primary" : "text-blue-500"
-  }
-/>
+            words={["Industry Training", "ZANE ΩMEGA"]}
+            className="text-3xl lg:text-5xl font-bold"
+            getClassName={(word) =>
+              word.includes("ZANE") ? "text-primary" : "text-blue-500"
+            }
+          />
         </div>
-
-        {/* Works */}
         <span>Works</span>
       </h2>
 
@@ -387,33 +381,29 @@ const Index: React.FC = () => {
       </p>
     </div>
 
-    {/* Right Column stays the same */}
-    <div className="flex flex-col justify-center h-screen">
-      <div ref={scrollRef} className="overflow-y-auto max-h-[80vh] pr-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
-        <div className="space-y-12">
-          {steps.map((item, index) => (
-            <div
-              key={index}
-              className="relative flex flex-col group animate-fade-in"
-            >
-              <div className="flex-1 relative p-6 bg-transparent backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02] hover:shadow-2xl">
-                <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/20 to-transparent opacity-40 rounded-t-2xl pointer-events-none" />
-                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/10 to-transparent rounded-b-2xl pointer-events-none" />
+    {/* Right Column (scrolls) */}
+    <div className="space-y-12">
+      {steps.map((item, index) => (
+        <div
+          key={index}
+          className="relative flex flex-col group animate-fade-in"
+        >
+          <div className="relative p-6 bg-transparent backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg transition-transform duration-300 hover:scale-[1.02] hover:shadow-2xl">
+            <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-white/20 to-transparent opacity-40 rounded-t-2xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/10 to-transparent rounded-b-2xl pointer-events-none" />
 
-                <h3 className="text-lg font-semibold mb-4 transition-colors duration-300 group-hover:text-primary">
-                  {item.step}
-                </h3>
+            <h3 className="text-lg font-semibold mb-4 transition-colors duration-300 group-hover:text-primary">
+              {item.step}
+            </h3>
 
-                <ul className="list-disc list-inside space-y-2 text-white/80">
-                  {item.desc.split("\n").map((line, i) => (
-                    <li key={i}>{line.replace(/^•\s*/, "")}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ))}
+            <ul className="list-disc list-inside space-y-2 text-white/80">
+              {item.desc.split("\n").map((line, i) => (
+                <li key={i}>{line.replace(/^•\s*/, "")}</li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </div>
+      ))}
     </div>
 
   </div>
@@ -532,9 +522,7 @@ const Index: React.FC = () => {
     <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-6">
       Ready to <span className="text-primary">Stop Pretending</span> and Do the Work?
     </h2>
-    <p className="text-lg text-gray-100 max-w-3xl mx-auto mb-12">
-      ZANE ΩMEGA is built for real healthcare training. Start with a trial, run a simulation, or explore capstone samples.
-    </p>
+    
 {/* Start Training Button */}
 <div className="text-center mt-8">
   <button
