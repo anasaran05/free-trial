@@ -6,6 +6,7 @@ interface CircularTextProps {
   onHover?: 'slowDown' | 'speedUp' | 'pause' | 'goBonkers';
   className?: string;
  centerContent?: React.ReactNode; // ✅ Add this
+ backgroundClass?: string; // 👈 Add this
 }
 
 const getRotationTransition = (duration: number, from: number, loop: boolean = true) => ({
@@ -31,7 +32,8 @@ const CircularText: React.FC<CircularTextProps> = ({
   spinDuration = 20,
   onHover = 'speedUp',
   className = '',
-  centerContent
+  centerContent,
+  backgroundClass = ''
 }) => {
   const letters = Array.from(text);
   const controls = useAnimation();
@@ -127,6 +129,9 @@ const CircularText: React.FC<CircularTextProps> = ({
 )}
 </motion.div>
   );
+  <motion.div
+  className={`m-0 mx-auto rounded-full relative font-black text-white text-center cursor-pointer origin-center ${backgroundClass || ""} ${className || ""}`}
+></motion.div>
 };
 
 export default CircularText;
