@@ -9,6 +9,8 @@ import { PrimaryButton } from "@/components/Button";
 import ProgressBar from "@/components/ProgressBar";
 import { fetchTasks, organizeTasks, Course, calculateProgress } from "@/lib/csv";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react'; 
+import { AuroraText } from "@/components/Reactbits/aurora-text";
+
 
 const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
 
@@ -266,17 +268,17 @@ function CTAPage() {
   <div className="max-w-7xl mx-auto">
    {/* Heading */}
 <motion.h2
-  className="text-7xl lg:text-8xl font-bold bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent text-center 
-             animate-gradient-x mb-8"
+  className="text-7xl lg:text-8xl font-bold text-white text-transparent text-center 
+             animate-gradient-x mb-12"
   initial={{ scale: 0.9 }}
   animate={{ scale: 1 }}
   transition={{ duration: 0.4 }}
 >
-  Take the Next Step.
+  Take the <AuroraText>Next Step.</AuroraText>
 </motion.h2>
     {/* Subheading */}
     <motion.p
-  className="text-xl lg:text-2xl text-center text-gray-200 max-w-4xl mx-auto mt-6 mb-16 leading-relaxed"
+  className="text-xl lg:text-2xl text-center text-gray-200 max-w-4xl mx-auto mt-10 mb-16 leading-relaxed"
   initial={{ opacity: 0, y: 20 }}
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.4, delay: 0.2 }}
@@ -286,7 +288,7 @@ function CTAPage() {
 </motion.p>
 
     {/* Feature Cards Grid */}
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10">
   {[
     {
       title: "1-on-1 Mentorship",
