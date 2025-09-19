@@ -202,13 +202,14 @@ export default function CoursesIndex() {
                     </div>
                     
                     {/* Action Button */}
-                    <div className="pt-4">
-                      <Link to={`/courses/${course.id}`} className="block">
-                        <PrimaryButton className="w-full">
-                          {stats.completedTasks > 0 ? 'Continue Course' : 'Start Course'}
-                        </PrimaryButton>
-                      </Link>
-                    </div>
+<div className="pt-4">
+  <button
+    className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg shadow"
+  >
+    {stats.completedTasks > 0 ? 'Continue Course' : 'Start Course'}
+  </button>
+</div>
+
                   </CardContent>
                 </Card>
               );

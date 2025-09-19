@@ -176,7 +176,7 @@ function CTAPage() {
 
   useEffect(() => {
     if (showConfetti) {
-      const timer = setTimeout(() => setShowConfetti(false), 5000);
+      const timer = setTimeout(() => setShowConfetti(false), 10000);
       return () => clearTimeout(timer);
     }
   }, [showConfetti]);
@@ -201,29 +201,42 @@ function CTAPage() {
           <Confetti
             width={windowSize.width}
             height={windowSize.height}
-            numberOfPieces={200}
+            numberOfPieces={2000}
             recycle={false}
-            colors={['#3B82F6', '#EF4444', '#10B981', '#F59E0B']}
+            colors={['#3bf648ff', '#EF4444', '#6400c8ff', '#c77e00ff']}
           />
         )}
 
         {/* Hero Section */}
-        <section 
-          ref={heroRef}
-          className="w-full h-screen flex flex-col items-center justify-center text-center px-4"
-        >
-          <h1 className="text-4xl sm:text-6xl md:text-9xl font-extrabold text-white mb-12 tracking-tight animate-rise-from-bottom">
-            Congratulations!
-          </h1>
-          <p className="text-lg sm:text-3xl text-gray-300 mb-10 leading-relaxed animate-rise-from-bottom animate-delay-300">
-            You've completed your Free Trial with{" "}
-            <span className="text-primary font-semibold">ΩMEGA</span>!
-          </p>
-          <p className="text-base sm:text-2xl text-gray-400 max-w-2xl mx-auto mt-4 animate-rise-from-bottom animate-delay-600">
-            It’s time to turn your skills into a career!
-          </p>
-        </section>
+<section
+  ref={heroRef}
+  className="relative w-full h-screen flex flex-col items-center justify-center text-center px-4"
+>
+  <h1 className="text-4xl sm:text-6xl md:text-9xl font-extrabold text-white mb-12 tracking-tight animate-rise-from-bottom">
+    Congratulations!
+  </h1>
+  <p className="text-lg sm:text-3xl text-gray-300 mb-10 leading-relaxed animate-rise-from-bottom animate-delay-300">
+    You've completed your Free Trial with{" "}
+    <span className="text-blue-500 font-semibold">ΩMEGA</span>!
+  </p>
+  <p className="text-base sm:text-2xl text-gray-400 max-w-2xl mx-auto mt-4 animate-rise-from-bottom animate-delay-600">
+    It’s time to turn your skills into a career!
+  </p>
 
+  {/* Down Arrow */}
+  <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-10 h-10 text-white"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+    </svg>
+  </div>
+</section>
       {/* Upgrade Section */}
 <motion.section
   ref={upgradeSectionRef}
@@ -251,7 +264,7 @@ function CTAPage() {
   transition={{ duration: 0.4, delay: 0.2 }}
 >
   Unlock the full experience with{" "}
-  <span className="text-2xl text-primary font-semibold">Zane ProEd</span>’s Pro-Training Courses – your next move to upskill, gain industry exposure, and become job-ready.
+  <span className="text-2xl text-red-700 font-semibold">Zane ProEd</span>’s Pro-Training Courses → Your next move to upskill, gain industry exposure, and become job-ready.
 </motion.p>
 
     {/* Feature Cards Grid */}
@@ -269,7 +282,7 @@ function CTAPage() {
     },
     {
       title: "Real-World Simulations",
-      description: "Experience how the job really feels — before Day 1.",
+      description: "Experience how the job really feels-before Day 1.",
       icon: <FlaskConical className="w-8 h-8 text-purple-400 transition-colors duration-300" />,
     },
     {
@@ -298,9 +311,9 @@ function CTAPage() {
     >
       <div className="flex items-center gap-3 mb-3">
         {React.cloneElement(feature.icon, {
-          className: feature.icon.props.className + " group-hover:text-red-800",
+          className: feature.icon.props.className + " group-hover:text-blue-800",
         })}
-        <h3 className="font-semibold text-lg text-white transition-colors duration-300 group-hover:text-green-400">
+        <h3 className="font-semibold text-lg text-white transition-colors duration-300 group-hover:text-blue-400">
           {feature.title}
         </h3>
       </div>
@@ -310,74 +323,44 @@ function CTAPage() {
     </motion.div>
   ))}
 </div>
+
+
 {/* Discount & Social Proof */}
 <motion.div
-  className="text-white rounded-xl p-6 shadow-lg mt-8 bg-gray-800/30 bg-opacity-50 border border-gray-700 flex flex-col sm:flex-row items-center justify-between"
-  initial={{ opacity: 0, scale: 0.8 }}
+  className="backdrop-blur-md bg-white/10 border border-gray-400/30 rounded-xl p-8 shadow-xl mt-8"
+  initial={{ opacity: 0, scale: 0.95 }}
   animate={{ opacity: 1, scale: 1 }}
-  transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
+  transition={{ duration: 0.4 }}
 >
-  {/* Left side - text */}
-  <div className="text-center sm:text-left mb-4 sm:mb-0">
-    <h3 className="text-2xl text-green-600 font-semibold">AVAIL UPTO 50% SCHOLARSHIP!!</h3>
-    <p className="mt-2">
-      Drop a 5 star google review & get a chance to avail a scholarship of up to <span className= "text-blue-600 font-bold">50% on any</span> pro training course!
-    </p>
-  </div>
-
-  {/* Right side - Google Review Button */}
-  <a
-    href="https://www.google.com/search?sca_esv=fed2f1198a559411&rlz=1C5MACD_enIN1164IN1164&sxsrf=AE3TifNMXX6HD5eZlXH_ynjNTHaVhkfZEw:1758167283249&si=AMgyJEtREmoPL4P1I5IDCfuA8gybfVI2d5Uj7QMwYCZHKDZ-E5QJkKLwyRzatmMuzKz9qcHJvnQ1ED2zh5Af_v6kgvLNIcHG0_5eirBWOthtY0FkHJOwegXvLezGoUJekP_77tUAac6w&q=ZANE+ProEd+Reviews&sa=X&ved=2ahUKEwi_v_7Cs-GPAxXAoGMGHbuXKccQ0bkNegQIHxAD&cshid=1758167286614497&biw=1960&bih=1108&dpr=1.5#lrd=0x2546bc9aff207035:0x8247e94bc20e966a,3,,,,"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="flex items-center gap-2 bg-white text-black px-6 py-3 rounded-lg font-medium shadow-md border border-gray-300 transition-all duration-300 hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-    aria-label="Leave a Google Review">
-             <img src="https://img.icons8.com/color/48/google-logo.png"
-            alt="google-logo"
-            className="w-6 h-6"
-             />
-           Google Review
-          </a>
-        </motion.div>   
-       </div>
-     </motion.section> 
-        
-        {/* ProTraining Features - Scroll Rise */}
-<section
-  ref={featuresRef}
-  className="opacity-0 translate-y-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mb-16 px-4"
->
-  {[
-    {
-      title: "Advanced Simulations",
-      description: "Immerse yourself in realistic healthcare scenarios and assessments.",
-    },
-    {
-      title: "Certification",
-      description: "Earn credentials recognized by top healthcare organizations.",
-    },
-    {
-      title: "Career Advisory",
-      description: "Personalized guidance to accelerate your healthcare career.",
-    },
-    {
-      title: "Exclusive Community",
-      description: "Join a network of peers and mentors on LinkedIn & Instagram.",
-    },
-  ].map((feature, index) => (
-    <div
-      key={index}
-      className="group p-6 bg-gray-800/50 border border-gray-700 rounded-lg shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
-    >
-      <h3 className="font-semibold text-lg text-white mb-2 transition-colors duration-300 group-hover:text-blue-600">
-        {feature.title}
-      </h3>
-      <p className="text-gray-300 text-sm transition-colors duration-300 group-hover:text-white">
-        {feature.description}
+  <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+    {/* Left text */}
+    <div className="text-center sm:text-left">
+      <h3 className="text-2xl font-semibold text-green-400">AVAIL UPTO 50% SCHOLARSHIP!!</h3>
+      <p className="mt-2 text-gray-200">
+        Drop a 5 star google review & get a chance to avail a scholarship of up to <span className="text-blue-400 font-bold">50% on any</span> pro training course!
       </p>
     </div>
-  ))}
-</section>
+
+    {/* Button with your Google Review link */}
+    <a
+      href="https://www.google.com/search?sca_esv=fed2f1198a559411&rlz=1C5MACD_enIN1164IN1164&sxsrf=AE3TifNMXX6HD5eZlXH_ynjNTHaVhkfZEw:1758167283249&si=AMgyJEtREmoPL4P1I5IDCfuA8gybfVI2d5Uj7QMwYCZHKDZ-E5QJkKLwyRzatmMuzKz9qcHJvnQ1ED2zh5Af_v6kgvLNIcHG0_5eirBWOthtY0FkHJOwegXvLezGoUJekP_77tUAac6w&q=ZANE+ProEd+Reviews&sa=X&ved=2ahUKEwi_v_7Cs-GPAxXAoGMGHbuXKccQ0bkNegQIHxAD&cshid=1758167286614497&biw=1960&bih=1108&dpr=1.5#lrd=0x2546bc9aff207035:0x8247e94bc20e966a,3,,,,"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2 bg-white/90 text-black px-6 py-3 rounded-xl font-semibold shadow-md hover:bg-blue-600 hover:text-white transition-all duration-300"
+      aria-label="Leave a Google Review"
+    >
+      <img
+        src="https://img.icons8.com/color/48/google-logo.png"
+        alt="google-logo"
+        className="w-6 h-6"
+      />
+      Google Review
+    </a>
+  </div>
+</motion.div>
+       </div>
+     </motion.section> 
+     
 
  {/* CTA Button */}
 <motion.div
@@ -400,10 +383,9 @@ function CTAPage() {
   </a>
 </motion.div>
 
-{/* Social Links - Scroll Rise */}
 <section
   ref={socialRef}
-  className="opacity-0 translate-y-10 flex flex-col sm:flex-row gap-4 justify-center mb-16 mt-12" // <-- added mt-12 for spacing
+  className="opacity-0 translate-y-10 flex flex-col sm:flex-row gap-4 justify-center mb-16 mt-12"
 >
   {[
     {
@@ -422,8 +404,14 @@ function CTAPage() {
     },
     {
       href: "https://zaneproed.com",
-      icon: <Globe className="w-5 h-5" />,
-      label: "Website",
+      icon: (
+        <img
+          src="https://static.wixstatic.com/media/6abdd9_d0e031399dad4c0caf608d0a6407ac4c~mv2.png" // <-- your hosted logo
+          alt="ZANE ProEd logo"
+          className="w-6 h-6"
+        />
+      ),
+      label: "ZANE ProEd",
       color: "hover:bg-gray-700",
       focusRing: "focus:ring-gray-500",
     },
@@ -472,7 +460,7 @@ function CTAPage() {
                     >
                       <CardHeader>
                         <div className="flex items-start justify-between mb-4">
-                          <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                          <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
                             <Award className="w-6 h-6 text-white" />
                           </div>
                           <div className="text-right">
@@ -536,7 +524,7 @@ function CTAPage() {
         </section>
       </div>
 
-      <style jsx>{`
+      <style >{`
         @keyframes rise-from-bottom {
           0% {
             opacity: 0;
