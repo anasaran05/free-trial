@@ -9,7 +9,6 @@ import { PrimaryButton } from "@/components/Button";
 import ProgressBar from "@/components/ProgressBar";
 import { fetchTasks, organizeTasks, Course, calculateProgress } from "@/lib/csv";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-
 const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
 
 class ErrorBoundary extends React.Component<
