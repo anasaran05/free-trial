@@ -449,6 +449,7 @@ function CTAPage() {
   ))}
 </section>
 
+
         {/* Recommended Free Trial Courses - Infinite Horizontal Scroll */}
         <section ref={recommendedRef} className="opacity-0 translate-y-10 max-w-6xl mx-auto mb-16 px-4 w-full">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-8 text-center">
@@ -502,7 +503,7 @@ function CTAPage() {
                           {course.name}
                         </CardTitle>
                         <CardDescription className="text-gray-300 break-words whitespace-normal">
-  Comprehensive training program covering essential healthcare administration skills.
+  .
 </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-6">
