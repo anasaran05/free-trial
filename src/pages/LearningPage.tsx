@@ -64,6 +64,7 @@ export default function LearningPage() {
     try {
       setLoading(true);
       setError(null);
+      const startTime = Date.now(); // Track loading start time
       
       console.log('🔄 Loading learning data for:', { courseId, chapterId, lessonId });
       
@@ -105,6 +106,14 @@ export default function LearningPage() {
       setTopics(lessonTopics);
       setQuizQuestions(lessonQuiz);
       
+      // Check if quiz was already completed
+      const existingScore = getQuizScore(lessonId);
+      if (existingScore !== null) {
+        setQuizScoreState(existingScore);
+        setQuizCompleted(true);
+        console.log('📊 Quiz already completed with score:', existingScore);
+      }
+      
       // Set current topic
       if (topicId) {
         const topic = lessonTopics.find(t => t.id === topicId);
@@ -123,30 +132,51 @@ export default function LearningPage() {
         setCurrentTopic(null);
       }
       
-      // Check if quiz was already completed
-      const existingScore = getQuizScore(lessonId);
-      if (existingScore !== null) {
-        setQuizScoreState(existingScore);
-        setQuizCompleted(true);
-        console.log('📊 Quiz already completed with score:', existingScore);
-      }
-      
       if (lessonTopics.length === 0 && lessonQuiz.length === 0) {
         setError(`No learning content found for lesson: ${lessonId}. Please check the topics and quiz CSV files.`);
       }
       
+      // Calculate elapsed time and ensure minimum loading duration
+      const elapsedTime = Date.now() - startTime;
+      const minLoadingTime = 2000; // 2 seconds
+      const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+      // Wait for remaining time if needed
+      setTimeout(() => {
+        setLoading(false);
+      }, remainingTime);
+      
     } catch (err) {
       console.error('❌ Error loading learning data:', err);
       setError(err instanceof Error ? err.message : 'Failed to load learning data');
-    } finally {
-      setLoading(false);
+      console.error("Error loading learning data:", err);
+     
+      // Still respect minimum loading time even on error
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
     }
   };
 
-  const handleTopicSelect = (topic: Topic) => {
+  const handleTopicSelect = async (topic: Topic) => {
     console.log('🎯 Topic selected:', topic.title);
     setCurrentTopic(topic);
-    markTopicWatched(lessonId!, topic.id);
+    if (lessonId && topic.id) {
+      markTopicWatched(lessonId, topic.id);
+      // Check if all topics are now watched
+      const updatedWatchedTopics = getWatchedTopics(lessonId);
+      if (updatedWatchedTopics.length === topics.length && topics.length > 0) {
+        // All topics watched - sync learning completion
+        try {
+          if (courseId && chapterId && lessonId) {
+            // You can implement syncLearningDone here if needed
+            console.log('✅ All topics completed');
+          }
+        } catch (error) {
+          console.error('⚠️ Failed to sync learning completion:', error);
+        }
+      }
+      window.dispatchEvent(new Event("progress:updated")); // 🔥 notify chapter
+    }
     navigate(`/courses/${courseId}/chapters/${chapterId}/lessons/${lessonId}/learning/${topic.id}`);
   };
 
@@ -165,7 +195,7 @@ export default function LearningPage() {
     console.log('✅ Answer selected:', answerIndex, 'for question:', currentQuizQuestion);
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     if (currentQuizQuestion < quizQuestions.length - 1) {
       setCurrentQuizQuestion(currentQuizQuestion + 1);
     } else {
@@ -192,6 +222,13 @@ export default function LearningPage() {
           ? "Congratulations! You can now access the simulation tasks."
           : "You need 80% to pass. You can retake the quiz anytime.",
       });
+
+      try {
+        // Notify chapter page to update progress
+        window.dispatchEvent(new Event("progress:updated"));
+      } catch (err) {
+        console.error("❌ Error in quiz completion:", err);
+      }
     }
   };
 
@@ -239,20 +276,19 @@ export default function LearningPage() {
   });
 
   if (loading) {
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black z-50">
-      <div className="text-center">
-        <DotLottieReact
-          src="/animations/animation.lottie"
-          loop
-          autoplay
-          style={{ width: 400, height: 400 }}
-        />
-       
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black z-50">
+        <div className="text-center">
+          <DotLottieReact
+            src="/animations/animation.lottie"
+            loop
+            autoplay
+            style={{ width: 400, height: 400 }}
+          />
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   if (error) {
     return (
@@ -287,6 +323,7 @@ export default function LearningPage() {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-12">
+          {/* Breadcrumb Navigation for Quiz */}
           <nav className="mb-8">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Link to="/courses" className="hover:text-foreground transition-colors">
@@ -308,41 +345,43 @@ export default function LearningPage() {
               <span className="text-foreground">Quiz</span>
             </div>
           </nav>
-
           <div className="max-w-4xl mx-auto">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span>Lesson Quiz - {lessonName}</span>
-                  <Badge variant="outline"
-                     className="text-lg whitespace-nowrap px-3 py-1">
-                      {currentQuizQuestion + 1} of {quizQuestions.length}
+                  <Badge variant="outline">
+                    {currentQuizQuestion + 1} / {quizQuestions.length}
                   </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent>
                 <div className="space-y-6">
-                  <Progress value={((currentQuizQuestion + 1) / quizQuestions.length) * 100} className="w-full" />
-                  
+                  <Progress value={((currentQuizQuestion + 1) / quizQuestions.length) * 100} />
+                 
                   <div className="space-y-4">
                     <h3 className="text-xl font-semibold">
                       {quizQuestions[currentQuizQuestion]?.question || 'Question not available'}
                     </h3>
-                    
-                    <div className="space-y-2">
+                   
+                    <div className="space-y-3">
                       {quizQuestions[currentQuizQuestion]?.options.map((option, index) => (
-                        <Button
+                        <div
                           key={index}
-                          variant={selectedAnswers[currentQuizQuestion] === index ? "default" : "outline"}
-                          className="w-full justify-start text-left h-auto p-4"
+                          className={`w-full p-4 rounded-md border cursor-pointer transition-colors min-h-[3rem] ${
+                            selectedAnswers[currentQuizQuestion] === index
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-background border-border hover:bg-accent hover:text-accent-foreground'
+                          }`}
                           onClick={() => handleAnswerSelect(index)}
                         >
-                          {option}
-                        </Button>
+                          <div className="text-left break-words whitespace-normal leading-relaxed">
+                            {option}
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
-
                   <div className="flex justify-between">
                     <Button
                       variant="outline"
@@ -350,7 +389,7 @@ export default function LearningPage() {
                     >
                       Back to Learning
                     </Button>
-                    
+                   
                     <Button
                       onClick={handleNextQuestion}
                       disabled={selectedAnswers[currentQuizQuestion] === undefined}
@@ -370,9 +409,9 @@ export default function LearningPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+     
       <div className="container mx-auto px-4 py-12">
-        {/* Breadcrumb */}
+        {/* Breadcrumb Navigation for Learning */}
         <nav className="mb-8">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Link to="/courses" className="hover:text-foreground transition-colors">
@@ -425,7 +464,7 @@ export default function LearningPage() {
                         <iframe
                           width="100%"
                           height="100%"
-                          src={`https://www.youtube.com/embed/${currentTopic.youtubeId}`}
+                          src={`https://www.youtube.com/embed/${currentTopic.youtubeId}?modestbranding=1&controls=1&showinfo=0&rel=0&iv_load_policy=3&disablekb=1&end=${Math.floor(Math.random() * 1000) + 1}`}
                           title={currentTopic.title}
                           frameBorder="0"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -458,9 +497,9 @@ export default function LearningPage() {
                 </CardContent>
               </Card>
 
-              {/* Quiz Results */}
+              {/* Quiz Results - Desktop View (hidden on mobile) */}
               {quizCompleted && (
-                <Card className="mt-6">
+                <Card className="mt-6 hidden lg:block">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Award className="h-5 w-5" />
@@ -476,7 +515,7 @@ export default function LearningPage() {
                         </Badge>
                       </div>
                       <Progress value={quizScore} />
-                      
+                     
                       <div className="space-y-4">
                         {isPassed ? (
                           <>
@@ -590,6 +629,47 @@ export default function LearningPage() {
               </Card>
             </div>
           </div>
+        )}
+
+        {/* Quiz Results - Mobile View (at bottom, only visible on mobile) */}
+        {quizCompleted && (
+          <Card className="mt-6 lg:hidden">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Award className="h-5 w-5" />
+                Quiz Results
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span>Your Score:</span>
+                  <Badge variant={isPassed ? "default" : "destructive"}>
+                    {quizScore}%
+                  </Badge>
+                </div>
+                <Progress value={quizScore} />
+               
+                <div className="space-y-4">
+                  {isPassed ? (
+                    <>
+                      <p className="text-success">Congratulations! You passed the quiz.</p>
+                      <Button onClick={handleStartSimulation} className="w-full">
+                        Start Workplace Simulation
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-destructive">You need 80% to pass. Try again!</p>
+                      <Button onClick={handleQuizStart} variant="outline" className="w-full">
+                        Retake Quiz
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

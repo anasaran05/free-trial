@@ -8,6 +8,7 @@ import { fetchTasks, organizeTasks, Course, calculateProgress } from '@/lib/csv'
 import { BookOpen, Clock, Award } from 'lucide-react';
 import Footer from "../components/Footer";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { InteractiveHoverButton } from "../components/Buttons/interactive-hover-button";
 
 // Use environment variable or fallback to sample data
 const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
@@ -183,79 +184,83 @@ export default function CoursesIndex() {
               const stats = getCourseStats(course);
 
               return (
-                <Card 
-                  key={course.id}
-                  variant="interactive"
-                  className="h-full animate-fade-in bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg transition-transform hover:scale-[1.02] hover:shadow-2xl"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <CardHeader>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 bg-primary/80 backdrop-blur-md rounded-lg flex items-center justify-center">
-                        <Award className="w-6 h-6 text-primary-foreground" />
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-primary">
-                          {stats.earnedXP}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          / {stats.totalXP} XP
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <CardTitle className="text-xl">
-                      {course.name}
-                    </CardTitle>
-                    
-                    <CardDescription>
-                      {course.description || "No description available."}
-                    </CardDescription>
-                  </CardHeader>
-                  
-                  <CardContent className="space-y-6">
-                    {/* Progress */}
-                    <div>
-                      <ProgressBar
-                        value={stats.progressPercentage}
-                        label="Progress"
-                        size="sm"
-                      />
-                    </div>
-                    
-                    {/* Course Stats */}
-                    <div className="grid grid-cols-2 gap-4 text-center">
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-center gap-1 text-muted-foreground">
-                          <BookOpen className="w-4 h-4" />
-                          <span className="text-xs">Chapters</span>
-                        </div>
-                        <div className="font-semibold text-foreground">
-                          {stats.totalChapters}
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-center gap-1 text-muted-foreground">
-                          <Clock className="w-4 h-4" />
-                          <span className="text-xs">Tasks</span>
-                        </div>
-                        <div className="font-semibold text-foreground">
-                          {stats.completedTasks}/{stats.totalTasks}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Action Button */}
-                    <div className="pt-4">
-                      <Link to={`/courses/${course.id}`} className="block">
-                        <Button className="w-full bg-green-700 hover:bg-blue-500 text-white">
-                          {stats.completedTasks > 0 ? 'Continue Course' : 'Start Course'}
-                        </Button>
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
+              <Card
+  key={course.id}
+  variant="interactive"
+  className="h-full animate-fade-in bg-backdrop-blur-xl border border-white/10 shadow-lg
+             transition-transform hover:scale-[1.02] hover:shadow-2xl
+             p-4 sm:p-6 md:p-8" // smaller padding for mobile
+  style={{ animationDelay: `${index * 100}ms` }}
+>
+  <CardHeader>
+    <div className="flex items-start justify-between mb-3 sm:mb-4">
+      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/80 backdrop-blur-md rounded-lg flex items-center justify-center">
+        <Award className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
+      </div>
+      <div className="text-right">
+        <div className="text-xl sm:text-2xl font-bold text-primary">
+          {stats.earnedXP}
+        </div>
+        <div className="text-[0.65rem] sm:text-xs text-muted-foreground">
+          / {stats.totalXP} XP
+        </div>
+      </div>
+    </div>
+
+    <CardTitle className="text-lg sm:text-xl text-green-600">
+      {course.name}
+    </CardTitle>
+
+    <CardDescription className="text-sm sm:text-base">
+      {course.description || "No description available."}
+    </CardDescription>
+  </CardHeader>
+
+  <CardContent className="space-y-4 sm:space-y-6">
+    <ProgressBar
+      value={stats.progressPercentage}
+      label="Progress"
+      size="sm"
+    />
+
+    <div className="grid grid-cols-2 gap-2 sm:gap-4 text-center text-xs sm:text-sm">
+      <div className="space-y-1">
+        <div className="flex items-center justify-center gap-1 text-muted-foreground">
+          <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span>Chapters</span>
+        </div>
+        <div className="font-semibold text-foreground text-sm sm:text-base">
+          {stats.totalChapters}
+        </div>
+      </div>
+
+      <div className="space-y-1">
+        <div className="flex items-center justify-center gap-1 text-muted-foreground">
+          <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span>Tasks</span>
+        </div>
+        <div className="font-semibold text-foreground text-sm sm:text-base">
+          {stats.completedTasks}/{stats.totalTasks}
+        </div>
+      </div>
+    </div>
+
+    <div className="pt-4 sm:pt-6">
+      <Link to={`/courses/${course.id}`} className="block">
+        <InteractiveHoverButton
+          className="relative w-full flex items-center justify-center
+                     rounded-lg sm:rounded-xl font-semibold px-3 py-2 sm:px-4 sm:py-3
+                     bg-gray-200 text-black
+                     hover:bg-black hover:text-white
+                     transition-all duration-300 ease-in-out shadow-sm
+                     text-sm sm:text-base"
+        >
+          {stats.completedTasks > 0 ? "Continue Course" : "Start Course"}
+        </InteractiveHoverButton>
+      </Link>
+    </div>
+  </CardContent>
+</Card>
               );
             })}
           </div>

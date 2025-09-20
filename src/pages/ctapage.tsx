@@ -10,7 +10,7 @@ import ProgressBar from "@/components/ProgressBar";
 import { fetchTasks, organizeTasks, Course, calculateProgress } from "@/lib/csv";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react'; 
 import { AuroraText } from "@/components/Reactbits/aurora-text";
-
+import { InteractiveHoverButton } from "../components/Buttons/interactive-hover-button";
 
 const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
 
@@ -278,15 +278,16 @@ function CTAPage() {
 </motion.h2>
     {/* Subheading */}
     <motion.p
-  className="text-xl lg:text-2xl text-center text-gray-200 max-w-4xl mx-auto mt-10 mb-16 leading-relaxed"
+  className="text-base sm:text-lg lg:text-2xl text-center text-gray-200 max-w-xs sm:max-w-xl lg:max-w-4xl mx-auto mt-6 sm:mt-10 mb-8 sm:mb-16 leading-relaxed"
   initial={{ opacity: 0, y: 20 }}
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.4, delay: 0.2 }}
 >
   Unlock the full experience with{" "}
-  <span className="text-3xl lg:text-4xl text-red-700 font-bold">Zane ProEd</span>’s Pro-Training Courses → Your next move to upskill, gain industry exposure, and become job-ready.
+  <span className="text-xl sm:text-2xl lg:text-4xl text-red-700 font-bold whitespace-nowrap">
+    Zane ProEd
+  </span>’s Pro-Training Courses → Your next move to upskill, gain industry exposure, and become job-ready.
 </motion.p>
-
     {/* Feature Cards Grid */}
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10">
   {[
@@ -535,13 +536,20 @@ function CTAPage() {
                             </div>
                           </div>
                         </div>
-                        <div className="pt-4">
-                          <a href={`/courses/${course.id}`} className="block">
-                            <button className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded">
-                              {stats.completedTasks > 0 ? 'Continue Course' : 'Start Course'}
-                            </button>
-                          </a>
-                        </div>
+                       <div className="pt-4">
+  <a href={`/courses/${course.id}`} className="block">
+    <InteractiveHoverButton
+      className="relative w-full flex items-center justify-center
+                 rounded-lg sm:rounded-xl font-semibold px-3 py-2 sm:px-4 sm:py-3
+                 bg-green-500 text-white
+                 hover:bg-green-600 hover:text-white
+                 transition-all duration-300 ease-in-out shadow-sm
+                 text-sm sm:text-base"
+    >
+      {stats.completedTasks > 0 ? "Continue Course" : "Start Course"}
+    </InteractiveHoverButton>
+  </a>
+</div>
                       </CardContent>
                     </Card>
                   </div>

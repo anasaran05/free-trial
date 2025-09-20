@@ -14,7 +14,7 @@ const WIX_RETURN_URL = import.meta.env.VITE_WIX_RETURN_URL || 'https://example.c
 
 export default function TaskPage() {
   const { courseId, chapterId, taskId } = useParams<{ courseId: string; chapterId: string; taskId: string }>();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -150,24 +150,24 @@ export default function TaskPage() {
   };
 
   const handleTaskCompleted = () => {
-  if (courseId && taskId) {
-    try {
-      const completedKey = `course_${courseId}_completed_tasks`;
-      const completed = sessionStorage.getItem(completedKey);
-      const arr = completed ? (JSON.parse(completed) as string[]) : [];
+    if (courseId && taskId) {
+      try {
+        const completedKey = `course_${courseId}_completed_tasks`;
+        const completed = sessionStorage.getItem(completedKey);
+        const arr = completed ? (JSON.parse(completed) as string[]) : [];
 
-      if (!arr.includes(taskId)) {
-        arr.push(taskId);
-        sessionStorage.setItem(completedKey, JSON.stringify(arr));
+        if (!arr.includes(taskId)) {
+          arr.push(taskId);
+          sessionStorage.setItem(completedKey, JSON.stringify(arr));
+        }
+
+        console.log('Navigating to /cta with courseId:', courseId);
+        navigate('/cta', { state: { courseId } });
+      } catch (error) {
+        console.error('Error in handleTaskCompleted:', error);
       }
-
-      console.log('Navigating to /cta with courseId:', courseId);
-      navigate('/cta', { state: { courseId } }); // Pass courseId in state
-    } catch (error) {
-      console.error('Error in handleTaskCompleted:', error);
     }
-  }
-};
+  };
 
   if (loading) {
     return (
@@ -273,6 +273,7 @@ export default function TaskPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto px-4 py-12">
+        {/* Navigation */}
         <nav className="mb-8">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Link to="/courses" className="hover:text-foreground transition-colors">Courses</Link>
@@ -285,6 +286,7 @@ export default function TaskPage() {
           </div>
         </nav>
 
+        {/* Top Content - Course, Chapter, Task Info */}
         <div className="mb-12">
           <div className="flex items-start gap-6 mb-6">
             <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center">
@@ -308,8 +310,11 @@ export default function TaskPage() {
           </div>
         </div>
 
+        {/* Main Content Grid - Desktop keeps original layout, Mobile shows Scenario + Instructions + Resources */}
         <div className="grid lg:grid-cols-3 gap-8">
+          {/* Left Column - Scenario + Resources (Desktop), Scenario only (Mobile) */}
           <div className="lg:col-span-2 space-y-8">
+            {/* Scenario Card - Always visible */}
             <Card>
               <CardHeader>
                 <CardTitle>
@@ -321,7 +326,8 @@ export default function TaskPage() {
               </CardContent>
             </Card>
 
-            <div className="space-y-6">
+            {/* Desktop Resources - Only show on desktop */}
+            <div className="space-y-6 lg:block hidden">
               {task.resources?.pdfs?.length > 0 && (
                 <Card>
                   <CardHeader>
@@ -394,7 +400,8 @@ export default function TaskPage() {
             </div>
           </div>
 
-          <div className="space-y-6">
+          {/* Right Column - Instructions + Progress (Desktop only) */}
+          <div className="lg:space-y-6 hidden lg:block">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 !text-2xl !font-bold text-white">
@@ -458,6 +465,148 @@ export default function TaskPage() {
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Mobile Layout: Instructions Card - AFTER Scenario Card */}
+        <div className="block lg:hidden mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 !text-2xl !font-bold text-white">
+                <FileText className="w-5 h-5" /> Instructions for Completion
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 text-sm text-muted-foreground">
+                {task.instructions ? (
+                  task.instructions.split('\n').map((line: string, i: number) => {
+                    const t = line.trim();
+                    if (!t) return null;
+                    return (
+                      <div key={i} className="flex items-start gap-2">
+                        <span className="text-primary font-medium">•</span>
+                        <span>{t}</span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <>
+                    <div className="flex items-start gap-2"><span className="text-primary font-medium">•</span><span>Compare the versions using the provided SOP headers.</span></div>
+                    <div className="flex items-start gap-2"><span className="text-primary font-medium">•</span><span>Confirm which version should be marked "Active" based on the latest effective date.</span></div>
+                    <div className="flex items-start gap-2"><span className="text-primary font-medium">•</span><span>Fill the Document Master Register template accordingly.</span></div>
+                    <div className="flex items-start gap-2"><span className="text-primary font-medium">•</span><span>Clearly mark the older version as "Archived" and note the archive location.</span></div>
+                    <div className="flex items-start gap-2"><span className="text-primary font-medium">•</span><span>Submit the completed register to your supervisor for review.</span></div>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Mobile: Resources Section - After Instructions */}
+        <div className="block lg:hidden space-y-6 mb-8">
+          {task.resources?.pdfs?.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="!text-2xl !font-bold text-white">Reference Documents</CardTitle>
+                <p className="text-muted-foreground">Review these documents before proceeding with the task.</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {task.resources.pdfs.map((pdfUrl: string, index: number) => (
+                  <TaskResourceButton
+                    key={`pdf_${index}`}
+                    title={`Document ${index + 1}`}
+                    url={pdfUrl}
+                    type="pdf"
+                    taskId={taskId!}
+                    resourceId={`pdf_${index}`}
+                    required={true}
+                    onVisited={handleResourceVisited}
+                  />
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {task.resources?.forms?.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <span className="text-2xl font-bold text-white">
+                    Fillable Documents
+                  </span>
+                </CardTitle>
+                <p className="text-muted-foreground">Complete these forms as part of your task.</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {task.resources.forms.map((formUrl: string, index: number) => (
+                  <TaskResourceButton
+                    key={`form_${index}`}
+                    title={`Form ${index + 1}`}
+                    url={formUrl}
+                    type="form"
+                    taskId={taskId!}
+                    resourceId={`form_${index}`}
+                    required={true}
+                    onVisited={handleResourceVisited}
+                  />
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {task.resources?.answerKey && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Answer Key</CardTitle>
+                <p className="text-muted-foreground">Reference material for review (optional).</p>
+              </CardHeader>
+              <CardContent>
+                <TaskResourceButton
+                  title="Answer Key"
+                  url={task.resources.answerKey}
+                  type="pdf"
+                  taskId={taskId!}
+                  resourceId="answer_key"
+                  required={false}
+                  onVisited={handleResourceVisited}
+                />
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        {/* Mobile: Task Progress - At the bottom */}
+        <div className="block lg:hidden">
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <span className="text-2xl font-bold text-white">
+                  Task Progress
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-primary mb-2">{visitedRequiredCount}</div>
+                  <div className="text-sm text-muted-foreground">/ {requiredCount} Resources Completed</div>
+                </div>
+
+                <div className={`
+                  transition-all duration-300 ease-out
+                  ${showCompleted ? 'opacity-100 transform-none' : 'opacity-0 translate-y-2 pointer-events-none'}
+                `}>
+                  <GlowButton className="w-full" icon={<CheckCircle className="w-5 h-5" />} onClick={handleTaskCompleted}>
+                    Task Completed
+                  </GlowButton>
+                </div>
+
+                {!showCompleted && (
+                  <p className="text-xs text-muted-foreground text-center">Complete all required resources to finish this task</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
