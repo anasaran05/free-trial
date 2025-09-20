@@ -278,7 +278,7 @@ export default function LessonPage() {
                      transition-all duration-300 ease-in-out shadow-sm
                      text-sm sm:text-base"
         >
-                              Start Task
+                              ㅤStart Task
                             </InteractiveHoverButton>
                           )}
                         </Link>

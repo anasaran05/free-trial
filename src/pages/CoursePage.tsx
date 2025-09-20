@@ -261,7 +261,7 @@ function ChapterCard({
                      transition-all duration-300 ease-in-out shadow-sm
                      text-sm sm:text-base"
         >
-      {chapterProgress.completedTasks > 0 ? 'Continue' : 'Start Chapter'}
+      {chapterProgress.completedTasks > 0 ? 'Continue' : 'ㅤㅤStart Chapterㅤ'}
     </InteractiveHoverButton>
   </Link>
 </div>

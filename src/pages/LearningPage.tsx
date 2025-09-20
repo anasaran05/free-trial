@@ -277,15 +277,13 @@ export default function LearningPage() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black z-50">
-        <div className="text-center">
-          <DotLottieReact
-            src="/animations/animation.lottie"
-            loop
-            autoplay
-            style={{ width: 400, height: 400 }}
-          />
-        </div>
+      <div className="fixed inset-0 flex items-center justify-center bg-black z-50 w-screen h-screen">
+        <DotLottieReact
+          src="/animations/animation.lottie"
+          loop
+          autoplay
+          style={{ width: 400, height: 400 }}
+        />
       </div>
     );
   }

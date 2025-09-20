@@ -252,7 +252,7 @@ export default function ChapterPage() {
                      transition-all duration-300 ease-in-out shadow-sm
                      text-sm sm:text-base"
         >
-                              Start Lesson
+                             ㅤ Start Lesson
                             </InteractiveHoverButton>
                           )}
                         </Link>
