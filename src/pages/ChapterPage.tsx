@@ -131,7 +131,7 @@ export default function ChapterPage() {
                 {chapter.name}
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
-                Complete all lessons in this chapter to advance your healthcare administration skills.
+                Complete all lessons in this chapter to advance your healthcare skills.
               </p>
              
               {/* Chapter Progress */}
@@ -155,7 +155,7 @@ export default function ChapterPage() {
           </div>
 
           {/* Chapter Stats - Mobile Optimized */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+          <div className="chapter-stats grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
             <div className="text-center p-2 sm:p-0">
               <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">{chapter.lessons.length}</div>
               <div className="text-xs sm:text-sm text-muted-foreground">Total Lessons</div>
@@ -165,8 +165,8 @@ export default function ChapterPage() {
               <div className="text-xs sm:text-sm text-muted-foreground">Completed Tasks</div>
             </div>
             <div className="text-center p-2 sm:p-0">
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">{Math.round(chapterProgress.completionPercentage)}%</div>
-              <div className="text-xs sm:text-sm text-muted-foreground">Progress</div>
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-success">{Math.round(chapterProgress.completionPercentage)}%</div>
+              <div className="text-xs sm:text-sm text-success">Progress</div>
             </div>
           </div>
         </div>
@@ -191,22 +191,14 @@ export default function ChapterPage() {
                 >
                   <CardHeader className="p-4 sm:p-6">
                     <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4">
+                      {/* Lesson Content - No Number Indicator */}
                       <div className="flex items-start gap-3 sm:gap-4 flex-1 w-full min-w-0">
-                        <div className={`
-                          w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center text-base sm:text-lg font-bold flex-shrink-0
-                          ${isLessonFullyComplete
-                            ? 'bg-success text-success-foreground'
-                            : 'bg-surface text-muted-foreground'
-                          }
-                        `}>
-                          {isLessonFullyComplete ? '✓' : index + 1}
-                        </div>
-                       
+                        {/* Removed the number/checkmark circle */}
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-base sm:text-lg md:text-xl mb-2 leading-tight">
+                          <CardTitle className="text-sm sm:text-base mb-2 leading-tight">
                             {lesson.name}
                           </CardTitle>
-                          <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4 leading-relaxed">
+                          <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4 leading-relaxed">
                             {lesson.tasks.length} tasks • {lesson.tasks.reduce((sum, task) => sum + task.xp, 0)} XP
                           </p>
                          
@@ -245,14 +237,14 @@ export default function ChapterPage() {
                             </PrimaryButton>
                           ) : (
                             <InteractiveHoverButton
-          className="relative w-full flex items-center justify-center
-                     rounded-lg sm:rounded-xl font-semibold px-3 py-2 sm:px-4 sm:py-3
-                     bg-gray-200 text-black
-                     hover:bg-black hover:text-white
-                     transition-all duration-300 ease-in-out shadow-sm
-                     text-sm sm:text-base"
-        >
-                             ㅤ Start Lesson
+                              className="relative w-full flex items-center justify-center
+                                         rounded-lg sm:rounded-xl font-semibold px-3 py-2 sm:px-4 sm:py-3
+                                         bg-gray-200 text-black
+                                         hover:bg-black hover:text-white
+                                         transition-all duration-300 ease-in-out shadow-sm
+                                         text-sm sm:text-base"
+                            >
+                              ㅤ Start Lesson
                             </InteractiveHoverButton>
                           )}
                         </Link>
@@ -271,6 +263,72 @@ export default function ChapterPage() {
           </div>
         </div>
       </div>
+
+      <style >{`
+        /* Chapter Stats - Mobile Horizontal Layout */
+        @media screen and (max-width: 768px) {
+          .chapter-stats {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 8px 0 !important;
+            flex-wrap: nowrap !important;
+          }
+          
+          .chapter-stats > div {
+            flex: 1 !important;
+            text-align: center !important;
+            padding: 4px 2px !important;
+            min-width: 0 !important;
+          }
+          
+          .chapter-stats > div > div:first-child {
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            line-height: 1.2 !important;
+            margin-bottom: 1px !important;
+            color: #1f2937 !important;
+          }
+          
+          .chapter-stats > div > div:last-child {
+            font-size: 10px !important;
+            line-height: 1.1 !important;
+            color: #6b7280 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.025em !important;
+          }
+          
+          /* Special styling for Progress percentage */
+          .chapter-stats > div:last-child > div:first-child {
+            font-size: 18px !important;
+            color: #059669 !important;
+          }
+          
+          .chapter-stats > div:last-child > div:last-child {
+            color: #059669 !important;
+          }
+        }
+
+        /* Ensure desktop layout remains unchanged */
+        @media screen and (min-width: 769px) {
+          .chapter-stats {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 1.5rem !important;
+          }
+          
+          .chapter-stats > div {
+            display: block !important;
+            padding: 0 !important;
+            text-align: center !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

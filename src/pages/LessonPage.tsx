@@ -173,7 +173,7 @@ export default function LessonPage() {
                 {lesson.name}
               </h1>
               <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
-                Complete all tasks in this lesson to advance your healthcare administration skills.
+                Complete all tasks in this lesson to advance your healthcare skills.
               </p>
              
               {/* Lesson Progress */}
@@ -230,19 +230,11 @@ export default function LessonPage() {
                 >
                   <CardHeader className="p-4 sm:p-6">
                     <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                      {/* Task Content - No Number Indicator */}
                       <div className="flex items-start gap-3 sm:gap-4 flex-1 w-full">
-                        <div className={`
-                          w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center text-base sm:text-lg font-bold flex-shrink-0
-                          ${isCompleted
-                            ? 'bg-success text-success-foreground'
-                            : 'bg-surface text-muted-foreground'
-                          }
-                        `}>
-                          {isCompleted ? '✓' : index + 1}
-                        </div>
-                       
+                        {/* Removed the number/checkmark circle entirely */}
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg sm:text-xl mb-2 leading-tight">
+                          <CardTitle className="text-sm sm:text-xl mb-2 leading-tight">
                             {task.title}
                           </CardTitle>
                           <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4 leading-relaxed">
@@ -271,13 +263,13 @@ export default function LessonPage() {
                             </PrimaryButton>
                           ) : (
                              <InteractiveHoverButton
-          className="relative w-full flex items-center justify-center
-                     rounded-lg sm:rounded-xl font-semibold px-3 py-2 sm:px-4 sm:py-3
-                     bg-gray-200 text-black
-                     hover:bg-black hover:text-white
-                     transition-all duration-300 ease-in-out shadow-sm
-                     text-sm sm:text-base"
-        >
+                              className="relative w-full flex items-center justify-center
+                                         rounded-lg sm:rounded-xl font-semibold px-3 py-2 sm:px-4 sm:py-3
+                                         bg-gray-200 text-black
+                                         hover:bg-black hover:text-white
+                                         transition-all duration-300 ease-in-out shadow-sm
+                                         text-sm sm:text-base"
+                            >
                               ㅤStart Task
                             </InteractiveHoverButton>
                           )}

@@ -15,8 +15,11 @@ export default function Header({ className = '' }: HeaderProps) {
     >
       <nav className="theme-container">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
+          {/* Logo - 2cm offset on desktop, normal on mobile */}
+          <Link 
+            to="/" 
+            className="flex items-center space-x-2 group md:-ml-[2cm]"
+          >
             <span className="font-heading font-semibold text-xl">
               ZANE <span style={{ color: '#ff0000' }}>ΩMEGA</span>
             </span>
@@ -25,6 +28,7 @@ export default function Header({ className = '' }: HeaderProps) {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
           </div>
+          
           {/* Mobile menu button */}
           <button
             className="md:hidden p-2 rounded-lg text-foreground hover:bg-surface-elevated transition-colors duration-200"

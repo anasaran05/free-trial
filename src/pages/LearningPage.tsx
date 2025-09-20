@@ -46,6 +46,8 @@ export default function LearningPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lessonName, setLessonName] = useState<string>('');
+  const [courseName, setCourseName] = useState<string>('');
+  const [chapterName, setChapterName] = useState<string>('');
   
   // Quiz state
   const [showQuiz, setShowQuiz] = useState(false);
@@ -92,15 +94,27 @@ export default function LearningPage() {
       console.log('📊 Topics for lesson:', lessonTopics.length, lessonId);
       console.log('📊 Quiz for lesson:', lessonQuiz.length, lessonId);
       
-      // Get lesson name
-      const lesson = findLesson(courses, courseId, chapterId, lessonId);
-      console.log('📊 Found lesson:', lesson?.name);
-      
-      if (lesson) {
-        setLessonName(lesson.name);
+      // Get lesson, chapter, and course names
+      const foundCourse = courses.find(c => c.id === courseId);
+      if (foundCourse) {
+        const foundChapter = foundCourse.chapters.find(ch => ch.id === chapterId);
+        if (foundChapter) {
+          const lesson = foundChapter.lessons.find(l => l.id === lessonId);
+          if (lesson) {
+            setCourseName(foundCourse.name);
+            setChapterName(foundChapter.name);
+            setLessonName(lesson.name);
+          } else {
+            console.warn('⚠️ Lesson not found in tasks CSV');
+            setLessonName('Unknown Lesson');
+          }
+        } else {
+          console.warn('⚠️ Chapter not found');
+          setChapterName('Unknown Chapter');
+        }
       } else {
-        console.warn('⚠️ Lesson not found in tasks CSV');
-        setLessonName('Unknown Lesson');
+        console.warn('⚠️ Course not found');
+        setCourseName('Unknown Course');
       }
       
       setTopics(lessonTopics);
@@ -317,87 +331,89 @@ export default function LearningPage() {
   }
 
   if (showQuiz && !quizCompleted) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-12">
-          {/* Breadcrumb Navigation for Quiz */}
-          <nav className="mb-8">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Link to="/courses" className="hover:text-foreground transition-colors">
-                Courses
-              </Link>
-              <ChevronRight className="w-4 h-4" />
-              <Link to={`/courses/${courseId}`} className="hover:text-foreground transition-colors">
-                Course
-              </Link>
-              <ChevronRight className="w-4 h-4" />
-              <Link to={`/courses/${courseId}/chapters/${chapterId}`} className="hover:text-foreground transition-colors">
-                Chapter
-              </Link>
-              <ChevronRight className="w-4 h-4" />
-              <Link to={`/courses/${courseId}/chapters/${chapterId}/lessons/${lessonId}`} className="hover:text-foreground transition-colors">
-                {lessonName}
-              </Link>
-              <ChevronRight className="w-4 h-4" />
-              <span className="text-foreground">Quiz</span>
-            </div>
-          </nav>
-          <div className="max-w-4xl mx-auto">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Lesson Quiz - {lessonName}</span>
-                  <Badge variant="outline">
-                    {currentQuizQuestion + 1} / {quizQuestions.length}
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  <Progress value={((currentQuizQuestion + 1) / quizQuestions.length) * 100} />
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-12">
+        {/* Breadcrumb Navigation for Quiz - Mobile Optimized */}
+        <nav className="mb-4 sm:mb-8">
+          <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground overflow-x-auto">
+            <Link to="/courses" className="hover:text-foreground transition-colors whitespace-nowrap">
+              Courses
+            </Link>
+            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <Link to={`/courses/${courseId}`} className="hover:text-foreground transition-colors whitespace-nowrap">
+              {courseName}
+            </Link>
+            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <Link to={`/courses/${courseId}/chapters/${chapterId}`} className="hover:text-foreground transition-colors whitespace-nowrap">
+              {chapterName}
+            </Link>
+            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <Link to={`/courses/${courseId}/chapters/${chapterId}/lessons/${lessonId}`} className="hover:text-foreground transition-colors whitespace-nowrap">
+              {lessonName}
+            </Link>
+            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <span className="text-foreground whitespace-nowrap">Quiz</span>
+          </div>
+        </nav>
+        <div className="max-w-4xl mx-auto">
+          <Card className="sm:shadow-lg">
+            <CardHeader className="sm:pt-6 pt-4 pb-3">
+              <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
+                <span className="text-base sm:text-lg">Lesson Quiz - {lessonName}</span>
+                <Badge variant="outline" className="text-xs sm:text-sm px-2 sm:px-3 py-0.5">
+                  {currentQuizQuestion + 1} / {quizQuestions.length}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="sm:p-6 p-4">
+              <div className="space-y-6">
+                <Progress value={((currentQuizQuestion + 1) / quizQuestions.length) * 100} className="h-1 sm:h-2" />
+               
+                <div className="space-y-4">
+                  <h3 className="text-lg sm:text-xl font-semibold leading-relaxed">
+                    {quizQuestions[currentQuizQuestion]?.question || 'Question not available'}
+                  </h3>
                  
-                  <div className="space-y-4">
-                    <h3 className="text-xl font-semibold">
-                      {quizQuestions[currentQuizQuestion]?.question || 'Question not available'}
-                    </h3>
-                   
-                    <div className="space-y-3">
-                      {quizQuestions[currentQuizQuestion]?.options.map((option, index) => (
-                        <div
-                          key={index}
-                          className={`w-full p-4 rounded-md border cursor-pointer transition-colors min-h-[3rem] ${
-                            selectedAnswers[currentQuizQuestion] === index
-                              ? 'bg-primary text-primary-foreground border-primary'
-                              : 'bg-background border-border hover:bg-accent hover:text-accent-foreground'
-                          }`}
-                          onClick={() => handleAnswerSelect(index)}
-                        >
-                          <div className="text-left break-words whitespace-normal leading-relaxed">
-                            {option}
-                          </div>
+                  <div className="space-y-2 sm:space-y-3">
+                    {quizQuestions[currentQuizQuestion]?.options.map((option, index) => (
+                      <div
+                        key={index}
+                        className={`w-full p-3 sm:p-4 rounded-md border cursor-pointer transition-colors min-h-[2.5rem] sm:min-h-[3rem] text-sm sm:text-base ${
+                          selectedAnswers[currentQuizQuestion] === index
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background border-border hover:bg-accent hover:text-accent-foreground'
+                        }`}
+                        onClick={() => handleAnswerSelect(index)}
+                      >
+                        <div className="text-left break-words whitespace-normal leading-relaxed">
+                          {option}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex justify-between">
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowQuiz(false)}
-                    >
-                      Back to Learning
-                    </Button>
-                   
-                    <Button
-                      onClick={handleNextQuestion}
-                      disabled={selectedAnswers[currentQuizQuestion] === undefined}
-                    >
-                      {currentQuizQuestion === quizQuestions.length - 1 ? "Complete Quiz" : "Next Question"}
-                    </Button>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 justify-between">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowQuiz(false)}
+                    className="w-full sm:w-auto text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-2"
+                  >
+                    Back to Learning
+                  </Button>
+                 
+                  <Button
+                    onClick={handleNextQuestion}
+                    disabled={selectedAnswers[currentQuizQuestion] === undefined}
+                    className="w-full sm:w-auto text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-2"
+                  >
+                    {currentQuizQuestion === quizQuestions.length - 1 ? "Complete Quiz" : "Next Question"}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           </div>
         </div>
       </div>
@@ -408,27 +424,27 @@ export default function LearningPage() {
     <div className="min-h-screen bg-background">
       <Header />
      
-      <div className="container mx-auto px-4 py-12">
-        {/* Breadcrumb Navigation for Learning */}
-        <nav className="mb-8">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Link to="/courses" className="hover:text-foreground transition-colors">
+      <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-12">
+        {/* Breadcrumb Navigation for Learning - Mobile Optimized */}
+        <nav className="mb-4 sm:mb-8">
+          <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground overflow-x-auto">
+            <Link to="/courses" className="hover:text-foreground transition-colors whitespace-nowrap">
               Courses
             </Link>
-            <ChevronRight className="w-4 h-4" />
-            <Link to={`/courses/${courseId}`} className="hover:text-foreground transition-colors">
-              Course
+            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <Link to={`/courses/${courseId}`} className="hover:text-foreground transition-colors whitespace-nowrap">
+              {courseName}
             </Link>
-            <ChevronRight className="w-4 h-4" />
-            <Link to={`/courses/${courseId}/chapters/${chapterId}`} className="hover:text-foreground transition-colors">
-              Chapter
+            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <Link to={`/courses/${courseId}/chapters/${chapterId}`} className="hover:text-foreground transition-colors whitespace-nowrap">
+              {chapterName}
             </Link>
-            <ChevronRight className="w-4 h-4" />
-            <Link to={`/courses/${courseId}/chapters/${chapterId}/lessons/${lessonId}`} className="hover:text-foreground transition-colors">
+            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <Link to={`/courses/${courseId}/chapters/${chapterId}/lessons/${lessonId}`} className="hover:text-foreground transition-colors whitespace-nowrap">
               {lessonName}
             </Link>
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-foreground">Learning</span>
+            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+            <span className="text-foreground whitespace-nowrap">Learning</span>
           </div>
         </nav>
 
@@ -453,47 +469,47 @@ export default function LearningPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="lg:col-span-3">
-              {/* Video Player */}
-              <Card>
-                <CardContent className="p-0">
-                  {currentTopic?.youtubeId ? (
-                    <>
-                      <div className="aspect-video">
-                        <iframe
-                          width="100%"
-                          height="100%"
-                          src={`https://www.youtube.com/embed/${currentTopic.youtubeId}?modestbranding=1&controls=1&showinfo=0&rel=0&iv_load_policy=3&disablekb=1&end=${Math.floor(Math.random() * 1000) + 1}`}
-                          title={currentTopic.title}
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          className="rounded-t-lg"
-                        />
-                      </div>
-                      <div className="p-6">
-                        <h2 className="text-xl font-semibold mb-2">{currentTopic.title}</h2>
-                        <p className="text-muted-foreground">{currentTopic.description}</p>
-                      </div>
-                    </>
-                  ) : currentTopic ? (
-                    <div className="aspect-video bg-muted flex items-center justify-center">
-                      <div className="text-center p-6">
-                        <Play className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">{currentTopic.title}</h3>
-                        <p className="text-muted-foreground mb-4">{currentTopic.description}</p>
-                        <p className="text-sm text-destructive">Video URL not available</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="aspect-video bg-muted flex items-center justify-center">
-                      <div className="text-center">
-                        <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                        <p className="text-muted-foreground">Please select a topic to begin learning</p>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+             {/* Video Player */}
+<Card>
+  <CardContent className="p-0">
+    {currentTopic?.youtubeId ? (
+      <>
+        <div className="aspect-video">
+          <iframe
+            width="100%"
+            height="100%"
+            src={`https://www.youtube.com/embed/${currentTopic.youtubeId}?modestbranding=1&controls=1&showinfo=0&rel=0&iv_load_policy=3&disablekb=1&end=${Math.floor(Math.random() * 1000) + 1}`}
+            title={currentTopic.title}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="rounded-t-lg"
+          />
+        </div>
+        <div className="p-6">
+          <h2 className="text-xl font-semibold mb-2 sm:text-xl text-base sm:leading-tight leading-relaxed">{currentTopic.title}</h2>
+          <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">{currentTopic.description}</p>
+        </div>
+      </>
+    ) : currentTopic ? (
+      <div className="aspect-video bg-muted flex items-center justify-center">
+        <div className="text-center p-6">
+          <Play className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2 sm:text-lg text-base sm:leading-tight leading-relaxed">{currentTopic.title}</h3>
+          <p className="text-muted-foreground mb-4 text-sm sm:text-base leading-relaxed">{currentTopic.description}</p>
+          <p className="text-sm text-destructive">Video URL not available</p>
+        </div>
+      </div>
+    ) : (
+      <div className="aspect-video bg-muted flex items-center justify-center">
+        <div className="text-center">
+          <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground">Please select a topic to begin learning</p>
+        </div>
+      </div>
+    )}
+  </CardContent>
+</Card>
 
               {/* Quiz Results - Desktop View (hidden on mobile) */}
               {quizCompleted && (

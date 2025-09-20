@@ -12,9 +12,8 @@ import {
   Chapter,
   calculateProgress,
 } from '@/lib/csv';
-import { BookOpen, ChevronRight } from 'lucide-react';
+import { BookOpen, ChevronRight, Award, Clock } from 'lucide-react';
 import { InteractiveHoverButton } from "../components/Buttons/interactive-hover-button";
-
 
 const CSV_URL =
   import.meta.env.VITE_CSV_URL ||
@@ -108,6 +107,124 @@ export default function CoursePage() {
           })}
         </div>
       </div>
+
+      <style >{`
+        /* Course Stats - Mobile Horizontal Layout */
+        @media screen and (max-width: 768px) {
+          .course-stats {
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 8px 0 !important;
+            flex-wrap: nowrap !important;
+          }
+          
+          .course-stats > div {
+            flex: 1 !important;
+            text-align: center !important;
+            padding: 4px 2px !important;
+            min-width: 0 !important;
+          }
+          
+          .course-stats > div > div:first-child {
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            line-height: 1.2 !important;
+            margin-bottom: 1px !important;
+            color: #1f2937 !important;
+          }
+          
+          .course-stats > div > div:last-child {
+            font-size: 10px !important;
+            line-height: 1.1 !important;
+            color: #6b7280 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.025em !important;
+          }
+          
+          /* Special styling for Progress percentage */
+          .course-stats > div:last-child > div:first-child {
+            font-size: 18px !important;
+            color: #059669 !important;
+          }
+          
+          .course-stats > div:last-child > div:last-child {
+            color: #059669 !important;
+          }
+        }
+
+        /* Ensure desktop layout remains unchanged */
+        @media screen and (min-width: 769px) {
+          .course-stats {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 1.5rem !important;
+          }
+          
+          .course-stats > div {
+            display: block !important;
+            padding: 0 !important;
+            text-align: center !important;
+          }
+        }
+
+        /* Chapter Card Mobile Optimizations - Matching ChapterPage Lesson Cards */
+        @media screen and (max-width: 768px) {
+          .chapter-card-header {
+            padding: 16px !important;
+          }
+          
+          .chapter-card-content {
+            padding: 0 16px 16px 16px !important;
+          }
+          
+          .chapter-card-title {
+            font-size: 16px !important;
+            line-height: 1.3 !important;
+            margin-bottom: 8px !important;
+          }
+          
+          .chapter-card-description {
+            font-size: 12px !important;
+            line-height: 1.4 !important;
+            margin-bottom: 12px !important;
+          }
+          
+          .chapter-card-progress-container {
+            margin-bottom: 12px !important;
+            max-width: 100% !important;
+          }
+          
+          .chapter-card-meta {
+            font-size: 12px !important;
+            line-height: 1.3 !important;
+          }
+          
+          .chapter-card-meta > div {
+            margin-bottom: 4px !important;
+          }
+          
+          .chapter-card-button {
+            padding: 12px 16px !important;
+            font-size: 14px !important;
+          }
+          
+          .lesson-item {
+            padding: 8px !important;
+            margin-bottom: 4px !important;
+          }
+          
+          .lesson-item span {
+            font-size: 13px !important;
+            line-height: 1.3 !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -180,18 +297,11 @@ function CourseHeader({
             <ProgressBar value={progress.completionPercentage} label="Overall Progress" size="sm" />
           </div>
         </div>
-        <div className="text-right mt-2 sm:mt-0">
-          <div className="text-xl sm:text-3xl font-bold text-primary mb-1">
-            {progress.earnedXP}
-          </div>
-          <div className="text-xs sm:text-sm text-muted-foreground">
-            / {progress.totalXP} XP
-          </div>
-        </div>
+        {/* Removed XP display as requested */}
       </div>
 
-      {/* Stats in a single line on mobile */}
-      <div className="flex flex-wrap sm:grid sm:grid-cols-4 gap-2 sm:gap-6">
+      {/* Course Stats - Mobile Optimized */}
+      <div className="course-stats flex flex-wrap sm:grid sm:grid-cols-4 gap-2 sm:gap-6">
         <Stat value={course.chapters.length} label="Chapters" />
         <Stat value={course.chapters.reduce((sum, ch) => sum + ch.lessons.length, 0)} label="Total Lessons" />
         <Stat value={progress.completedTasks} label="Completed" />
@@ -224,63 +334,99 @@ function ChapterCard({
   completedTaskIds: string[];
 }) {
   const allTasks = chapter.lessons.flatMap(l => l.tasks);
+  const totalChapterXP = allTasks.reduce((sum, task) => sum + task.xp, 0);
+  const estimatedTime = chapter.lessons.length * 15; // 15 min per lesson
+
+  const isChapterFullyComplete = chapterProgress.completedTasks === allTasks.length;
 
   return (
     <Card
-      variant="elevated"
-      className="animate-fade-in p-2 sm:p-4 md:p-6"
+      variant="interactive"
+      className="animate-fade-in"
       style={{ animationDelay: `${index * 100}ms` }}
     >
-      <CardHeader>
-        <div className="flex flex-col sm:flex-row items-start sm:justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-lg sm:text-xl mb-1 sm:mb-2">
-              Chapter {index + 1}: {chapter.name}
-            </CardTitle>
-            <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2">
-              {chapter.lessons.length} lessons • {allTasks.length} tasks •{' '}
-              {allTasks.reduce((sum, task) => sum + task.xp, 0)} XP
-            </p>
-            <div className="max-w-full sm:max-w-md">
-              <ProgressBar
-                value={chapterProgress.completionPercentage}
-                label="Chapter Progress"
-                size="sm"
-              />
+      {/* Header - Optimized for mobile like ChapterPage */}
+      <CardHeader className="chapter-card-header p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4">
+          {/* Chapter Content - No Number Indicator */}
+          <div className="flex items-start gap-3 sm:gap-4 flex-1 w-full min-w-0">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="chapter-card-title text-sm sm:text-base mb-2 leading-tight">
+                Chapter {index + 1}: {chapter.name}
+              </CardTitle>
+              <p className="chapter-card-description text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4 leading-relaxed">
+                {chapter.lessons.length} lessons • {allTasks.length} tasks • {totalChapterXP} XP
+              </p>
+             
+              {/* Chapter Progress Bar - Full width on mobile */}
+              <div className="chapter-card-progress-container max-w-full sm:max-w-md mb-3 sm:mb-4">
+                <ProgressBar
+                  value={chapterProgress.completionPercentage}
+                  label="Chapter Progress"
+                  size="sm"
+                />
+              </div>
+             
+              {/* Meta Information - Same as ChapterPage lesson cards */}
+              <div className="flex flex-col xs:flex-row items-start xs:items-center gap-2 xs:gap-4 chapter-card-meta text-xs sm:text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Award className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span>{chapterProgress.earnedXP}/{chapterProgress.totalXP} XP</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span>~{estimatedTime} min</span>
+                </div>
+              </div>
             </div>
           </div>
-
-          {/* Button moved right for mobile */}
-        <div className="flex mb-4 mt-6 sm:mt-0 justify-end pr-2 sm:pr-0">
-  <Link to={`/courses/${courseId}/chapters/${chapter.id}`}>
-    <InteractiveHoverButton
-          className="relative w-full flex items-center justify-center
-                     rounded-lg sm:rounded-xl font-semibold px-3 py-2 sm:px-4 sm:py-3
-                     bg-gray-200 text-black
-                     hover:bg-black hover:text-white
-                     transition-all duration-300 ease-in-out shadow-sm
-                     text-sm sm:text-base"
-        >
-      {chapterProgress.completedTasks > 0 ? 'Continue' : 'ㅤㅤStart Chapterㅤ'}
-    </InteractiveHoverButton>
-  </Link>
-</div>
-
-
+         
+          {/* Button and Status - Mobile Optimized like ChapterPage */}
+          <div className="flex flex-col items-center sm:items-end gap-2 w-full sm:w-auto mt-4 sm:mt-0">
+            <Link to={`/courses/${courseId}/chapters/${chapter.id}`} className="w-full sm:w-auto">
+              {isChapterFullyComplete ? (
+                <PrimaryButton className="w-full sm:w-auto chapter-card-button text-sm sm:text-base px-3 sm:px-4 py-2">
+                  Review
+                </PrimaryButton>
+              ) : chapterProgress.completedTasks > 0 ? (
+                <PrimaryButton className="w-full sm:w-auto chapter-card-button text-sm sm:text-base px-3 sm:px-4 py-2">
+                  Continue
+                </PrimaryButton>
+              ) : (
+                <InteractiveHoverButton
+                  className="relative w-full flex items-center justify-center chapter-card-button
+                             rounded-lg sm:rounded-xl font-semibold px-3 py-2 sm:px-4 sm:py-3
+                             bg-gray-200 text-black
+                             hover:bg-black hover:text-white
+                             transition-all duration-300 ease-in-out shadow-sm
+                             text-sm sm:text-base"
+                >
+                  Start Chapter
+                </InteractiveHoverButton>
+              )}
+            </Link>
+           
+            {isChapterFullyComplete && (
+              <span className="text-xs text-success-foreground bg-success/10 px-2 py-1 rounded-full">
+                Completed
+              </span>
+            )}
+          </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-1 sm:space-y-2">
+      {/* Content - Lesson list - Only on mobile, hidden on desktop */}
+      <CardContent className="chapter-card-content space-y-1 sm:space-y-2 pb-0 sm:pb-2 sm:hidden">
         {chapter.lessons.slice(0, 3).map((lesson) => {
           const lessonProgress = calculateProgress(lesson.tasks, completedTaskIds);
           const isCompleted = lessonProgress.completedTasks === lesson.tasks.length;
           return (
             <div
               key={lesson.id}
-              className="flex items-center gap-2 sm:gap-3 p-1 sm:p-2 rounded-lg hover:bg-surface-elevated transition-colors"
+              className="lesson-item flex items-center gap-2 p-1 rounded-lg hover:bg-surface-elevated transition-colors"
             >
               <div
-                className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs ${
+                className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${
                   isCompleted
                     ? 'bg-success text-success-foreground'
                     : 'bg-surface text-muted-foreground'
@@ -289,7 +435,7 @@ function ChapterCard({
                 {isCompleted ? '✓' : lesson.tasks.reduce((sum, task) => sum + task.xp, 0)}
               </div>
               <span
-                className={`text-xs sm:text-sm flex-1 ${
+                className={`text-xs flex-1 ${
                   isCompleted ? 'text-success-foreground' : 'text-foreground'
                 }`}
               >
@@ -299,10 +445,10 @@ function ChapterCard({
           );
         })}
         {chapter.lessons.length > 3 && (
-          <div className="text-center pt-1 sm:pt-2">
+          <div className="text-center pt-1 pb-2">
             <Link
               to={`/courses/${courseId}/chapters/${chapter.id}`}
-              className="text-xs sm:text-sm text-primary hover:text-primary/80"
+              className="text-xs text-primary hover:text-primary/80"
             >
               View all {chapter.lessons.length} lessons
             </Link>
