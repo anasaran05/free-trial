@@ -7,6 +7,7 @@ import TaskResourceButton from '@/components/TaskResourceButton';
 import { fetchTasks, organizeTasks, findTask, Task } from '@/lib/csv';
 import { fetchTopics, organizeTopics, getTopicsForLesson, isQuizPassed } from '@/lib/learning';
 import { BookOpen, ChevronRight, Award, CheckCircle, FileText, Lock, GraduationCap } from 'lucide-react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const CSV_URL = import.meta.env.VITE_CSV_URL
   || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
@@ -171,14 +172,13 @@ export default function TaskPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-24">
-          <div className="text-center">
-            <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4" />
-            <p className="text-muted-foreground">Loading task...</p>
-          </div>
-        </div>
+      <div className="fixed inset-0 flex items-center justify-center bg-black z-50 w-screen h-screen">
+        <DotLottieReact
+          src="/animations/animation.lottie"
+          loop
+          autoplay
+          style={{ width: 400, height: 400 }}
+        />
       </div>
     );
   }

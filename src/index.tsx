@@ -6,6 +6,7 @@ import { PrimaryButton } from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
 import { fetchTasks, organizeTasks, Course, calculateProgress } from '@/lib/csv';
 import { BookOpen, Clock, Award, Users } from 'lucide-react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 // Use environment variable or fallback to sample data
 const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
@@ -60,14 +61,13 @@ export default function CoursesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="theme-container py-24">
-          <div className="text-center">
-            <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4" />
-            <p className="text-muted-foreground">Loading courses...</p>
-          </div>
-        </div>
+      <div className="fixed inset-0 flex items-center justify-center bg-black z-50 w-screen h-screen">
+        <DotLottieReact
+          src="/animations/animation.lottie"
+          loop
+          autoplay
+          style={{ width: 400, height: 400 }}
+        />
       </div>
     );
   }
