@@ -211,7 +211,7 @@ async function getUserProgressFromSheet(userId: string): Promise<any[]> {
   const cached = cache.get(cacheKey);
   
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    console.log(`Cache hit for user ${userId}`);
+    
     return cached.data;
   }
 
@@ -337,9 +337,7 @@ serve(async (req) => {
 
     const url = new URL(req.url);
     const pathParts = url.pathname.split('/').filter(Boolean);
-    
-    console.log('Request URL:', req.url);
-    console.log('Path parts:', pathParts);
+ 
     
     // Route: GET /api/progress/:userId  
     // Expected path: /functions/v1/sheets-progress/api/progress/:userId

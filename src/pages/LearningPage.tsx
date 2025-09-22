@@ -68,7 +68,7 @@ export default function LearningPage() {
       setError(null);
       const startTime = Date.now(); // Track loading start time
       
-      console.log('🔄 Loading learning data for:', { courseId, chapterId, lessonId });
+     
       
       // Load topics and quiz data
       const [topicRows, quizRows, taskRows] = await Promise.all([
@@ -77,22 +77,18 @@ export default function LearningPage() {
         fetchTasks(CSV_URL)
       ]);
       
-      console.log('📊 Raw topics loaded:', topicRows.length);
-      console.log('📊 Raw quiz loaded:', quizRows.length);
+    
       
       const allTopics = organizeTopics(topicRows);
       const allQuiz = organizeQuiz(quizRows);
       const courses = organizeTasks(taskRows);
       
-      console.log('📊 Organized topics:', allTopics.length);
-      console.log('📊 Organized quiz:', allQuiz.length);
+    
       
       // Filter for current lesson
       const lessonTopics = getTopicsForLesson(allTopics, lessonId);
       const lessonQuiz = getQuizForLesson(allQuiz, lessonId);
-      
-      console.log('📊 Topics for lesson:', lessonTopics.length, lessonId);
-      console.log('📊 Quiz for lesson:', lessonQuiz.length, lessonId);
+     
       
       // Get lesson, chapter, and course names
       const foundCourse = courses.find(c => c.id === courseId);
@@ -125,21 +121,21 @@ export default function LearningPage() {
       if (existingScore !== null) {
         setQuizScoreState(existingScore);
         setQuizCompleted(true);
-        console.log('📊 Quiz already completed with score:', existingScore);
+       
       }
       
       // Set current topic
       if (topicId) {
         const topic = lessonTopics.find(t => t.id === topicId);
         if (topic) {
-          console.log('📺 Setting current topic:', topic.title);
+         
           setCurrentTopic(topic);
           markTopicWatched(lessonId, topicId);
         } else {
           console.warn('⚠️ Topic not found:', topicId);
         }
       } else if (lessonTopics.length > 0) {
-        console.log('📺 Setting first topic:', lessonTopics[0].title);
+       
         setCurrentTopic(lessonTopics[0]);
       } else {
         console.warn('⚠️ No topics found for lesson:', lessonId);
@@ -172,7 +168,7 @@ export default function LearningPage() {
   };
 
   const handleTopicSelect = async (topic: Topic) => {
-    console.log('🎯 Topic selected:', topic.title);
+ 
     setCurrentTopic(topic);
     if (lessonId && topic.id) {
       markTopicWatched(lessonId, topic.id);
@@ -183,7 +179,7 @@ export default function LearningPage() {
         try {
           if (courseId && chapterId && lessonId) {
             // You can implement syncLearningDone here if needed
-            console.log('✅ All topics completed');
+          
           }
         } catch (error) {
           console.error('⚠️ Failed to sync learning completion:', error);
@@ -195,7 +191,7 @@ export default function LearningPage() {
   };
 
   const handleQuizStart = () => {
-    console.log('🎓 Starting quiz');
+  
     setShowQuiz(true);
     setCurrentQuizQuestion(0);
     setSelectedAnswers([]);
@@ -206,7 +202,7 @@ export default function LearningPage() {
     const newAnswers = [...selectedAnswers];
     newAnswers[currentQuizQuestion] = answerIndex;
     setSelectedAnswers(newAnswers);
-    console.log('✅ Answer selected:', answerIndex, 'for question:', currentQuizQuestion);
+   
   };
 
   const handleNextQuestion = async () => {
@@ -223,7 +219,7 @@ export default function LearningPage() {
       const scorePercentage = (correct / quizQuestions.length) * 100;
       const passed = scorePercentage >= 80;
       
-      console.log('📊 Quiz completed. Score:', scorePercentage, 'Passed:', passed);
+     
       
       setQuizScoreState(scorePercentage);
       setQuizScore(lessonId!, scorePercentage);
@@ -248,7 +244,7 @@ export default function LearningPage() {
 
   const handleStartSimulation = async () => {
     try {
-      console.log('🚀 Starting simulation');
+
       // Load tasks to find the first task for this lesson
       const taskRows = await fetchTasks(CSV_URL);
       const courses = organizeTasks(taskRows);
@@ -279,15 +275,7 @@ export default function LearningPage() {
   const isQuizUnlocked = topics.length > 0 && watchedTopics.length === topics.length;
   const isPassed = isQuizPassed(lessonId || '');
 
-  // Debug info for development
-  console.log('📋 Current state:', {
-    topicsCount: topics.length,
-    quizCount: quizQuestions.length,
-    currentTopic: currentTopic?.title,
-    watchedTopics,
-    isQuizUnlocked,
-    lessonId
-  });
+  
 
   if (loading) {
     return (

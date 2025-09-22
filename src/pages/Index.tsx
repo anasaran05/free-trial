@@ -296,24 +296,17 @@ const Index: React.FC = () => {
         Blends real industry workflows, tools & mentorship all in one place.
       </motion.p>
       
-      <motion.button
-        onClick={handleStartTraining}
-        className="group relative inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold rounded-full border border-white bg-white text-black shadow-lg transition-all duration-300 hover:bg-black hover:text-white hover:shadow-xl"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        whileHover={{ scale: 1.05 }} // Bonus: subtle scale on hover
-      >
-        Get started, for free
-        <motion.span 
-          className="transition-transform duration-300 group-hover:translate-x-1"
-          initial={{ x: 0 }}
-          animate={{ x: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          →
-        </motion.span>
-      </motion.button>
+      <button
+  onClick={handleStartTraining}
+  className="group relative inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold rounded-full border border-white bg-white text-black shadow-lg transition-all duration-300 hover:bg-black hover:text-white hover:shadow-xl"
+>
+  Get started, for free
+  <span 
+    className="transition-transform duration-300 group-hover:translate-x-1"
+  >
+    →
+  </span>
+</button>
     </motion.div>
   </div>
   

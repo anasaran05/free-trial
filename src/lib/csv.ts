@@ -176,12 +176,12 @@ export async function fetchTasks(csvUrl: string): Promise<TaskRow[]> {
     if (cached) {
       const { data, timestamp } = JSON.parse(cached);
       if (Date.now() - timestamp < CACHE_DURATION) {
-        console.log('📊 Using cached CSV data');
+      
         return data;
       }
     }
 
-    console.log('🔄 Fetching CSV data from:', csvUrl);
+    
 
     const response = await fetch(csvUrl);
     if (!response.ok) {
@@ -197,11 +197,11 @@ export async function fetchTasks(csvUrl: string): Promise<TaskRow[]> {
       timestamp: Date.now()
     }));
 
-    console.log(`✅ Loaded ${tasks.length} tasks from CSV`);
+
     return tasks;
 
   } catch (error) {
-    console.error('❌ Error fetching CSV data:', error);
+   
     throw error;
   }
 }
@@ -370,5 +370,5 @@ export function isTaskCompleted(courseId: string, taskId: string): boolean {
  */
 export function clearCache() {
   sessionStorage.removeItem(CACHE_KEY);
-  console.log('🧹 CSV cache cleared');
+  
 }

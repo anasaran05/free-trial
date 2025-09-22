@@ -254,12 +254,12 @@ export async function fetchTopics(): Promise<TopicRow[]> {
     if (cached) {
       const { data, timestamp } = JSON.parse(cached);
       if (Date.now() - timestamp < CACHE_DURATION) {
-        console.log('📊 Using cached topics data');
+      
         return data;
       }
     }
 
-    console.log('🔄 Fetching topics data from CSV');
+      
 
     const response = await fetch(TOPICS_CSV_URL);
     if (!response.ok) {
@@ -278,10 +278,10 @@ export async function fetchTopics(): Promise<TopicRow[]> {
       })
     );
 
-    console.log(`✅ Loaded ${topics.length} topics from CSV`);
+   
     return topics;
   } catch (error) {
-    console.error('❌ Error fetching topics data:', error);
+
     throw error;
   }
 }
@@ -295,12 +295,12 @@ export async function fetchQuiz(): Promise<QuizRow[]> {
     if (cached) {
       const { data, timestamp } = JSON.parse(cached);
       if (Date.now() - timestamp < CACHE_DURATION) {
-        console.log('📊 Using cached quiz data');
+      
         return data;
       }
     }
 
-    console.log('🔄 Fetching quiz data from CSV');
+  
 
     const response = await fetch(QUIZ_CSV_URL);
     if (!response.ok) {
@@ -319,10 +319,10 @@ export async function fetchQuiz(): Promise<QuizRow[]> {
       })
     );
 
-    console.log(`✅ Loaded ${quiz.length} quiz rows from CSV`);
+   
     return quiz;
   } catch (error) {
-    console.error('❌ Error fetching quiz data:', error);
+
     throw error;
   }
 }
@@ -460,5 +460,5 @@ export function setQuizPassed(lessonId: string, passed: boolean): void {
 export function clearLearningCache(): void {
   sessionStorage.removeItem(TOPICS_CACHE_KEY);
   sessionStorage.removeItem(QUIZ_CACHE_KEY);
-  console.log('🧹 Learning cache cleared');
+ 
 }

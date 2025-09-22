@@ -401,7 +401,7 @@ function ChapterCard({
                              transition-all duration-300 ease-in-out shadow-sm
                              text-sm sm:text-base"
                 >
-                  Start Chapter
+                  ㅤㅤㅤStart Chapter
                 </InteractiveHoverButton>
               )}
             </Link>

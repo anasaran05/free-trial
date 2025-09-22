@@ -73,7 +73,6 @@ export default function LessonPage() {
 
           const forceTasks = forcedTab === 'tasks';
 
-          console.log(`🎓 Found ${lessonTopics.length} topics for lesson ${lessonId}. forceTasks=${forceTasks}`);
 
           // Only redirect if user did NOT request tasks explicitly
           if (!forceTasks) {
@@ -270,7 +269,7 @@ export default function LessonPage() {
                                          transition-all duration-300 ease-in-out shadow-sm
                                          text-sm sm:text-base"
                             >
-                              ㅤStart Task
+                              ㅤㅤStart Task
                             </InteractiveHoverButton>
                           )}
                         </Link>

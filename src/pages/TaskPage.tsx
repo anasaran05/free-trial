@@ -57,7 +57,7 @@ export default function TaskPage() {
           setHasLearningContent(true);
           const passed = isQuizPassed(task.lessonId);
           setQuizPassed(passed);
-          console.log(`🎓 Lesson ${task.lessonId} has learning content. Quiz passed: ${passed}`);
+          
         }
       }
     } catch (error) {
@@ -162,7 +162,7 @@ export default function TaskPage() {
           sessionStorage.setItem(completedKey, JSON.stringify(arr));
         }
 
-        console.log('Navigating to /cta with courseId:', courseId);
+        
         navigate('/cta', { state: { courseId } });
       } catch (error) {
         console.error('Error in handleTaskCompleted:', error);
