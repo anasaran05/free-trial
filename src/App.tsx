@@ -16,6 +16,8 @@ import CTAPage from "./pages/ctapage";
 import Dashboard from "./pages/Dashboard";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import { Analytics } from "@vercel/analytics/react"; // add this import
+
 
 const queryClient = new QueryClient();
 
@@ -43,6 +45,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      <Analytics />
     </TooltipProvider>
   </QueryClientProvider>
 );
