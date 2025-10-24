@@ -279,14 +279,16 @@ const Index: React.FC = () => {
         <span className="text-primary">ΩMEGA</span>
       </motion.h1>
       
-      <motion.h2 
-        className="text-3xl lg:text-6xl font-heading font-semibold mb-6"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      >
-        The Most Advanced AI powered Learning Platform.
-      </motion.h2>
+    <motion.h2 
+  className="text-3xl lg:text-5xl font-heading font-semibold mb-6"
+  initial={{ opacity: 0, y: 30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+>
+  The Most Advanced AI powered  
+  <br />
+  <span className="text-white">Learning Platform.</span>
+</motion.h2>
       
       <motion.p 
         className="text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed"
@@ -540,7 +542,7 @@ const Index: React.FC = () => {
   <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
 
   <div className="theme-container relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <h2 className="text-5xl lg:text-7xl font-heading font-bold mb-6">
+    <h2 className="text-5xl lg:text-5xl font-heading font-bold mb-6">
       Ready to <span className="text-primary">Stop Pretending</span> and Do the Work?
     </h2>
     
@@ -548,7 +550,7 @@ const Index: React.FC = () => {
 <div className="text-center mt-8">
   <button
   onClick={handleStartTraining}
-  className="group relative inline-flex items-center gap-3 px-10 py-6 text-lg font-semibold rounded-full border border-white bg-white text-black shadow-lg transition-all duration-300 hover:bg-black hover:text-white hover:shadow-xl"
+  className="group relative inline-flex items-center gap-3 px-6 py-6 text-lg font-semibold rounded-full border border-white bg-white text-black shadow-lg transition-all duration-300 hover:bg-black hover:text-white hover:shadow-xl"
 >
   Get started, for free
   <span 
