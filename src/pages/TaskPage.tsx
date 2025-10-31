@@ -8,6 +8,7 @@ import { fetchTasks, organizeTasks, findTask, Task } from '@/lib/csv';
 import { fetchTopics, organizeTopics, getTopicsForLesson, isQuizPassed } from '@/lib/learning';
 import { BookOpen, ChevronRight, Award, CheckCircle, FileText, Lock, GraduationCap } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import ToolsPanel from '@/Tools/ToolsPanel.tsx';
 
 const CSV_URL = import.meta.env.VITE_CSV_URL
   || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
@@ -293,6 +294,9 @@ export default function TaskPage() {
             <span className="text-foreground">{task.title}</span>
           </div>
         </nav>
+<ToolsPanel />
+
+
 
         {/* Top Content - Course, Chapter, Task Info */}
         <div className="mb-12">
