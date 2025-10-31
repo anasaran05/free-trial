@@ -88,6 +88,14 @@ export default function TaskPage() {
     const allVisited = Array.from(requiredResourceIds).every(id => visitedResources.has(id));
     setShowCompleted(allVisited);
   }, [visitedResources, requiredResourceIds]);
+  
+  const [scenarioText, deliverablesText] = useMemo(() => {
+    if (!task?.scenario) return ["", ""];
+    const parts = task.scenario.split(/Deliverables/i);
+    return parts.length > 1
+      ? [parts[0].trim(), parts.slice(1).join("Deliverables").trim()]
+      : [task.scenario.trim(), ""];
+  }, [task?.scenario]);
 
   const loadTask = async () => {
     try {
@@ -310,11 +318,11 @@ export default function TaskPage() {
           </div>
         </div>
 
-        {/* Main Content Grid - Desktop keeps original layout, Mobile shows Scenario + Instructions + Resources */}
+      {/* Main Grid */}
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column - Scenario + Resources (Desktop), Scenario only (Mobile) */}
+          {/* Left Column: Scenario + Resources */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Scenario Card - Always visible */}
+            {/* UPDATED SCENARIO CARD */}
             <Card>
               <CardHeader>
                 <CardTitle>
@@ -322,10 +330,32 @@ export default function TaskPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-foreground leading-relaxed whitespace-pre-line">{task.scenario}</p>
+                {/* Scenario Text */}
+                <p className="text-foreground leading-relaxed whitespace-pre-line mb-6">
+                  {scenarioText}
+                </p>
+
+                {/* Deliverables Section - Only if exists */}
+                {deliverablesText && (
+                  <div className="mt-8">
+                    <h3 className="text-3xl font-bold text-gray-200 mb-4">Deliverables</h3>
+                    <div className="space-y-3 text-foreground">
+                      {deliverablesText
+                        .split('\n')
+                        .map(line => line.trim())
+                        .filter(Boolean)
+                        .map((line, i) => (
+                          <div key={i} className="flex items-start gap-2">
+                            <span className="text-white font-medium mt-0.5">•</span>
+                            <span className="leading-relaxed">{line}</span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
-
+            
             {/* Desktop Resources - Only show on desktop */}
             <div className="space-y-6 lg:block hidden">
               {task.resources?.pdfs?.length > 0 && (
