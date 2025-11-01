@@ -10,6 +10,7 @@ import { WordRotate } from "@/components/Reactbits/word-rotate";
 import { MorphingText } from "@/components/Reactbits/morphing-text";
 import { motion } from 'framer-motion';
 import { Globe } from "../components/ui/globe";
+import { supabase } from '@/integrations/supabase/client';
 // Define types for custom components
 interface GlowButtonProps {
   size?: 'sm' | 'md' | 'lg';
@@ -192,12 +193,27 @@ const faqs: FAQ[] = [
 
 const Index: React.FC = () => {
   const [mounted, setMounted] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const navigate = useNavigate();
   const sectionRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
+    
+    // Check authentication status
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -227,7 +243,14 @@ const Index: React.FC = () => {
     };
   }, []);
 
-  const handleStartTraining = () => navigate('/courses');
+  const handleStartTraining = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      navigate('/courses');
+    } else {
+      navigate('/signin');
+    }
+  };
   const handleSignIn = () => navigate('/signin');
   const handleExploreCapstones = () => navigate('/capstones');
   const handleEmployerPilot = () => navigate('/employer-pilot');
