@@ -6,7 +6,6 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Play, BookOpen, Award, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import Header from "@/components/Header";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 import {
@@ -293,7 +292,6 @@ export default function LearningPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="container mx-auto px-4 py-24">
           <Card className="max-w-md mx-auto text-center">
             <CardContent className="p-8">
@@ -321,7 +319,6 @@ export default function LearningPage() {
   if (showQuiz && !quizCompleted) {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-12">
         {/* Breadcrumb Navigation for Quiz - Mobile Optimized */}
         <nav className="mb-4 sm:mb-8">
@@ -410,7 +407,6 @@ export default function LearningPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
      
       <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-12">
         {/* Breadcrumb Navigation for Learning - Mobile Optimized */}

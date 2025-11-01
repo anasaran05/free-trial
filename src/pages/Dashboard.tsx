@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import Header from '@/components/Header';
 import Card, { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/Card';
 import { PrimaryButton } from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
@@ -231,7 +230,6 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="container mx-auto px-4 py-24">
           <div className="text-center">
             <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4" />
@@ -245,7 +243,6 @@ export default function Dashboard() {
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="container mx-auto px-4 py-24">
           <Card className="max-w-md mx-auto text-center">
             <CardContent className="p-8">
@@ -264,7 +261,6 @@ export default function Dashboard() {
   if (error) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="container mx-auto px-4 py-24">
           <Card className="max-w-md mx-auto text-center">
             <CardContent className="p-8">
@@ -291,7 +287,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       
       <div className="container mx-auto px-4 py-12">
         {/* Page Header */}

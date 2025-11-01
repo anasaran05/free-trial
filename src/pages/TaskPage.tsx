@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import Header from '@/components/Header';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/Card';
 import { PrimaryButton, GlowButton } from '@/components/Button';
 import TaskResourceButton from '@/components/TaskResourceButton';
@@ -195,7 +194,6 @@ export default function TaskPage() {
   if (error || !task) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="container mx-auto px-4 py-24">
           <Card className="max-w-md mx-auto text-center">
             <CardContent className="p-8">
@@ -218,7 +216,6 @@ export default function TaskPage() {
   if (hasLearningContent && !quizPassed) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="container mx-auto px-4 py-12">
           <nav className="mb-8">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -280,7 +277,6 @@ export default function TaskPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <div className="container mx-auto px-4 py-12">
         {/* Navigation */}
         <nav className="mb-8">

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Header from '@/components/Header';
 import Card, { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/Card';
 import Button, { PrimaryButton } from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
@@ -130,7 +129,6 @@ export default function CoursesIndex() {
     }
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="container mx-auto px-4 py-24">
           <Card className="max-w-md mx-auto text-center">
             <CardContent className="p-8">
@@ -154,7 +152,6 @@ export default function CoursesIndex() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       
       <div className="container mx-auto px-4 py-12">
         {/* Page Header */}

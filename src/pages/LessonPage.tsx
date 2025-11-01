@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import Header from '@/components/Header';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/Card';
 import { PrimaryButton } from '@/components/Button';
 import { InteractiveHoverButton } from "../components/Buttons/interactive-hover-button";
@@ -113,7 +112,6 @@ export default function LessonPage() {
   if (error || !course || !chapter || !lesson) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="container mx-auto px-4 py-24">
           <Card className="max-w-md mx-auto text-center">
             <CardContent className="p-8">
@@ -139,7 +137,6 @@ export default function LessonPage() {
   // If we reach here, there's no learning content, so show tasks directly
   return (
     <div className="min-h-screen bg-background">
-      <Header />
      
       <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-12">
         {/* Breadcrumb Navigation - Mobile Optimized */}

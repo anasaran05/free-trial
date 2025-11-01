@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Header from '@/components/Header';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/Card';
 import { PrimaryButton } from '@/components/Button';
 import ProgressBar from '@/components/ProgressBar';
@@ -78,7 +77,6 @@ export default function CoursePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <div className="container mx-auto px-4 py-8 sm:py-12">
         <Breadcrumb courseName={course.name} />
 
@@ -234,7 +232,6 @@ export default function CoursePage() {
 function PageWrapper({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <div className="container mx-auto px-4 py-24">{children}</div>
     </div>
   );

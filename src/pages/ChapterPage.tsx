@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import Header from '@/components/Header';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/Card';
 import { PrimaryButton } from '@/components/Button';
 import { InteractiveHoverButton } from "../components/Buttons/interactive-hover-button";
@@ -77,7 +76,6 @@ export default function ChapterPage() {
   if (error || !course || !chapter) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
         <div className="container mx-auto px-4 py-12 sm:py-16 md:py-24">
           <Card className="max-w-sm sm:max-w-md mx-auto text-center">
             <CardContent className="p-6 sm:p-8">
@@ -102,7 +100,6 @@ export default function ChapterPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
      
       <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 md:py-12">
         {/* Breadcrumb - Mobile Optimized */}
