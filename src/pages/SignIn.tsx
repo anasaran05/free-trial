@@ -1,3 +1,7 @@
+// CREDIT
+// Component inspired from Can Tastemel's original work for the lambda.ai landing page
+// https://cantastemel.com
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -5,7 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Loader2, Lock, Mail } from 'lucide-react';
+import { AlertCircle, Loader2, Lock, Mail, ArrowRight } from 'lucide-react';
+import Cubes from '@/components/Reactbits/Cubes';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -14,7 +19,6 @@ export default function SignIn() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Redirect if already logged in
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -27,16 +31,12 @@ export default function SignIn() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-
       if (error) throw error;
-
-      // Success - redirect to courses
       navigate('/courses');
     } catch (error: any) {
       setError(error.message);
@@ -46,51 +46,59 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted p-4">
-      <div className="w-full max-w-md">
-        {/* Logo/Brand */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-heading font-bold mb-2">
-            ZANE <span style={{ color: '#ff0000' }}>ΩMEGA</span>
-          </h1>
-          <p className="text-muted-foreground">Welcome back</p>
-        </div>
+    <div className="min-h-screen flex">
+      {/* Left Panel – Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-background">
+        <div className="w-full max-w-md">
+          <div className="mb-12">
+            <div className="inline-flex items-center gap-2 mb-6">
+              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-3xl">Ω</span>
+              </div>
+              <span className="text-2xl font-semibold tracking-tight">ZANE ΩMEGA</span>
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight mb-2">Welcome back</h1>
+            <p className="text-muted-foreground">Sign in to continue to your account</p>
+          </div>
 
-        {/* Sign In Form */}
-        <div className="bg-card border border-border rounded-2xl shadow-xl p-8">
-          <form className="space-y-6" onSubmit={handleSignIn}>
+          <form onSubmit={handleSignIn} className="space-y-6">
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="border-destructive/50">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            
+
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">
-                  Email Address
+                <Label htmlFor="email" className="text-sm font-medium text-foreground">
+                  Email
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    className="pl-10"
+                    placeholder="name@company.com"
+                    className="pl-10 h-11 bg-background border-input"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">
-                  Password
-                </Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-sm font-medium text-foreground">
+                    Password
+                  </Label>
+                  <button type="button" className="text-sm text-primary hover:underline">
+                    Forgot password?
+                  </button>
+                </div>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="password"
                     type="password"
@@ -98,22 +106,57 @@ export default function SignIn() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="pl-10"
+                    className="pl-10 h-11 bg-background border-input"
                   />
                 </div>
               </div>
             </div>
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full h-11"
-              size="lg"
-            >
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {loading ? 'Signing in...' : 'Sign In'}
+            <Button type="submit" disabled={loading} className="w-full h-11 text-base font-medium">
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  Sign in
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              )}
             </Button>
           </form>
+
+          <div className="mt-8 text-center text-sm text-muted-foreground">
+  Need to try the experience?{' '}
+  <br />
+  <a
+    href="https://wa.me/919342205876"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-red-500 text-lg font-medium hover:underline"
+  >
+    Contact us  →
+  </a>
+
+          </div>
+        </div>
+      </div>
+
+      {/* Right Panel – Centered Cubes with Primary Theme */}
+      <div className="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-primary/5 via-primary/3 to-background overflow-hidden">
+        <div className="relative w-full max-w-2xl h-[600px] flex items-center justify-center">
+           <Cubes 
+    gridSize={8}
+    maxAngle={60}
+    radius={4}
+    borderStyle="8px dashed #b4a6a9ff"
+    faceColor="#9e2c2cff"
+    rippleColor="#000000ff"
+    rippleSpeed={1.5}
+    autoAnimate={true}
+    rippleOnClick={true}
+  />
         </div>
       </div>
     </div>

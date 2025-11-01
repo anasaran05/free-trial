@@ -274,8 +274,6 @@ export default function LearningPage() {
   const isQuizUnlocked = topics.length > 0 && watchedTopics.length === topics.length;
   const isPassed = isQuizPassed(lessonId || '');
 
-  
-
   if (loading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black z-50 w-screen h-screen">

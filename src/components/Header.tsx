@@ -14,7 +14,7 @@ export default function Header({ className = '' }: HeaderProps) {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    navigate('/signin');
+    navigate('/');
   };
 
   return (
