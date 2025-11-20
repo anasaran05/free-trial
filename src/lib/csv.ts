@@ -20,6 +20,7 @@ export interface TaskRow {
   answerKeyUrl: string;
   xp: number;
   instructions?: string; // may contain real newlines or \n escapes
+    taskType?: string; // <—— NEW
 }
 
 export interface Course {
@@ -58,6 +59,7 @@ export interface Task {
   };
   xp: number;
   instructions?: string;
+    taskType?: string; // <—— NEW
 }
 
 const CACHE_KEY = 'zane_omega_csv_data';
@@ -151,6 +153,7 @@ function parseTaskRows(csvData: string[][]): TaskRow[] {
 
   return rows.map(row => {
     const task: any = {};
+    
     rawHeaders.forEach((header, index) => {
       const value = row[index] ?? '';
       if (header === 'xp') {
@@ -160,8 +163,11 @@ function parseTaskRows(csvData: string[][]): TaskRow[] {
       }
     });
 
-    // ensure instructions exists as empty string if not present
+    // ensure instructions exists
     if (!('instructions' in task)) task.instructions = '';
+
+    // ensure taskType exists (NEW LINE)
+    if (!('taskType' in task)) task.taskType = '';
 
     return task as TaskRow;
   });
@@ -253,11 +259,10 @@ export function organizeTasks(tasks: TaskRow[]): Course[] {
       chapterMap.get(chapterKey)!.lessons.push(lesson);
     }
 
-    const splitUrls = (s?: string) => {
-      if (!s) return [];
-      return String(s).split(/[;|,]/).map(url => url.trim()).filter(Boolean);
-    };
-
+const splitUrls = (s?: string) => {
+  if (!s) return [];
+  return [String(s).trim()];   // treat entire cell as ONE text block
+};
     const task: Task = {
       id: taskRow.taskId,
       title: taskRow.taskTitle,
@@ -265,6 +270,7 @@ export function organizeTasks(tasks: TaskRow[]): Course[] {
       lessonId: taskRow.lessonId,
       chapterId: taskRow.chapterId,
       courseId: taskRow.courseId,
+        taskType: taskRow.taskType?.trim().toLowerCase() || '',
       resources: {
         pdfs: splitUrls(taskRow.pdfUrls),
         forms: splitUrls(taskRow.tallyUrls),

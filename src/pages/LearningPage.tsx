@@ -240,36 +240,50 @@ export default function LearningPage() {
       }
     }
   };
+const handleStartSimulation = async () => {
+  try {
+    const taskRows = await fetchTasks(CSV_URL);
+    const courses = organizeTasks(taskRows);
+    const lesson = findLesson(courses, courseId!, chapterId!, lessonId!);
 
-  const handleStartSimulation = async () => {
-    try {
-
-      // Load tasks to find the first task for this lesson
-      const taskRows = await fetchTasks(CSV_URL);
-      const courses = organizeTasks(taskRows);
-      const lesson = findLesson(courses, courseId!, chapterId!, lessonId!);
-      
-      if (lesson && lesson.tasks.length > 0) {
-        // Use route state (preferred)
-        navigate(
-          `/courses/${courseId}/chapters/${chapterId}/lessons/${lessonId}`,
-          { state: { defaultTab: 'tasks', from: 'quiz' } }
-        );
-      } else {
-        toast({
-          title: "No Tasks Available",
-          description: "No simulation tasks found for this lesson.",
-        });
-      }
-    } catch (error) {
-      console.error('Error loading tasks:', error);
+    if (!lesson || lesson.tasks.length === 0) {
       toast({
-        title: "Error",
-        description: "Failed to load simulation tasks.",
+        title: "No Tasks Available",
+        description: "No tasks found for this lesson.",
       });
+      return;
     }
-  };
 
+    const firstTask = lesson.tasks[0];
+    const type = (firstTask.taskType || "").toLowerCase();
+
+    // SIMULATION TASK (correct route)
+    if (type === "simulation") {
+      navigate(
+        `/courses/${courseId}/chapters/${chapterId}/tasks/${firstTask.id}/simulation`
+      );
+      return;
+    }
+
+    // CONSULTING TASK (correct route)
+if (type === "consulting") {
+  navigate(`/courses/${courseId}/chapters/${chapterId}/tasks/${firstTask.id}/consulting`);
+  return;
+}
+
+    // NORMAL TASK
+    navigate(
+      `/courses/${courseId}/chapters/${chapterId}/tasks/${firstTask.id}`
+    );
+
+  } catch (error) {
+    console.error("Error loading tasks:", error);
+    toast({
+      title: "Error",
+      description: "Failed to load tasks.",
+    });
+  }
+};
   const watchedTopics = getWatchedTopics(lessonId || '');
   const isQuizUnlocked = topics.length > 0 && watchedTopics.length === topics.length;
   const isPassed = isQuizPassed(lessonId || '');

@@ -10,7 +10,7 @@ import CoursePage from "./pages/CoursePage";
 import ChapterPage from "./pages/ChapterPage";
 import LessonPage from "./pages/LessonPage";
 import LearningPage from "./pages/LearningPage";
-import TaskPage from "./pages/TaskPage";
+import TaskPage from "./pages/Taskpages/TaskPage";
 import CTAPage from "./pages/ctapage";
 import Dashboard from "./pages/Dashboard";
 import SignIn from "./pages/SignIn";
@@ -18,6 +18,8 @@ import SignUp from "./pages/SignUp";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Header from "./components/Header";
 import { Analytics } from "@vercel/analytics/react";
+import SimulationTaskPage from "./pages/Taskpages/SimulationTaskPage"
+import ConsultingTaskPage from "./pages/Taskpages/ConsultingTaskPage";
 
 const queryClient = new QueryClient();
 
@@ -38,7 +40,23 @@ function AppContent() {
         <Route path="/courses/:courseId/chapters/:chapterId" element={<ProtectedRoute><ChapterPage /></ProtectedRoute>} />
         <Route path="/courses/:courseId/chapters/:chapterId/lessons/:lessonId" element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
         <Route path="/courses/:courseId/chapters/:chapterId/lessons/:lessonId/learning/:topicId?" element={<ProtectedRoute><LearningPage /></ProtectedRoute>} />
-        <Route path="/courses/:courseId/chapters/:chapterId/tasks/:taskId" element={<ProtectedRoute><TaskPage /></ProtectedRoute>} />
+{/* SIMULATION PAGE */}
+<Route
+  path="/courses/:courseId/chapters/:chapterId/tasks/:taskId/simulation"
+  element={<ProtectedRoute><SimulationTaskPage /></ProtectedRoute>}
+/>
+
+{/* CONSULTING PAGE */}
+<Route
+  path="/courses/:courseId/chapters/:chapterId/tasks/:taskId/consulting"
+  element={<ProtectedRoute><ConsultingTaskPage /></ProtectedRoute>}
+/>
+
+{/* NORMAL TASK (must be last!) */}
+<Route
+  path="/courses/:courseId/chapters/:chapterId/tasks/:taskId"
+  element={<ProtectedRoute><TaskPage /></ProtectedRoute>}
+/>
         <Route path="/cta" element={<ProtectedRoute><CTAPage /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
