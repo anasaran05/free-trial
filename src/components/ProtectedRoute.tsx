@@ -1,41 +1,34 @@
-import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { Navigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-}
-
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+export default function ProtectedRoute({ children }) {
+  const [allowed, setAllowed] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
-    };
+    async function check() {
+      const access = localStorage.getItem("omega_access");
+      const email = localStorage.getItem("omega_email");
 
-    checkAuth();
+      if (!access || !email) {
+        setAllowed(false);
+        return;
+      }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setIsAuthenticated(!!session);
-    });
+      // Validate from Supabase table
+      const { data } = await supabase
+        .from("form_users")
+        .select("email")
+        .eq("email", email)
+        .single();
 
-    return () => subscription.unsubscribe();
+      setAllowed(!!data);
+    }
+
+    check();
   }, []);
 
-  if (isAuthenticated === null) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  if (allowed === null) return null;
 
-  if (!isAuthenticated) {
-    return <Navigate to="/signin" replace />;
-  }
-
-  return <>{children}</>;
+  return allowed ? children : <Navigate to="/signin" replace />;
 }

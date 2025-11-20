@@ -21,6 +21,7 @@ export interface TaskRow {
   xp: number;
   instructions?: string; // may contain real newlines or \n escapes
     taskType?: string; // <—— NEW
+    courseCategory?: string;
 }
 
 export interface Course {
@@ -28,6 +29,7 @@ export interface Course {
   id: string;
   name: string;
   chapters: Chapter[];
+  category?: string;
 }
 
 export interface Chapter {
@@ -60,6 +62,7 @@ export interface Task {
   xp: number;
   instructions?: string;
     taskType?: string; // <—— NEW
+    courseCategory?: string;
 }
 
 const CACHE_KEY = 'zane_omega_csv_data';
@@ -228,7 +231,8 @@ export function organizeTasks(tasks: TaskRow[]): Course[] {
         id: taskRow.courseId,
         name: taskRow.courseName,
         description: taskRow.coursedescription,
-        chapters: []
+        chapters: [],
+        category: taskRow.courseCategory?.trim().toLowerCase() || 'uncategorized'
       });
     }
 

@@ -1,53 +1,47 @@
-// CREDIT
-// Component inspired from Can Tastemel's original work for the lambda.ai landing page
-// https://cantastemel.com
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Loader2, Lock, Mail, ArrowRight } from 'lucide-react';
+import { AlertCircle, Mail, ArrowRight, Loader2 } from 'lucide-react';
 import Cubes from '@/components/Reactbits/Cubes';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) navigate('/courses');
-    };
-    checkAuth();
-  }, [navigate]);
-
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleAccess = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-      navigate('/courses');
-    } catch (error: any) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
+
+    // 1. Check in Supabase table
+    const { data } = await supabase
+      .from("form_users")
+      .select("email")
+      .eq("email", email.trim().toLowerCase())
+      .single();
+
+    // 2. If NOT found → send to Tally form
+    if (!data) {
+      window.location.href = "https://tally.so/r/RGG88K";
+      return;
     }
+
+    // 3. If found → mark access locally and navigate
+    localStorage.setItem("omega_access", "yes");
+    localStorage.setItem("omega_email", email.trim().toLowerCase());
+
+    navigate("/dashboard");
+    setLoading(false);
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Panel – Form */}
       <div className="flex-1 flex items-center justify-center p-8 bg-background">
         <div className="w-full max-w-md">
           <div className="mb-12">
@@ -57,11 +51,13 @@ export default function SignIn() {
               </div>
               <span className="text-2xl font-semibold tracking-tight">ZANE ΩMEGA</span>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight mb-2">Welcome back</h1>
-            <p className="text-muted-foreground">Sign in to continue to your account</p>
+            <h1 className="text-3xl font-bold tracking-tight mb-2">Access the Platform</h1>
+            <p className="text-muted-foreground">
+              Enter the email you used in the onboarding form
+            </p>
           </div>
 
-          <form onSubmit={handleSignIn} className="space-y-6">
+          <form onSubmit={handleAccess} className="space-y-6">
             {error && (
               <Alert variant="destructive" className="border-destructive/50">
                 <AlertCircle className="h-4 w-4" />
@@ -71,9 +67,7 @@ export default function SignIn() {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-foreground">
-                  Email
-                </Label>
+                <Label htmlFor="email">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
@@ -82,30 +76,7 @@ export default function SignIn() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@company.com"
-                    className="pl-10 h-11 bg-background border-input"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-sm font-medium text-foreground">
-                    Password
-                  </Label>
-                  <button type="button" className="text-sm text-primary hover:underline">
-                    Forgot password?
-                  </button>
-                </div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
+                    placeholder="name@example.com"
                     className="pl-10 h-11 bg-background border-input"
                   />
                 </div>
@@ -116,11 +87,11 @@ export default function SignIn() {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
+                  Checking...
                 </>
               ) : (
                 <>
-                  Sign in
+                  Continue
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </>
               )}
@@ -128,35 +99,33 @@ export default function SignIn() {
           </form>
 
           <div className="mt-8 text-center text-sm text-muted-foreground">
-  Need to try the experience?{' '}
-  <br />
-  <a
-    href="https://wa.me/919342205876"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="text-red-500 text-lg font-medium hover:underline"
-  >
-    Contact us  →
-  </a>
-
+            Didn’t fill the onboarding form?
+            <br />
+            <a
+              href="https://tally.so/r/RGG88K"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary font-medium hover:underline"
+            >
+              Fill it to get access →
+            </a>
           </div>
         </div>
       </div>
 
-      {/* Right Panel – Centered Cubes with Primary Theme */}
       <div className="hidden lg:flex flex-1 items-center justify-center bg-gradient-to-br from-primary/5 via-primary/3 to-background overflow-hidden">
         <div className="relative w-full max-w-2xl h-[600px] flex items-center justify-center">
-           <Cubes 
-    gridSize={8}
-    maxAngle={60}
-    radius={4}
-    borderStyle="8px dashed #b4a6a9ff"
-    faceColor="#9e2c2cff"
-    rippleColor="#000000ff"
-    rippleSpeed={1.5}
-    autoAnimate={true}
-    rippleOnClick={true}
-  />
+          <Cubes
+            gridSize={8}
+            maxAngle={60}
+            radius={4}
+            borderStyle="8px dashed #b4a6a9ff"
+            faceColor="#9e2c2cff"
+            rippleColor="#000000ff"
+            rippleSpeed={1.5}
+            autoAnimate={true}
+            rippleOnClick={true}
+          />
         </div>
       </div>
     </div>
