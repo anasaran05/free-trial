@@ -295,7 +295,7 @@ if (type === "consulting") {
           src="/animations/animation.lottie"
           loop
           autoplay
-          style={{ width: 400, height: 400 }}
+          style={{ width: 200, height: 200 }}
         />
       </div>
     );

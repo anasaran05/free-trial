@@ -156,20 +156,27 @@ export default function CoursePage() {
           }
         }
 
-        /* Ensure desktop layout remains unchanged */
-        @media screen and (min-width: 769px) {
-          .course-stats {
-            display: grid !important;
-            grid-template-columns: repeat(4, 1fr) !important;
-            gap: 1.5rem !important;
-          }
-          
-          .course-stats > div {
-            display: block !important;
-            padding: 0 !important;
-            text-align: center !important;
-          }
-        }
+       @media screen and (min-width: 769px) {
+  /* Increase chapter title */
+  .chapter-card-title {
+    font-size: 1.125rem !important;   /* 18px */
+  }
+
+  /* Increase description */
+  .chapter-card-description {
+    font-size: 0.95rem !important;    /* ~15px */
+  }
+
+  /* Increase meta info */
+  .chapter-card-meta {
+    font-size: 0.9rem !important;     /* 14px */
+  }
+
+  /* Increase lesson text preview on desktop */
+  .lesson-item span {
+    font-size: 0.9rem !important;
+  }
+}
 
         /* Chapter Card Mobile Optimizations - Matching ChapterPage Lesson Cards */
         @media screen and (max-width: 768px) {

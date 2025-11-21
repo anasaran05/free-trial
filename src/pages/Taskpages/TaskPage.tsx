@@ -185,7 +185,7 @@ export default function TaskPage() {
           src="/animations/animation.lottie"
           loop
           autoplay
-          style={{ width: 400, height: 400 }}
+          style={{ width: 200, height: 200 }}
         />
       </div>
     );
@@ -290,7 +290,7 @@ export default function TaskPage() {
             <span className="text-foreground">{task.title}</span>
           </div>
         </nav>
-<ToolsPanel />
+<ToolsPanel courseId={courseId} lessonId={task?.lessonId} />
 
 
 
