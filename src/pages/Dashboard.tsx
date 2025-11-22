@@ -25,7 +25,7 @@ export default function StudentDashboard() {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   useEffect(() => {
     const loadCourses = async () => {
       try {
@@ -127,50 +127,103 @@ export default function StudentDashboard() {
   return (
     <div className="min-h-screen bg-background text-foreground flex">
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-background/95 backdrop-blur">
-        <div className="flex h-full flex-col">
-          <div className="flex h-16 items-center border-b border-border px-6">
-            <h2 className="text-xl font-semibold">ZANE ΩMEGA</h2>
-          </div>
-          <nav className="flex-1 space-y-1 p-4">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isProLocked = item.pro;
-              const isActive = item.active;
+<aside
+  className={`
+    ${sidebarOpen ? 'w-64' : 'w-20'}
+    hidden md:flex
+    fixed left-0 top-16 z-40
+    h-[calc(100vh-64px)]
+    bg-background/95 backdrop-blur
+    border-r border-border
+    transition-all duration-300
+  `}
+>
+  <div className="flex h-full flex-col">
 
-              return (
-                <button
-                  key={item.label}
-                  onClick={() => handleNavClick(item)}
-                  disabled={isProLocked}
-                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-all ${
-                    isProLocked
-                      ? 'text-muted-foreground cursor-not-allowed'
-                      : isActive
-                      ? 'bg-accent text-accent-foreground shadow-sm'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                  }`}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span className="flex-1 text-left">{item.label}</span>
-                  {isActive && <div className="h-2 w-2 rounded-full bg-primary" />}
-                  {isProLocked && (
-                    <div className="ml-auto flex items-center gap-1.5">
-                      <div className="text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                        PRO
-                      </div>
-                      
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-      </aside>
+    {/* Collapse Button */}
+    <div className="flex items-center justify-end px-4 py-4">
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="p-2 rounded-lg hover:bg-accent transition-colors"
+      >
+        {sidebarOpen ? '<' : '>'}
+      </button>
+    </div>
+
+    {/* Navigation */}
+    <nav className="flex-1 space-y-1 px-3 mt-2">
+
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const isProLocked = item.pro;
+        const active = item.active;
+
+        return (
+          <button
+            key={item.label}
+            onClick={() => handleNavClick(item)}
+            disabled={isProLocked}
+            className={`
+              flex items-center
+              w-full
+              rounded-md
+              py-3 px-3
+              text-sm font-medium
+              transition-all
+              ${
+                isProLocked
+                  ? 'text-muted-foreground cursor-not-allowed'
+                  : active
+                  ? 'bg-accent text-accent-foreground shadow-sm'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+              }
+            `}
+          >
+            <Icon
+              className={`
+                h-5 w-5 shrink-0
+                ${sidebarOpen ? '' : 'mx-auto'}
+              `}
+            />
+
+            {/* Label */}
+            <span
+              className={`
+                ml-3
+                ${sidebarOpen ? 'block' : 'hidden'}
+              `}
+            >
+              {item.label}
+            </span>
+
+            {/* PRO badge */}
+            {isProLocked && (
+              <span
+                className={`
+                  ml-auto mr-1 text-red-700 text-xs font-bold
+                  ${sidebarOpen ? 'block' : 'hidden'}
+                `}
+              >
+                PRO
+              </span>
+            )}
+          </button>
+        );
+      })}
+
+    </nav>
+
+  </div>
+</aside>
 
       {/* Main Content */}
-      <div className="flex-1 lg:ml-64">
+      <div
+  className={`
+    flex-1
+${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}
+    transition-all duration-300
+  `}
+>
         <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
           <div className="flex h-16 items-center justify-between px-6">
             <div>

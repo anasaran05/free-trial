@@ -243,14 +243,15 @@ const Index: React.FC = () => {
     };
   }, []);
 
-  const handleStartTraining = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      navigate('/courses');
-    } else {
-      navigate('/signin');
-    }
-  };
+const handleStartTraining = () => {
+  const access = localStorage.getItem("omega_access");
+
+  if (access === "yes") {
+    navigate('/courses');
+  } else {
+    navigate('/signin');
+  }
+};
   const handleSignIn = () => navigate('/signin');
   const handleExploreCapstones = () => navigate('/capstones');
   const handleEmployerPilot = () => navigate('/employer-pilot');
