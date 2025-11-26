@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-
+import Tutorial from "./pages/Tutorial"
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import CoursesIndex from "./pages/CoursesIndex";        // List of all courses
@@ -58,6 +58,7 @@ function AppContent() {
         <Route path="/courses/:courseSlug/chapters/:chapterId/tasks/:taskId/consulting" element={<ProtectedRoute><ConsultingTaskPage /></ProtectedRoute>} />
 
         <Route path="/cta" element={<ProtectedRoute><CTAPage /></ProtectedRoute>} />
+        <Route path="/tutorial" element={<Tutorial />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

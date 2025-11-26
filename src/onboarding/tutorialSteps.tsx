@@ -25,14 +25,6 @@ export const tutorialSteps: { full_onboarding: CustomStep[] } = {
       spotlightPadding: 60,
     },
     {
-      target: "body",
-      content: <IntroVideo />,
-      placement: "center",
-      page: "dashboard",
-      disableBeacon: true,
-      disableOverlayClose: true,
-    },
-    {
       target: '[data-tour="continue-btn"]:first-of-type',
       content: "Resume from your last active course or module.",
       page: "dashboard",
