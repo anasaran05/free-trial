@@ -20,18 +20,24 @@ export type Database = {
     email: string
     name: string | null
     created_at: string
+    onboarding: Json | null
+    approved_courses: Json | null
   }
   Insert: {
     id?: string
     email: string
     name?: string | null
     created_at?: string
+    onboarding?: Json | null
+    approved_courses?: Json | null
   }
   Update: {
     id?: string
     email?: string
     name?: string | null
     created_at?: string
+    onboarding?: Json | null
+    approved_courses?: Json | null
   }
   Relationships: []
 }
@@ -58,6 +64,24 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+            user_onboarding: {
+        Row: {
+          email: string
+          flags: Json
+          updated_at: string
+        }
+        Insert: { 
+          email: string
+          flags?: Json
+          updated_at?: string
+        }
+        Update: {
+          email?: string
+          flags?: Json
           updated_at?: string
         }
         Relationships: []

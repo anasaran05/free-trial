@@ -27,7 +27,7 @@ export const weeklyActivityData = [
 ] as const;
 
 export const xpBreakdownData = [
-  { name: 'Analytics', value: 35, color: '#8b5cf6' },
+  { name: 'Analytics', value: 0, color: '#8b5cf6' },
   { name: 'AI Skills', value: 28, color: '#3b82f6' },
   { name: 'Simulations', value: 22, color: '#10b981' },
   { name: 'Decision Rooms', value: 15, color: '#f59e0b' },

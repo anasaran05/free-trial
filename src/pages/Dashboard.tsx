@@ -2,12 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Joyride from 'react-joyride'; // ← ADD THIS
+import { useOnboarding } from '@/onboarding/useOnboarding'; // ← ADD THIS (same hook as CoursesIndex)
 import { 
-  Home, BookOpen, Trophy, Award, Activity, Settings, Lock, 
+  Home, BookOpen, Trophy, Award, Activity, Settings, 
   Zap, CheckCircle, TrendingUp, ChevronRight 
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,37 +16,76 @@ import {
   ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, 
   XAxis, YAxis, CartesianGrid, AreaChart, Area 
 } from 'recharts';
-
-// Your real data logic
+import { supabase } from '@/integrations/supabase/client';
 import { fetchTasks, organizeTasks, Course, calculateProgress } from '@/lib/csv';
 
 const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<DashboardCourse[]>([]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+
+  // ONBOARDING LOGIC — EXACT SAME AS COURSE INDEX
+  const email = localStorage.getItem("omega_email")?.trim() || null;
+  const { run, steps, handleFinish } = useOnboarding("dashboard", email);
+  const [approvedCourses, setApprovedCourses] = useState<string[]>([]);
+
+
+  interface DashboardCourse extends Course {
+  isLocked: boolean;
+}
   useEffect(() => {
-    const loadCourses = async () => {
-      try {
-        const tasks = await fetchTasks(CSV_URL);
-        const organized = organizeTasks(tasks);
-        const realCourses = organized.filter(c => 
-          c.name && 
-          !c.name.toLowerCase().includes('dummy') &&
-          !c.name.toLowerCase().includes('test') &&
-          c.chapters?.length > 0
-        );
-        setCourses(realCourses);
-      } catch (err) {
-        console.error("Failed to load courses:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadCourses();
-  }, []);
+  const fetchApproved = async () => {
+    const { data, error } = await supabase
+      .from("form_users")
+      .select("approved_courses")
+      .eq("email", email)
+      .single();
+
+    if (error) return;
+    if (Array.isArray(data?.approved_courses)) {
+      setApprovedCourses(data.approved_courses as string[]);
+    }
+  };
+
+  fetchApproved();
+}, [email]);
+
+
+ useEffect(() => {
+  const loadCourses = async () => {
+    try {
+      const tasks = await fetchTasks(CSV_URL);
+      const organized = organizeTasks(tasks);
+
+      const validCourses = organized.filter(c =>
+        c.id &&
+        c.name &&
+        c.chapters?.length > 0 &&
+        !c.name.toLowerCase().includes('dummy') &&
+        !c.name.toLowerCase().includes('test') &&
+        !c.name.toLowerCase().includes('sample')
+      );
+
+      const withFlag = validCourses.map(c => ({
+        ...c,
+        isLocked: !approvedCourses.includes(c.id),
+      }));
+
+setCourses(
+  withFlag.sort((a, b) => Number(a.isLocked) - Number(b.isLocked))
+);
+    } catch (err) {
+      console.error("Failed to load courses:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  loadCourses();
+}, [approvedCourses]);
 
   const getCompletedTasks = (courseId: string): string[] => {
     const key = `course_${courseId}_completed_tasks`;
@@ -70,7 +110,6 @@ export default function StudentDashboard() {
     };
   };
 
-  // === CHARTS DATA (You can make these dynamic later with real activity) ===
   const pieData = [
     { name: 'Analytics', value: 35, color: '#8b5cf6' },
     { name: 'AI Skills', value: 28, color: '#3b82f6' },
@@ -113,7 +152,7 @@ export default function StudentDashboard() {
     }
   };
 
-  if (loading) {
+ if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center">
@@ -126,105 +165,130 @@ export default function StudentDashboard() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex">
-      {/* Sidebar */}
-<aside
-  className={`
-    ${sidebarOpen ? 'w-64' : 'w-20'}
-    hidden md:flex
-    fixed left-0 top-16 z-40
-    h-[calc(100vh-64px)]
-    bg-background/95 backdrop-blur
-    border-r border-border
-    transition-all duration-300
-  `}
->
-  <div className="flex h-full flex-col">
+      {/* JOYRIDE TOUR — ALWAYS MOUNTED (same as CoursesIndex) */}
+      {run && steps.length > 0 && (
+     <Joyride
+  run={run}
+  steps={steps.map(({ page, action, to, ...rest }) => ({
+    ...rest,
+    placement: rest.placement as any
+  }))}
+  continuous
+  showSkipButton
+  scrollToFirstStep
+  spotlightClicks
+  disableScrolling={false}
+  callback={handleFinish}
+  styles={{
+    options: {
+      zIndex: 10000,
+    },
+    overlay: {
+      backgroundColor: "rgba(0,0,0,0.6)"    // darker overlay
+    },
+    tooltip: {
+      backgroundColor: "#121212",            // solid dark popup
+      borderRadius: "12px",
+      color: "#f2f2f2",
+      padding: "18px 20px",
+      border: "1px solid rgba(255,255,255,0.08)"
+    },
+    tooltipContainer: {
+      textAlign: "left"
+    },
+    spotlight: {
+      borderRadius: "10px",
+      boxShadow: "0 0 0 2px rgba(255,255,255,0.15)"
+    },
+    buttonNext: {
+      background: "#2563eb",
+      color: "#fff",
+      borderRadius: "8px",
+      padding: "6px 14px",
+    },
+    buttonBack: {
+      color: "#bbb",
+      padding: "6px 10px",
+    },
+    buttonSkip: {
+      color: "#ff7676",
+      fontWeight: 500
+    },
+    buttonClose: {
+      color: "#888",
+    },
+  }}
+  locale={{
+    back: 'Back',
+    close: 'Close',
+    last: 'Finish',
+    next: 'Next',
+    skip: 'Skip Tour',
+  }}
+/>
+      )}
 
-    {/* Collapse Button */}
-    <div className="flex items-center justify-end px-4 py-4">
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="p-2 rounded-lg hover:bg-accent transition-colors"
+     
+        {/* Sidebar */}
+      <aside
+        className={`
+          ${sidebarOpen ? 'w-64' : 'w-20'}
+          hidden md:flex fixed left-0 top-16 z-40 h-[calc(100vh-64px)]
+          bg-background/95 backdrop-blur border-r border-border
+          transition-all duration-300
+        `}
+        data-tour="sidebar" 
       >
-        {sidebarOpen ? '<' : '>'}
-      </button>
-    </div>
-
-    {/* Navigation */}
-    <nav className="flex-1 space-y-1 px-3 mt-2">
-
-      {navItems.map((item) => {
-        const Icon = item.icon;
-        const isProLocked = item.pro;
-        const active = item.active;
-
-        return (
-          <button
-            key={item.label}
-            onClick={() => handleNavClick(item)}
-            disabled={isProLocked}
-            className={`
-              flex items-center
-              w-full
-              rounded-md
-              py-3 px-3
-              text-sm font-medium
-              transition-all
-              ${
-                isProLocked
-                  ? 'text-muted-foreground cursor-not-allowed'
-                  : active
-                  ? 'bg-accent text-accent-foreground shadow-sm'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-              }
-            `}
-          >
-            <Icon
-              className={`
-                h-5 w-5 shrink-0
-                ${sidebarOpen ? '' : 'mx-auto'}
-              `}
-            />
-
-            {/* Label */}
-            <span
-              className={`
-                ml-3
-                ${sidebarOpen ? 'block' : 'hidden'}
-              `}
+        <div className="flex h-full flex-col">
+          <div className="flex items-center justify-end px-4 py-4">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 rounded-lg hover:bg-accent transition-colors"
             >
-              {item.label}
-            </span>
+              {sidebarOpen ? '<' : '>'}
+            </button>
+          </div>
 
-            {/* PRO badge */}
-            {isProLocked && (
-              <span
-                className={`
-                  ml-auto mr-1 text-red-700 text-xs font-bold
-                  ${sidebarOpen ? 'block' : 'hidden'}
-                `}
-              >
-                PRO
-              </span>
-            )}
-          </button>
-        );
-      })}
+          <nav className="flex-1 space-y-1 px-3 mt-2">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isProLocked = item.pro;
+              const active = item.active;
 
-    </nav>
-
-  </div>
-</aside>
+              return (
+                <button
+                  key={item.label}
+                  onClick={() => handleNavClick(item)}
+                  disabled={isProLocked}
+                  className={`
+                    flex items-center w-full rounded-md py-3 px-3 text-sm font-medium transition-all
+                    ${isProLocked
+                      ? 'text-muted-foreground cursor-not-allowed'
+                      : active
+                      ? 'bg-accent text-accent-foreground shadow-sm'
+                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                    }
+                  `}
+                >
+                  <Icon className={`h-5 w-5 shrink-0 ${sidebarOpen ? '' : 'mx-auto'}`} />
+                  <span className={`ml-3 ${sidebarOpen ? 'block' : 'hidden'}`}>
+                    {item.label}
+                  </span>
+                  {isProLocked && (
+                    <span className={`ml-auto mr-1 text-red-700 text-xs font-bold ${sidebarOpen ? 'block' : 'hidden'}`}>
+                      PRO
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+      </aside>
 
       {/* Main Content */}
-      <div
-  className={`
-    flex-1
-${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}
-    transition-all duration-300
-  `}
->
-        <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
+      <div className={`${sidebarOpen ? 'md:ml-64' : 'md:ml-20'} flex-1 transition-all duration-300`}>
+        <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur" data-tour="dashboard-header">
           <div className="flex h-16 items-center justify-between px-6">
             <div>
               <h1 className="text-2xl font-semibold">Student Dashboard</h1>
@@ -238,7 +302,7 @@ ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}
 
         <main className="p-6 lg:p-12">
           {/* KPI Strip */}
-          <div className="mb-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mb-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4" data-tour="kpi-cards">
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
@@ -267,23 +331,23 @@ ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}
               </CardContent>
             </Card>
 
-<Card>
-  <CardContent className="pt-6">
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm text-muted-foreground">Tasks Completed</p>
-        <p className="text-4xl font-bold">
-          {courses.reduce((sum, course) => {
-            const stats = getCourseStats(course);
-            const completed = parseInt(stats.lessons.split('/')[0], 10) || 0;
-            return sum + completed;
-          }, 0)}
-        </p>
-      </div>
-      <CheckCircle className="h-10 w-10 text-green-500 opacity-70" />
-    </div>
-  </CardContent>
-</Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Tasks Completed</p>
+                    <p className="text-4xl font-bold">
+                      {courses.reduce((sum, course) => {
+                        const stats = getCourseStats(course);
+                        const completed = parseInt(stats.lessons.split('/')[0], 10) || 0;
+                        return sum + completed;
+                      }, 0)}
+                    </p>
+                  </div>
+                  <CheckCircle className="h-10 w-10 text-green-500 opacity-70" />
+                </div>
+              </CardContent>
+            </Card>
 
             <Card>
               <CardContent className="pt-6">
@@ -302,9 +366,9 @@ ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}
             </Card>
           </div>
 
-          {/* Charts Section - FULLY RESTORED */}
+          {/* Charts Section */}
           <div className="mb-12 grid gap-6 lg:grid-cols-3">
-            <Card>
+            <Card data-tour="xp-pie-chart">
               <CardHeader>
                 <CardTitle className="text-lg">XP Breakdown</CardTitle>
               </CardHeader>
@@ -340,7 +404,7 @@ ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-tour="weekly-activity">
               <CardHeader>
                 <CardTitle className="text-lg">Weekly Activity</CardTitle>
               </CardHeader>
@@ -356,7 +420,7 @@ ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-tour="learning-momentum">
               <CardHeader>
                 <CardTitle className="text-lg">Learning Momentum</CardTitle>
               </CardHeader>
@@ -379,12 +443,29 @@ ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}
             </Card>
           </div>
 
-          {/* Continue Learning - Real Courses */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-6">Continue Learning</h2>
+          {/* Continue Learning */}
+          <section className="mb-12" data-tour="continue-learning">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold">Continue Learning</h2>
+              {courses.length > 4 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/courses')}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  View All ({courses.length})
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+              )}
+            </div>
+
             {courses.length === 0 ? (
-              <Card className="text-center py-16">
+              <Card className="text-center py-16 border-dashed">
                 <CardContent>
+                  <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                    <BookOpen className="h-8 w-8 text-muted-foreground" />
+                  </div>
                   <p className="text-lg text-muted-foreground mb-4">No courses enrolled yet</p>
                   <Button onClick={() => navigate('/courses')} size="lg">
                     Explore Courses
@@ -392,37 +473,89 @@ ${sidebarOpen ? 'md:ml-64' : 'md:ml-20'}
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {courses.slice(0, 4).map((course) => {
                   const stats = getCourseStats(course);
+                  const isCompleted = stats.progress >= 100;
+
                   return (
-                    <Card key={course.id} className="hover:shadow-lg transition-shadow">
-                      <CardHeader className="pb-4">
-                        <div className="flex items-start justify-between">
-                          <CardTitle className="text-lg line-clamp-2">{stats.title}</CardTitle>
-                          <Badge variant="secondary">{stats.xp} XP</Badge>
+                    <Card
+                      key={course.id}
+                      className="cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-xl group overflow-hidden"
+                      onClick={() => {
+  if (course.isLocked) return;
+  navigate(`/courses/${course.id}`);
+}}
+                      data-tour="continue-card"
+                    >
+                      <div className="h-2 bg-primary" />
+
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between mb-4">
+                          <h3 className="font-bold text-lg leading-tight line-clamp-2 pr-2">
+                            {stats.title}
+                          </h3>
+                          <Badge variant="secondary" className="text-xs font-semibold flex items-center gap-1">
+                            <Zap className="h-3 w-3" />
+                            {stats.xp} XP
+                          </Badge>
                         </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
+
+                        <div className="space-y-3">
                           <div>
-                            <div className="flex items-center justify-between text-sm mb-2">
+                            <div className="flex justify-between text-sm mb-1">
                               <span className="text-muted-foreground">Progress</span>
-                              <span className="font-medium">{Math.round(stats.progress)}%</span>
+                              <span className="font-semibold">{Math.round(stats.progress)}%</span>
                             </div>
-                            <Progress value={stats.progress} className="h-2" />
+                            <div className="relative h-3 rounded-full bg-muted overflow-hidden">
+                              <div
+                                className="absolute inset-y-0 left-0 transition-all duration-700 ease-out"
+                                style={{
+                                  width: `${stats.progress}%`,
+                                  backgroundColor:
+                                    stats.progress >= 90 ? '#10b981' :
+                                    stats.progress >= 60 ? '#3b82f6' :
+                                    stats.progress >= 30 ? '#f59e0b' : '#8b5cf6',
+                                }}
+                              />
+                            </div>
                           </div>
-                          <p className="text-xs text-muted-foreground">{stats.lessons}</p>
-                          <Button 
-                            className="w-full" 
-                            size="sm"
-                            onClick={() => navigate(`/courses/${course.id}`)}
-                          >
-                            Continue Learning
-                            <ChevronRight className="ml-1 h-4 w-4" />
-                          </Button>
+
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>Tasks Completed</span>
+                            <span className="font-medium text-foreground">{stats.lessons}</span>
+                          </div>
+
+                          <div className="pt-2">
+                            <Badge
+                              variant={isCompleted ? "default" : "secondary"}
+                              className={`w-full justify-center py-1.5 text-xs font-medium ${
+                                isCompleted ? "bg-green-500 text-white" : "bg-blue-500/10 text-blue-600"
+                              }`}
+                            >
+                              {isCompleted ? <>Completed</> : <>In Progress</>}
+                            </Badge>
+                          </div>
                         </div>
+
+                      <Button
+  className="w-full mt-4"
+  size="sm"
+  disabled={course.isLocked}
+  onClick={(e) => {
+    e.stopPropagation();
+    if (!course.isLocked) navigate(`/courses/${course.id}`);
+  }}
+>
+  {course.isLocked ? "Locked" : isCompleted ? "Review Course" : "Continue Learning"}
+  {!course.isLocked && <ChevronRight className="ml-1 h-4 w-4" />}
+</Button>
                       </CardContent>
+                      {course.isLocked && (
+  <Badge variant="destructive" className="absolute top-2 right-2 text-xs">
+    Locked
+  </Badge>
+)}
                     </Card>
                   );
                 })}

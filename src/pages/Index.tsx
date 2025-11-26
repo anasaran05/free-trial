@@ -247,7 +247,7 @@ const handleStartTraining = () => {
   const access = localStorage.getItem("omega_access");
 
   if (access === "yes") {
-    navigate('/courses');
+    navigate('/dashboard');
   } else {
     navigate('/signin');
   }

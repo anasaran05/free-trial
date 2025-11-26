@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { Home, BookOpen, Trophy, Award, Activity, Settings } from 'lucide-react';
 
 interface HeaderProps {
@@ -14,10 +13,24 @@ export default function Header({ className = '' }: HeaderProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
+  // Optional: Track if user has access (to conditionally render header or parts)
+  const hasAccess = localStorage.getItem('omega_access') === 'yes';
+
+  const handleSignOut = () => {
+    // Clear your custom access flags
+    localStorage.removeItem('omega_access');
+    localStorage.removeItem('omega_email');
+
+    // Redirect to home/login
     navigate('/');
+    setMobileMenuOpen(false);
   };
+
+  // If no access, don't render the full header (or redirect early)
+  // You can also move this check higher up in a layout/route guard
+  if (!hasAccess && location.pathname !== '/') {
+    return null; // or a minimal header, or redirect
+  }
 
   const isDashboard = location.pathname === '/dashboard';
 
@@ -32,15 +45,12 @@ export default function Header({ className = '' }: HeaderProps) {
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border ${className}`}
+      className={`sticky top-0 z-50 bg-background/10 backdrop-blur-sm border-b border-border ${className}`}
     >
       <nav className="theme-container">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link 
-            to="/" 
-            className="flex items-center space-x-2 group md:-ml-[2cm]"
-          >
+          <Link to="/" className="flex items-center space-x-2 group md:-ml-[2cm]">
             <span className="font-heading font-semibold text-xl">
               ZANE <span style={{ color: '#ff0000' }}>ΩMEGA</span>
             </span>
@@ -62,7 +72,7 @@ export default function Header({ className = '' }: HeaderProps) {
               variant="ghost"
               size="sm"
               onClick={handleSignOut}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <LogOut className="h-4 w-4" />
               Sign Out
@@ -88,11 +98,13 @@ export default function Header({ className = '' }: HeaderProps) {
                   key={item.label}
                   variant={item.active ? 'default' : 'ghost'}
                   onClick={() => {
-                    if (!item.pro && item.path) navigate(item.path);
+                    if (!item.pro && item.path) {
+                      navigate(item.path);
+                    }
                     setMobileMenuOpen(false);
                   }}
                   disabled={item.pro}
-                  className="flex items-center gap-2 justify-start"
+                  className="flex items-center gap-2 justify-start w-full"
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}
@@ -104,14 +116,10 @@ export default function Header({ className = '' }: HeaderProps) {
                 </Button>
               ))}
 
-              {/* Sign Out */}
               <Button
                 variant="ghost"
-                onClick={() => {
-                  handleSignOut();
-                  setMobileMenuOpen(false);
-                }}
-                className="flex items-center gap-2 justify-start"
+                onClick={handleSignOut}
+                className="flex items-center gap-2 justify-start w-full text-red-600"
               >
                 <LogOut className="h-4 w-4" />
                 Sign Out

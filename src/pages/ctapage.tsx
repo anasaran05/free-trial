@@ -11,8 +11,10 @@ import { fetchTasks, organizeTasks, Course, calculateProgress } from "@/lib/csv"
 import { DotLottieReact } from '@lottiefiles/dotlottie-react'; 
 import { AuroraText } from "@/components/Reactbits/aurora-text";
 import { InteractiveHoverButton } from "../components/Buttons/interactive-hover-button";
-
+import { supabase } from '@/integrations/supabase/client';
 const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
+
+type UICourse = Course & { isLocked: boolean };
 
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode },
@@ -90,15 +92,16 @@ function useScrollRiseAnimation(targetRef: React.RefObject<HTMLElement>) {
   }, [targetRef]);
 }
 
+
 function CTAPage() {
   const [mounted, setMounted] = useState(false);
-  const [courses, setCourses] = useState<Course[]>([]);
+ const [courses, setCourses] = useState<UICourse[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(true);
   const location = useLocation();
   const completedCourseId = location.state?.courseId;
-
+  const [approvedCourses, setApprovedCourses] = useState<string[]>([]);
   const heroRef = useRef<HTMLElement>(null);
   const upgradeSectionRef = useRef<HTMLElement>(null);
   const reviewRef = useRef<HTMLElement>(null);
@@ -155,7 +158,17 @@ function CTAPage() {
           await new Promise(resolve => setTimeout(resolve, remainingTime));
         }
 
-        setCourses(filteredCourses);
+        const email = localStorage.getItem("omega_email")?.trim() || null;
+
+// later inside loadWithMinimumDelay:
+const withLockFlag: UICourse[] = filteredCourses.map(c => ({
+  ...c,
+  isLocked: !approvedCourses.includes(c.id),
+}));
+
+setCourses(
+  withLockFlag.sort((a, b) => Number(a.isLocked) - Number(b.isLocked))
+);
         setMounted(true);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load courses');
@@ -479,79 +492,59 @@ function CTAPage() {
             </div>
           ) : (
             <InfiniteHorizontalScroll>
-              {courses.map((course, index) => {
+              {courses
+  .sort((a, b) => Number(a.isLocked) - Number(b.isLocked))
+  .map((course, index) => {
                 const stats = getCourseStats(course);
                 return (
                   <div key={`${course.id}-${index}`} className="flex-shrink-0 w-80 mx-4">
-                    <Card
-                      variant="interactive"
-                      className="h-full w-full"
-                    >
-                      <CardHeader>
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <Award className="w-6 h-6 text-white" />
-                          </div>
-                          <div className="text-right">
-                            <div className="text-2xl font-bold text-blue-400">
-                              {stats.earnedXP}
-                            </div>
-                            <div className="text-xs text-gray-400">
-                              / {stats.totalXP} XP
-                            </div>
-                          </div>
-                        </div>
-                        <CardTitle className="text-xl text-white">
-                          {course.name}
-                        </CardTitle>
-                        <CardDescription className="text-gray-300 break-words whitespace-normal">
-                          {course.description || "No description available."}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-6">
-                        <div>
-                          <ProgressBar
-                            value={stats.progressPercentage}
-                            label="Progress"
-                            size="sm"
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 text-center">
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-center gap-1 text-gray-400">
-                              <BookOpen className="w-4 h-4" />
-                              <span className="text-xs">Chapters</span>
-                            </div>
-                            <div className="font-semibold text-white">
-                              {stats.totalChapters}
-                            </div>
-                          </div>
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-center gap-1 text-gray-400">
-                              <BookOpen className="w-4 h-4" />
-                              <span className="text-xs">Tasks</span>
-                            </div>
-                            <div className="font-semibold text-white">
-                              {stats.completedTasks}/{stats.totalTasks}
-                            </div>
-                          </div>
-                        </div>
-                       <div className="pt-4">
-  <a href={`/courses/${course.id}`} className="block">
-    <InteractiveHoverButton
-      className="relative w-full flex items-center justify-center
-                 rounded-lg sm:rounded-xl font-semibold px-3 py-2 sm:px-4 sm:py-3
-                 bg-green-500 text-white
-                 hover:bg-green-600 hover:text-white
-                 transition-all duration-300 ease-in-out shadow-sm
-                 text-sm sm:text-base"
+                   <Card
+  variant="interactive"
+  className="h-full w-full flex flex-col p-4 bg-gray-900/30 border border-gray-700 rounded-xl"
+>
+  {/* content grows naturally */}
+  <div className="flex flex-col gap-4 flex-grow">
+    <CardHeader className="p-0">
+      <div className="flex items-start justify-between mb-4">
+        <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+          <Award className="w-6 h-6 text-white" />
+        </div>
+      </div>
+
+      <CardTitle className="text-xl text-white break-words whitespace-normal">
+        {course.name}
+      </CardTitle>
+
+      <CardDescription className="text-gray-300 break-words whitespace-normal">
+        {course.description || "No description available."}
+      </CardDescription>
+    </CardHeader>
+
+    {/* if you have other stats, keep them here */}
+  </div>
+
+  {/* button always sticks to bottom */}
+ <div className="mt-auto pt-4">
+  {course.isLocked ? (
+    <a
+      href={`https://wa.me/919342205876?text=${encodeURIComponent(
+        `Hi! Please unlock the "${course.name}" free trial course for me (Slug: ${course.slug})`
+      )}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="w-full flex items-center justify-center rounded-lg font-semibold px-4 py-3 bg-green-500 text-black border border-black hover:bg-white hover:text-black transition-all duration-300"
     >
-      {stats.completedTasks > 0 ? "Continue Course" : "Start Course"}
-    </InteractiveHoverButton>
-  </a>
+      Contact Us to Unlock
+    </a>
+  ) : (
+    <a href={`/courses/${course.slug}`} className="block">
+      <InteractiveHoverButton className="w-full px-4 py-3">
+        {stats.completedTasks > 0 ? "Continue Course" : "Start Course"}
+      </InteractiveHoverButton>
+    </a>
+  )}
 </div>
-                      </CardContent>
-                    </Card>
+</Card>
                   </div>
                 );
               })}

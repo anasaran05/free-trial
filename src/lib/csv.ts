@@ -3,9 +3,10 @@
  * Handles caching and type-safe parsing of course/chapter/lesson/task data
  * Robust CSV parser: supports quoted fields (with commas/newlines inside)
  */
-
+export const coursesBySlug: Record<string, Course> = {};
 export interface TaskRow {
   courseId: string;
+  courseSlug?: string;
   courseName: string;
   coursedescription?: string;
   chapterId: string;
@@ -27,6 +28,7 @@ export interface TaskRow {
 export interface Course {
   description?: string;
   id: string;
+  slug: string;
   name: string;
   chapters: Chapter[];
   category?: string;
@@ -227,14 +229,15 @@ export function organizeTasks(tasks: TaskRow[]): Course[] {
   tasks.forEach(taskRow => {
     // Create or get course
     if (!courseMap.has(taskRow.courseId)) {
-      courseMap.set(taskRow.courseId, {
-        id: taskRow.courseId,
-        name: taskRow.courseName,
-        description: taskRow.coursedescription,
-        chapters: [],
-        category: taskRow.courseCategory?.trim().toLowerCase() || 'uncategorized'
-      });
-    }
+  courseMap.set(taskRow.courseId, {
+    id: taskRow.courseId,
+    slug: taskRow.courseSlug || taskRow.courseId, // fallback for dev
+    name: taskRow.courseName,
+    description: taskRow.coursedescription,
+    chapters: [],
+    category: taskRow.courseCategory?.trim().toLowerCase() || 'uncategorized'
+  });
+}
 
     // Create or get chapter
     const chapterKey = `${taskRow.courseId}-${taskRow.chapterId}`;
@@ -287,9 +290,15 @@ const splitUrls = (s?: string) => {
     lessonMap.get(lessonKey)!.tasks.push(task);
   });
 
-  return Array.from(courseMap.values());
+const courses = Array.from(courseMap.values());
+courses.forEach(c => {
+  coursesBySlug[c.slug] = c;
+});
+return courses;
 }
-
+export function getCourseBySlug(slug: string): Course | null {
+  return coursesBySlug[slug] ?? null;
+}
 /**
  * Get a specific chapter by IDs
  */
