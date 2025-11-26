@@ -22,7 +22,7 @@ export default function Tutorial() {
           </p>
         </div>
 
-        <div className="relative w-full rounded-3xl overflow-hidden shadow-[0_0_40px_-10px_rgba(255,255,255,0.2)]">
+        <div className="relative w-full rounded-xl overflow-hidden shadow-[0_0_40px_-10px_rgba(255,255,255,0.2)]">
           <div className="aspect-video bg-black">
             <iframe
               className="absolute inset-0 w-full h-full"
@@ -33,15 +33,45 @@ export default function Tutorial() {
         </div>
 
         <Button
-          onClick={() => {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-            setTimeout(() => navigate("/"), 400);
-          }}
-          className="bg-white text-black text-lg px-14 py-5 rounded-full font-medium 
-          hover:bg-white/90 transition-colors"
-        >
-          Begin Your Journey
-        </Button>
+  onClick={() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => navigate("/"), 400);
+  }}
+  className="
+    relative overflow-hidden
+    bg-white text-black text-lg px-20 py-5 rounded-full font-medium
+    border border-transparent hover:border-white hover:bg-black hover:text-white
+    transition-colors duration-300 ease-in-out group
+  "
+>
+  <span
+    className="
+      block w-full h-full
+      transition-transform duration-500 ease-in-out
+      [transform-style:preserve-3d]
+      group-hover:[transform:rotateX(180deg)]
+    "
+  >
+    <span
+      className="
+        absolute inset-0 flex items-center justify-center
+        [backface-visibility:hidden]
+      "
+    >
+      Begin
+    </span>
+
+    <span
+      className="
+        absolute inset-0 flex items-center justify-center
+        [transform:rotateX(180deg)]
+        [backface-visibility:hidden]
+      "
+    >
+      Your Journey
+    </span>
+  </span>
+</Button>
       </div>
     </div>
   );
