@@ -88,6 +88,7 @@ export default function SimulationTaskPage() {
     return result;
   }, [task]);
 
+  // CLEANED OUTCOMES — removes "If you chose A –", "If you chose B –", etc.
   const outcomes = useMemo(() => {
     if (!task?.resources?.answerKey) return {};
 
@@ -95,9 +96,20 @@ export default function SimulationTaskPage() {
     const out: Record<string, string> = {};
 
     ["A", "B", "C"].forEach((key) => {
-      const regex = new RegExp(`If you chose ${key}[\\s\\S]*?(?=If you chose [ABC]|$)`, "i");
+      const regex = new RegExp(`If you chose ${key}[^\\n]*\\n([\\s\\S]*?)(?=If you chose [ABC]|$)`, "i");
       const match = text.match(regex);
-      if (match) out[key] = match[0].trim();
+
+      if (match?.[1]) {
+        out[key] = match[1].trim();
+      } else {
+        // Fallback: remove the "If you chose X" line entirely
+        const fallback = text.match(new RegExp(`If you chose ${key}[^\\n]*(?:\\n|.)*?(?=If you chose [ABC]|$)`, "i"));
+        if (fallback) {
+          out[key] = fallback[0]
+            .replace(new RegExp(`^If you chose ${key}[^\\n]*\\n?`, "i"), "")
+            .trim();
+        }
+      }
     });
 
     return out;
@@ -121,7 +133,7 @@ export default function SimulationTaskPage() {
     navigate("/cta", { state: { courseSlug } });
   };
 
-  // Dynamic styling based on selected option
+  // Dynamic color for outcome card
   const getOutcomeStyles = () => {
     if (!selectedOption || !showOutcome) return "";
 
