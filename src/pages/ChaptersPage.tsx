@@ -29,7 +29,7 @@ export default function CoursePage() {
   const [error, setError] = useState<string | null>(null);
 
 
-  const completedKey = course ? `course_${course.id}_completed_tasks` : '';
+  const completedKey = course ? `course_${course.slug}_completed_tasks` : '';
  const getCompletedTasks = (): string[] => {
   if (!course) return [];
   return JSON.parse(sessionStorage.getItem(completedKey) || '[]');

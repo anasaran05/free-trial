@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { fetchTasks, organizeTasks, findTask, Task } from "@/lib/csv";
 import { getCourseBySlug } from '@/lib/csv';
@@ -15,7 +15,6 @@ const CSV_URL =
   "https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv";
 
 export default function SimulationTaskPage() {
-  // Now using courseSlug instead of courseId
   const { courseSlug, chapterId, taskId } = useParams<{
     courseSlug: string;
     chapterId: string;
@@ -30,7 +29,8 @@ export default function SimulationTaskPage() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showOutcome, setShowOutcome] = useState(false);
 
-  // Resolve courseId from slug (needed for findTask)
+  const outcomeRef = useRef<HTMLDivElement>(null);
+
   const course = useMemo(() => {
     if (!courseSlug) return null;
     return getCourseBySlug(courseSlug);
@@ -39,9 +39,7 @@ export default function SimulationTaskPage() {
   const courseId = course?.id;
 
   useEffect(() => {
-    if (courseId) {
-      loadTask();
-    }
+    if (courseId) loadTask();
   }, [courseId, chapterId, taskId]);
 
   const loadTask = async () => {
@@ -53,14 +51,12 @@ export default function SimulationTaskPage() {
 
       const rows = await fetchTasks(CSV_URL);
       const structured = organizeTasks(rows);
-
       const found = findTask(structured, courseId, chapterId!, taskId!);
 
       if (!found) {
         setError("Task not found");
         return;
       }
-
       setTask(found);
     } catch (err) {
       console.error(err);
@@ -70,45 +66,32 @@ export default function SimulationTaskPage() {
     }
   };
 
-  // Scenario text
   const scenarioText = task?.scenario || "";
-
-  // Reference text from first PDF field
   const referenceText = task?.resources?.pdfs?.[0] || "";
 
-  // Options parsed from forms[0]
   const options = useMemo(() => {
     if (!task?.resources?.forms?.[0]) return [];
 
     const block = task.resources.forms[0];
-
     const result: { key: string; title: string; content: string }[] = [];
-
     const chunks = block.split(/Option\s+/i).filter(Boolean);
 
     chunks.forEach((chunk) => {
-      const key = chunk.trim().charAt(0).toUpperCase(); // A / B / C
+      const key = chunk.trim().charAt(0).toUpperCase();
       const rest = chunk.substring(1).trim();
-
       const titleLine = rest.split("\n")[0].trim();
       const content = rest.replace(titleLine, "").trim();
 
-      result.push({
-        key,
-        title: `Option ${key} – ${titleLine}`,
-        content,
-      });
+      result.push({ key, title: `Option ${key} – ${titleLine}`, content });
     });
 
     return result;
   }, [task]);
 
-  // Outcomes parsed from answerKey
   const outcomes = useMemo(() => {
     if (!task?.resources?.answerKey) return {};
 
     const text = task.resources.answerKey;
-
     const out: Record<string, string> = {};
 
     ["A", "B", "C"].forEach((key) => {
@@ -122,12 +105,45 @@ export default function SimulationTaskPage() {
 
   const confirmChoice = () => {
     if (!selectedOption) return;
+
     setShowOutcome(true);
+
+    setTimeout(() => {
+      outcomeRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
+    }, 100);
   };
 
   const completeSimulation = () => {
-    // Use courseSlug for navigation (same as regular TaskPage)
     navigate("/cta", { state: { courseSlug } });
+  };
+
+  // Dynamic styling based on selected option
+  const getOutcomeStyles = () => {
+    if (!selectedOption || !showOutcome) return "";
+
+    switch (selectedOption) {
+      case "A":
+        return "border-green-500/60 bg-green-500/5 shadow-lg shadow-green-500/20";
+      case "B":
+        return "border-yellow-500/60 bg-yellow-500/5 shadow-lg shadow-yellow-500/20";
+      case "C":
+        return "border-red-500/60 bg-red-500/5 shadow-lg shadow-red-500/20";
+      default:
+        return "border-yellow-500/60 bg-yellow-500/5";
+    }
+  };
+
+  const getOutcomeTitleColor = () => {
+    switch (selectedOption) {
+      case "A": return "text-green-400";
+      case "B": return "text-yellow-400";
+      case "C": return "text-red-400";
+      default: return "text-yellow-400";
+    }
   };
 
   if (loading) {
@@ -156,49 +172,31 @@ export default function SimulationTaskPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-12">
-        {/* Breadcrumb – now uses courseSlug */}
+        {/* Breadcrumb */}
         <nav className="mb-8">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Link to="/courses" className="hover:text-foreground">
-              Courses
-            </Link>
+            <Link to="/courses" className="hover:text-foreground">Courses</Link>
             <ChevronRight className="w-4 h-4" />
-            <Link
-              to={`/courses/${courseSlug}`}
-              className="hover:text-foreground"
-            >
-              Course
-            </Link>
+            <Link to={`/courses/${courseSlug}`} className="hover:text-foreground">Course</Link>
             <ChevronRight className="w-4 h-4" />
-            <Link
-              to={`/courses/${courseSlug}/chapters/${chapterId}`}
-              className="hover:text-foreground"
-            >
-              Chapter
-            </Link>
+            <Link to={`/courses/${courseSlug}/chapters/${chapterId}`} className="hover:text-foreground">Chapter</Link>
             <ChevronRight className="w-4 h-4" />
             <span className="text-foreground">{task.title}</span>
           </div>
         </nav>
 
-        {/* Top header */}
+        {/* Header */}
         <div className="mb-10">
           <div className="flex items-start gap-6 mb-6">
             <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-2xl font-bold text-primary-foreground">
-                AI
-              </span>
+              <span className="text-2xl font-bold text-primary-foreground">AI</span>
             </div>
             <div className="flex-1">
               <h1 className="text-4xl font-heading font-bold text-foreground mb-4">
                 {task.title}
               </h1>
               <div className="flex items-center gap-4 text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <span className="text-sm font-medium">
-                    {task.xp ?? 0} XP · Simulation Task
-                  </span>
-                </div>
+                <span className="text-sm font-medium">{task.xp ?? 0} XP · Simulation Task</span>
               </div>
             </div>
           </div>
@@ -214,9 +212,7 @@ export default function SimulationTaskPage() {
                 <p className="text-4xl font-semibold text-white">Scenario</p>
               </CardHeader>
               <CardContent>
-                <p className="text-foreground leading-relaxed whitespace-pre-line">
-                  {scenarioText}
-                </p>
+                <p className="text-foreground leading-relaxed whitespace-pre-line">{scenarioText}</p>
               </CardContent>
             </Card>
 
@@ -244,9 +240,7 @@ export default function SimulationTaskPage() {
             {/* Options */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-blue-400 text-2xl font-bold">
-                  Choose Your Action
-                </CardTitle>
+                <CardTitle className="text-blue-400 text-2xl font-bold">Choose Your Action</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {options.map((opt) => (
@@ -256,23 +250,19 @@ export default function SimulationTaskPage() {
                       setSelectedOption(opt.key);
                       setShowOutcome(false);
                     }}
-                    className={`p-4 rounded-xl border cursor-pointer transition ${
+                    className={`p-4 rounded-xl border cursor-pointer transition-all ${
                       selectedOption === opt.key
-                        ? "border-blue-500 bg-blue-500/10"
-                        : "border-white/10 bg-black/20"
+                        ? "border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/20"
+                        : "border-white/10 bg-black/20 hover:bg-white/5"
                     }`}
                   >
-                    <div className="text-white font-semibold text-lg mb-1">
-                      {opt.title}
-                    </div>
-                    <div className="text-gray-300 whitespace-pre-line">
-                      {opt.content}
-                    </div>
+                    <div className="text-white font-semibold text-lg mb-1">{opt.title}</div>
+                    <div className="text-gray-300 whitespace-pre-line">{opt.content}</div>
                   </div>
                 ))}
 
-                {selectedOption && (
-                  <GlowButton className="w-full mt-4" onClick={confirmChoice}>
+                {selectedOption && !showOutcome && (
+                  <GlowButton className="w-full mt-6" onClick={confirmChoice}>
                     Confirm Choice
                   </GlowButton>
                 )}
@@ -281,17 +271,15 @@ export default function SimulationTaskPage() {
 
             {/* Outcome – Mobile */}
             {selectedOutcome && (
-              <div className="block lg:hidden">
-                <Card className="bg-black/40 border border-yellow-500/20 backdrop-blur-xl">
+              <div ref={outcomeRef} className="block lg:hidden mt-8">
+                <Card className={`bg-black/40 border-2 backdrop-blur-xl transition-all ${getOutcomeStyles()}`}>
                   <CardHeader>
-                    <CardTitle className="text-yellow-400 text-2xl font-bold">
+                    <CardTitle className={`text-2xl font-bold ${getOutcomeTitleColor()}`}>
                       Outcome: Option {selectedOption}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-200 whitespace-pre-line leading-relaxed">
-                      {selectedOutcome}
-                    </p>
+                    <p className="text-gray-200 whitespace-pre-line leading-relaxed">{selectedOutcome}</p>
                     <GlowButton
                       className="w-full mt-6"
                       icon={<CheckCircle className="w-5 h-5" />}
@@ -305,7 +293,7 @@ export default function SimulationTaskPage() {
             )}
           </div>
 
-          {/* Right Column – Desktop only */}
+          {/* Right Column – Desktop */}
           <div className="space-y-6">
             {/* Instructions */}
             <Card>
@@ -317,18 +305,16 @@ export default function SimulationTaskPage() {
               <CardContent>
                 <div className="space-y-3 text-sm text-muted-foreground">
                   {task.instructions ? (
-                    task.instructions
-                      .split("\n")
-                      .map((line: string, i: number) => {
-                        const t = line.trim();
-                        if (!t) return null;
-                        return (
-                          <div key={i} className="flex items-start gap-2">
-                            <span className="text-primary font-medium">•</span>
-                            <span>{t}</span>
-                          </div>
-                        );
-                      })
+                    task.instructions.split("\n").map((line: string, i: number) => {
+                      const t = line.trim();
+                      if (!t) return null;
+                      return (
+                        <div key={i} className="flex items-start gap-2">
+                          <span className="text-primary font-medium">•</span>
+                          <span>{t}</span>
+                        </div>
+                      );
+                    })
                   ) : (
                     <p>No instructions provided.</p>
                   )}
@@ -338,25 +324,25 @@ export default function SimulationTaskPage() {
 
             {/* Outcome – Desktop */}
             {selectedOutcome && (
-              <Card className="hidden lg:block bg-black/40 border border-yellow-500/20 backdrop-blur-xl">
-                <CardHeader>
-                  <CardTitle className="text-yellow-400 text-2xl font-bold">
-                    Outcome: Option {selectedOption}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-200 whitespace-pre-line leading-relaxed">
-                    {selectedOutcome}
-                  </p>
-                  <GlowButton
-                    className="w-full mt-6"
-                    icon={<CheckCircle className="w-5 h-5" />}
-                    onClick={completeSimulation}
-                  >
-                    Complete Simulation
-                  </GlowButton>
-                </CardContent>
-              </Card>
+              <div ref={outcomeRef}>
+                <Card className={`bg-black/40 border-2 backdrop-blur-xl transition-all ${getOutcomeStyles()}`}>
+                  <CardHeader>
+                    <CardTitle className={`text-2xl font-bold ${getOutcomeTitleColor()}`}>
+                      Outcome: Option {selectedOption}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-200 whitespace-pre-line leading-relaxed">{selectedOutcome}</p>
+                    <GlowButton
+                      className="w-full mt-6"
+                      icon={<CheckCircle className="w-5 h-5" />}
+                      onClick={completeSimulation}
+                    >
+                      Complete Simulation
+                    </GlowButton>
+                  </CardContent>
+                </Card>
+              </div>
             )}
           </div>
         </div>

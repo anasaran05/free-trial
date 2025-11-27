@@ -91,7 +91,7 @@ export default function LessonPage() {
   };
 
   const getCompletedTasks = (): string[] => {
-    const completedKey = `course_${courseId}_completed_tasks`;
+    const completedKey = `course_${course.slug}_completed_tasks`;
     const completed = sessionStorage.getItem(completedKey);
     return completed ? JSON.parse(completed) : [];
   };

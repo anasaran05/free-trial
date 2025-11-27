@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Joyride from 'react-joyride'; // ← ADD THIS
-import { useOnboarding } from '@/onboarding/useOnboarding'; // ← ADD THIS (same hook as CoursesIndex)
+import Joyride from 'react-joyride';
+import { useOnboarding } from '@/onboarding/useOnboarding';
 import { 
   Home, BookOpen, Trophy, Award, Activity, Settings, 
   Zap, CheckCircle, TrendingUp, ChevronRight 
@@ -17,96 +17,117 @@ import {
   XAxis, YAxis, CartesianGrid, AreaChart, Area 
 } from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
-import { fetchTasks, organizeTasks, Course, calculateProgress } from '@/lib/csv';
+import { fetchTasks, organizeTasks, Course } from '@/lib/csv';
 
 const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
+
+interface DashboardCourse extends Course {
+  isLocked: boolean;
+}
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<DashboardCourse[]>([]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  
 
-  // ONBOARDING LOGIC — EXACT SAME AS COURSE INDEX
   const email = localStorage.getItem("omega_email")?.trim() || null;
   const { run, steps, handleFinish } = useOnboarding("dashboard", email);
   const [approvedCourses, setApprovedCourses] = useState<string[]>([]);
 
-
-  interface DashboardCourse extends Course {
-  isLocked: boolean;
-}
   useEffect(() => {
-  const fetchApproved = async () => {
-    const { data, error } = await supabase
-      .from("form_users")
-      .select("approved_courses")
-      .eq("email", email)
-      .single();
+    const fetchApproved = async () => {
+      const { data, error } = await supabase
+        .from("form_users")
+        .select("approved_courses")
+        .eq("email", email)
+        .single();
 
-    if (error) return;
-    if (Array.isArray(data?.approved_courses)) {
-      setApprovedCourses(data.approved_courses as string[]);
-    }
-  };
+      if (error) return;
+      if (Array.isArray(data?.approved_courses)) {
+        setApprovedCourses(data.approved_courses as string[]);
+      }
+    };
 
-  fetchApproved();
-}, [email]);
+    fetchApproved();
+  }, [email]);
 
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        const tasks = await fetchTasks(CSV_URL);
+        const organized = organizeTasks(tasks);
 
- useEffect(() => {
-  const loadCourses = async () => {
-    try {
-      const tasks = await fetchTasks(CSV_URL);
-      const organized = organizeTasks(tasks);
+        const validCourses = organized.filter(c =>
+          c.id &&
+          c.name &&
+          c.slug &&
+          c.chapters?.length > 0 &&
+          !c.name.toLowerCase().includes('dummy') &&
+          !c.name.toLowerCase().includes('test') &&
+          !c.name.toLowerCase().includes('sample')
+        );
 
-      const validCourses = organized.filter(c =>
-        c.id &&
-        c.name &&
-        c.chapters?.length > 0 &&
-        !c.name.toLowerCase().includes('dummy') &&
-        !c.name.toLowerCase().includes('test') &&
-        !c.name.toLowerCase().includes('sample')
-      );
+        const withFlag = validCourses.map(c => ({
+          ...c,
+          isLocked: !approvedCourses.includes(c.id),
+        }));
 
-      const withFlag = validCourses.map(c => ({
-        ...c,
-        isLocked: !approvedCourses.includes(c.id),
-      }));
+        setCourses(
+          withFlag.sort((a, b) => Number(a.isLocked) - Number(b.isLocked))
+        );
+      } catch (err) {
+        console.error("Failed to load courses:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadCourses();
+  }, [approvedCourses]);
 
-setCourses(
-  withFlag.sort((a, b) => Number(a.isLocked) - Number(b.isLocked))
-);
-    } catch (err) {
-      console.error("Failed to load courses:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  loadCourses();
-}, [approvedCourses]);
-
-  const getCompletedTasks = (courseId: string): string[] => {
-    const key = `course_${courseId}_completed_tasks`;
+  const getCompletedTasks = (courseSlug: string): string[] => {
+    const key = `course_${courseSlug}_completed_tasks`;
     const stored = sessionStorage.getItem(key);
-    return stored ? JSON.parse(stored) : [];
+    try {
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
   };
 
   const getCourseStats = (course: Course) => {
-    const allTasks = course.chapters.flatMap(ch => ch.lessons.flatMap(l => l.tasks));
-    const completed = getCompletedTasks(course.id);
-    const progress = calculateProgress(allTasks, completed);
+    const allTaskIds = course.chapters
+      .flatMap(ch => ch.lessons)
+      .flatMap(l => l.tasks)
+      .map(t => t.id);
+
+    const completedTaskIds = getCompletedTasks(course.slug || course.id);
+    const completedCount = allTaskIds.filter(id => completedTaskIds.includes(id)).length;
+
+    const totalXP = course.chapters
+      .flatMap(ch => ch.lessons)
+      .flatMap(l => l.tasks)
+      .reduce((sum, t) => sum + (t.xp || 0), 0);
+
+    const earnedXP = course.chapters
+      .flatMap(ch => ch.lessons)
+      .flatMap(l => l.tasks)
+      .filter(t => completedTaskIds.includes(t.id))
+      .reduce((sum, t) => sum + (t.xp || 0), 0);
+
+    const progressPercentage = allTaskIds.length > 0
+      ? Math.round((completedCount / allTaskIds.length) * 100)
+      : 0;
 
     return {
       title: course.name,
-      progress: progress.completionPercentage,
-      lessons: `${progress.completedTasks}/${progress.totalTasks} Tasks`,
-      xp: progress.earnedXP,
-      totalXP: progress.totalXP,
-      color: progress.completionPercentage >= 90 ? 'bg-green-500' :
-             progress.completionPercentage >= 60 ? 'bg-blue-500' :
-             progress.completionPercentage >= 30 ? 'bg-amber-500' : 'bg-purple-500'
+      progress: progressPercentage,
+      lessons: `${completedCount}/${allTaskIds.length} Tasks`,
+      xp: earnedXP,
+      totalXP,
+      color: progressPercentage >= 90 ? 'bg-green-500' :
+             progressPercentage >= 60 ? 'bg-blue-500' :
+             progressPercentage >= 30 ? 'bg-amber-500' : 'bg-purple-500'
     };
   };
 
@@ -152,7 +173,7 @@ setCourses(
     }
   };
 
- if (loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center">
@@ -165,120 +186,57 @@ setCourses(
 
   return (
     <div className="min-h-screen bg-background text-foreground flex">
-      {/* JOYRIDE TOUR — ALWAYS MOUNTED (same as CoursesIndex) */}
       {run && steps.length > 0 && (
-     <Joyride
-  run={run}
-  steps={steps.map(({ page, action, to, ...rest }) => ({
-    ...rest,
-    placement: rest.placement as any
-  }))}
-  continuous
-  showSkipButton
-  scrollToFirstStep
-  spotlightClicks
-  disableScrolling={false}
-  callback={handleFinish}
-  styles={{
-    options: {
-      zIndex: 10000,
-    },
-    overlay: {
-      backgroundColor: "rgba(0,0,0,0.6)"    // darker overlay
-    },
-    tooltip: {
-      backgroundColor: "#121212",            // solid dark popup
-      borderRadius: "12px",
-      color: "#f2f2f2",
-      padding: "18px 20px",
-      border: "1px solid rgba(255,255,255,0.08)"
-    },
-    tooltipContainer: {
-      textAlign: "left"
-    },
-    spotlight: {
-      borderRadius: "10px",
-      boxShadow: "0 0 0 2px rgba(255,255,255,0.15)"
-    },
-    buttonNext: {
-      background: "#2563eb",
-      color: "#fff",
-      borderRadius: "8px",
-      padding: "6px 14px",
-    },
-    buttonBack: {
-      color: "#bbb",
-      padding: "6px 10px",
-    },
-    buttonSkip: {
-      color: "#ff7676",
-      fontWeight: 500
-    },
-    buttonClose: {
-      color: "#888",
-    },
-  }}
-  locale={{
-    back: 'Back',
-    close: 'Close',
-    last: 'Finish',
-    next: 'Next',
-    skip: 'Skip Tour',
-  }}
-/>
+        <Joyride
+          run={run}
+          steps={steps}
+          continuous
+          showSkipButton
+          scrollToFirstStep
+          spotlightClicks
+          disableScrolling={false}
+          callback={handleFinish}
+          styles={{
+            options: { zIndex: 10000 },
+            overlay: { backgroundColor: "rgba(0,0,0,0.6)" },
+            tooltip: {
+              backgroundColor: "#121212",
+              borderRadius: "12px",
+              color: "#f2f2f2",
+              padding: "18px 20px",
+              border: "1px solid rgba(255,255,255,0.08)"
+            },
+            buttonNext: { background: "#2563eb", borderRadius: "8px" },
+          }}
+          locale={{ back: 'Back', close: 'Close', last: 'Finish', next: 'Next', skip: 'Skip Tour' }}
+        />
       )}
 
-     
-        {/* Sidebar */}
-      <aside
-        className={`
-          ${sidebarOpen ? 'w-64' : 'w-20'}
-          hidden md:flex fixed left-0 top-16 z-40 h-[calc(100vh-64px)]
-          bg-background/95 backdrop-blur border-r border-border
-          transition-all duration-300
-        `}
-        data-tour="sidebar" 
-      >
+      {/* Sidebar */}
+      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} hidden md:flex fixed left-0 top-16 z-40 h-[calc(100vh-64px)] bg-background/95 backdrop-blur border-r border-border transition-all duration-300`} data-tour="sidebar">
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-end px-4 py-4">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg hover:bg-accent transition-colors"
-            >
+            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-lg hover:bg-accent">
               {sidebarOpen ? '<' : '>'}
             </button>
           </div>
-
           <nav className="flex-1 space-y-1 px-3 mt-2">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isProLocked = item.pro;
-              const active = item.active;
-
               return (
                 <button
                   key={item.label}
                   onClick={() => handleNavClick(item)}
-                  disabled={isProLocked}
-                  className={`
-                    flex items-center w-full rounded-md py-3 px-3 text-sm font-medium transition-all
-                    ${isProLocked
-                      ? 'text-muted-foreground cursor-not-allowed'
-                      : active
-                      ? 'bg-accent text-accent-foreground shadow-sm'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                    }
-                  `}
+                  disabled={item.pro}
+                  className={`flex items-center w-full rounded-md py-3 px-3 text-sm font-medium transition-all ${
+                    item.pro ? 'text-muted-foreground cursor-not-allowed' :
+                    item.active ? 'bg-accent text-accent-foreground' :
+                    'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  }`}
                 >
                   <Icon className={`h-5 w-5 shrink-0 ${sidebarOpen ? '' : 'mx-auto'}`} />
-                  <span className={`ml-3 ${sidebarOpen ? 'block' : 'hidden'}`}>
-                    {item.label}
-                  </span>
-                  {isProLocked && (
-                    <span className={`ml-auto mr-1 text-red-700 text-xs font-bold ${sidebarOpen ? 'block' : 'hidden'}`}>
-                      PRO
-                    </span>
-                  )}
+                  <span className={`ml-3 ${sidebarOpen ? 'block' : 'hidden'}`}>{item.label}</span>
+                  {item.pro && <span className={`ml-auto mr-1 text-red-700 text-xs font-bold ${sidebarOpen ? 'block' : 'hidden'}`}>PRO</span>}
                 </button>
               );
             })}
@@ -294,14 +252,12 @@ setCourses(
               <h1 className="text-2xl font-semibold">Student Dashboard</h1>
               <p className="text-sm text-muted-foreground">Your learning analytics and performance insights</p>
             </div>
-            <Avatar>
-              <AvatarFallback>JD</AvatarFallback>
-            </Avatar>
+            <Avatar><AvatarFallback>JD</AvatarFallback></Avatar>
           </div>
         </header>
 
         <main className="p-6 lg:p-12">
-          {/* KPI Strip */}
+          {/* KPI Strip - FIXED SYNTAX ERROR HERE */}
           <div className="mb-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4" data-tour="kpi-cards">
             <Card>
               <CardContent className="pt-6">
@@ -337,11 +293,7 @@ setCourses(
                   <div>
                     <p className="text-sm text-muted-foreground">Tasks Completed</p>
                     <p className="text-4xl font-bold">
-                      {courses.reduce((sum, course) => {
-                        const stats = getCourseStats(course);
-                        const completed = parseInt(stats.lessons.split('/')[0], 10) || 0;
-                        return sum + completed;
-                      }, 0)}
+                      {courses.reduce((sum, c) => sum + parseInt(getCourseStats(c).lessons.split('/')[0] || '0'), 0)}
                     </p>
                   </div>
                   <CheckCircle className="h-10 w-10 text-green-500 opacity-70" />
@@ -443,19 +395,13 @@ setCourses(
             </Card>
           </div>
 
-          {/* Continue Learning */}
+          {/* Continue Learning Section */}
           <section className="mb-12" data-tour="continue-learning">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-semibold">Continue Learning</h2>
               {courses.length > 4 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate('/courses')}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  View All ({courses.length})
-                  <ChevronRight className="ml-1 h-4 w-4" />
+                <Button variant="ghost" size="sm" onClick={() => navigate('/courses')}>
+                  View All ({courses.length}) <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               )}
             </div>
@@ -467,9 +413,7 @@ setCourses(
                     <BookOpen className="h-8 w-8 text-muted-foreground" />
                   </div>
                   <p className="text-lg text-muted-foreground mb-4">No courses enrolled yet</p>
-                  <Button onClick={() => navigate('/courses')} size="lg">
-                    Explore Courses
-                  </Button>
+                  <Button onClick={() => navigate('/courses')} size="lg">Explore Courses</Button>
                 </CardContent>
               </Card>
             ) : (
@@ -483,21 +427,20 @@ setCourses(
                       key={course.id}
                       className="cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-xl group overflow-hidden"
                       onClick={() => {
-  if (course.isLocked) return;
-  navigate(`/courses/${course.id}`);
-}}
+                        if (!course.isLocked) {
+                          navigate(`/courses/${course.slug}`);
+                        }
+                      }}
                       data-tour="continue-card"
                     >
                       <div className="h-2 bg-primary" />
-
                       <CardContent className="p-5">
                         <div className="flex items-start justify-between mb-4">
                           <h3 className="font-bold text-lg leading-tight line-clamp-2 pr-2">
                             {stats.title}
                           </h3>
                           <Badge variant="secondary" className="text-xs font-semibold flex items-center gap-1">
-                            <Zap className="h-3 w-3" />
-                            {stats.xp} XP
+                            <Zap className="h-3 w-3" /> {stats.xp} XP
                           </Badge>
                         </div>
 
@@ -533,29 +476,29 @@ setCourses(
                                 isCompleted ? "bg-green-500 text-white" : "bg-blue-500/10 text-blue-600"
                               }`}
                             >
-                              {isCompleted ? <>Completed</> : <>In Progress</>}
+                              {isCompleted ? "Completed" : "In Progress"}
                             </Badge>
                           </div>
                         </div>
 
-                      <Button
-  className="w-full mt-4"
-  size="sm"
-  disabled={course.isLocked}
-  onClick={(e) => {
-    e.stopPropagation();
-    if (!course.isLocked) navigate(`/courses/${course.id}`);
-  }}
->
-  {course.isLocked ? "Locked" : isCompleted ? "Review Course" : "Continue Learning"}
-  {!course.isLocked && <ChevronRight className="ml-1 h-4 w-4" />}
-</Button>
+                        <Button
+                          className="w-full mt-4"
+                          size="sm"
+                          disabled={course.isLocked}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!course.isLocked) {
+                              navigate(`/courses/${course.slug}`);
+                            }
+                          }}
+                        >
+                          {course.isLocked ? "Locked" : isCompleted ? "Review Course" : "Continue Learning"}
+                          {!course.isLocked && <ChevronRight className="ml-1 h-4 w-4" />}
+                        </Button>
                       </CardContent>
                       {course.isLocked && (
-  <Badge variant="destructive" className="absolute top-2 right-2 text-xs">
-    Locked
-  </Badge>
-)}
+                        <Badge variant="destructive" className="absolute top-2 right-2 text-xs">Locked</Badge>
+                      )}
                     </Card>
                   );
                 })}
