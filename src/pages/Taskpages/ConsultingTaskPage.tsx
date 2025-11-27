@@ -1,9 +1,12 @@
 // src/pages/taskpages/ConsultingTaskPage.tsx
 
+'use client';
+
 import { useEffect, useMemo, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 
 import { fetchTasks, organizeTasks, findTask, Task } from "@/lib/csv";
+import { getCourseBySlug } from "@/lib/csv";
 
 import Card, { CardHeader, CardTitle, CardContent } from "@/components/Card";
 import { GlowButton } from "@/components/Button";
@@ -29,9 +32,6 @@ interface ParsedAnswerKey {
   extraText: string;
 }
 
-/* ---------------------------------------------------
-   MARKDOWN TABLE PARSER — unchanged, keeps your format
----------------------------------------------------- */
 function parseMarkdownTable(text: string): ParsedAnswerKey {
   const lines = text.split("\n");
 
@@ -87,9 +87,6 @@ function parseMarkdownTable(text: string): ParsedAnswerKey {
   return { headers, rows, extraText };
 }
 
-/* ---------------------------------------------------
-   SCORING HELPERS 
----------------------------------------------------- */
 function countMatchingKeywords(sentence: string, expected: string[]): number {
   const s = sentence.toLowerCase();
   return expected.filter((kw) => s.includes(kw.toLowerCase())).length;
@@ -99,9 +96,6 @@ function wordCount(s: string) {
   return s.trim().split(/\s+/).length;
 }
 
-/* ---------------------------------------------------
-   MAIN SCORING FUNCTION 
----------------------------------------------------- */
 function scorePhase(
   phase: PhaseKey,
   userText: string,
@@ -111,7 +105,6 @@ function scorePhase(
   const text = userText.toLowerCase();
   const ref = correctText.toLowerCase();
 
-  // Driver numbers expected in this challenge
   const numericDrivers = [
     "1.46",
     "51",
@@ -125,9 +118,8 @@ function scorePhase(
     "100",
   ];
   const matchedDrivers = countMatchingKeywords(text, numericDrivers);
-  pts += Math.min(matchedDrivers, 3) * 3; // 0–9 pts
+  pts += Math.min(matchedDrivers, 3) * 3;
 
-  // Phase-wise expected keywords
   const expectedMap: Record<PhaseKey, string[]> = {
     D1: ["risk", "behind", "plan", "gap", "loss"],
     D2: ["drivers", "root", "cause", "due", "issues"],
@@ -138,29 +130,25 @@ function scorePhase(
 
   const expected = expectedMap[phase];
   const matched = countMatchingKeywords(text, expected);
-  pts += Math.min(matched, 3) * 3; // 0–9 pts
+  pts += Math.min(matched, 3) * 3;
 
-  // Word limit
   const wc = wordCount(userText);
   if (wc <= 28) pts += 2;
   else if (wc <= 35) pts += 1;
 
-  // Rough semantic overlap
   const refWords = new Set(ref.split(/\W+/));
   const userWords = text.split(/\W+/);
   const overlap = userWords.filter((w) => refWords.has(w)).length;
+ 4;
   pts += Math.min(overlap, 4);
 
   if (pts > 20) pts = 20;
   return pts;
 }
 
-/* ---------------------------------------------------
-   MAIN COMPONENT
----------------------------------------------------- */
 export default function ConsultingTaskPage() {
-  const { courseId, chapterId, taskId } = useParams<{
-    courseId: string;
+  const { courseSlug, chapterId, taskId } = useParams<{
+    courseSlug: string;
     chapterId: string;
     taskId: string;
   }>();
@@ -182,19 +170,33 @@ export default function ConsultingTaskPage() {
   const [showAnswerKey, setShowAnswerKey] = useState(false);
   const [score, setScore] = useState<number | null>(null);
 
-  /* LOAD TASK */
+  const course = useMemo(() => {
+    if (!courseSlug) return null;
+    return getCourseBySlug(courseSlug);
+  }, [courseSlug]);
+
+  const courseId = course?.id;
+
   useEffect(() => {
-    loadTask();
+    if (courseId) {
+      loadTask();
+    }
   }, [courseId, chapterId, taskId]);
 
   const loadTask = async () => {
+    if (!courseId) {
+      setError("Course not found");
+      setLoading(false);
+      return;
+    }
+
     try {
       setError(null);
       setLoading(true);
 
       const rows = await fetchTasks(CSV_URL);
       const structured = organizeTasks(rows);
-      const found = findTask(structured, courseId!, chapterId!, taskId!);
+      const found = findTask(structured, courseId, chapterId!, taskId!);
 
       if (!found) {
         setError("Task not found");
@@ -212,7 +214,6 @@ export default function ConsultingTaskPage() {
     }
   };
 
-  /* REFERENCE */
   const parsedAnswerKey = useMemo<ParsedAnswerKey>(() => {
     if (!task?.resources?.answerKey) {
       return { headers: [], rows: [], extraText: "" };
@@ -228,12 +229,10 @@ export default function ConsultingTaskPage() {
     [fiveD]
   );
 
-  /* PHASE TEXT UPDATE */
   const handlePhaseChange = (phase: PhaseKey, value: string) => {
     setFiveD((prev) => ({ ...prev, [phase]: value }));
   };
 
-  /* SUBMIT + SCORE */
   const handleSubmitFiveD = () => {
     if (!allPhasesFilled) return;
 
@@ -256,11 +255,11 @@ export default function ConsultingTaskPage() {
     setHasSubmittedFiveD(true);
     setShowAnswerKey(false);
   };
-    /* COMPLETE TASK */
+
   const handleTaskCompleted = () => {
-    if (courseId && taskId) {
+    if (courseSlug && taskId) {
       try {
-        const completedKey = `course_${courseId}_completed_tasks`;
+        const completedKey = `course_${courseSlug}_completed_tasks`;
         const completed = sessionStorage.getItem(completedKey);
         const arr = completed ? (JSON.parse(completed) as string[]) : [];
 
@@ -269,17 +268,14 @@ export default function ConsultingTaskPage() {
           sessionStorage.setItem(completedKey, JSON.stringify(arr));
         }
 
-        navigate("/cta", { state: { courseId } });
+        navigate("/cta", { state: { courseSlug } });
       } catch (err) {
-        console.error("Error in handleTaskCompleted:", err);
-        navigate("/cta", { state: { courseId } });
+        console.error("Error saving completion:", err);
+        navigate("/cta", { state: { courseSlug } });
       }
-    } else {
-      navigate("/cta", { state: { courseId } });
     }
   };
 
-  /* LOADING STATE */
   if (loading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black z-50 w-screen h-screen">
@@ -293,8 +289,7 @@ export default function ConsultingTaskPage() {
     );
   }
 
-  /* ERROR STATE */
-  if (error || !task) {
+  if (error || !task || !courseSlug) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-24">
@@ -306,6 +301,9 @@ export default function ConsultingTaskPage() {
               <p className="text-muted-foreground mb-4">
                 {error || "Unable to load this consulting task."}
               </p>
+              <Link to="/courses">
+                <GlowButton>Back to Courses</GlowButton>
+              </Link>
             </CardContent>
           </Card>
         </div>
@@ -313,29 +311,24 @@ export default function ConsultingTaskPage() {
     );
   }
 
-  /* MAIN RENDER */
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-12">
-        {/* Breadcrumb */}
         <nav className="mb-8">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Link
-              to="/courses"
-              className="hover:text-foreground transition-colors"
-            >
+            <Link to="/courses" className="hover:text-foreground transition-colors">
               Courses
             </Link>
             <ChevronRight className="w-4 h-4" />
             <Link
-              to={`/courses/${courseId}`}
+              to={`/courses/${courseSlug}`}
               className="hover:text-foreground transition-colors"
             >
               Course
             </Link>
             <ChevronRight className="w-4 h-4" />
             <Link
-              to={`/courses/${courseId}/chapters/${chapterId}`}
+              to={`/courses/${courseSlug}/chapters/${chapterId}`}
               className="hover:text-foreground transition-colors"
             >
               Chapter
@@ -345,7 +338,6 @@ export default function ConsultingTaskPage() {
           </div>
         </nav>
 
-        {/* Top header */}
         <div className="mb-12">
           <div className="flex items-start gap-6 mb-6">
             <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center">
@@ -365,11 +357,8 @@ export default function ConsultingTaskPage() {
           </div>
         </div>
 
-        {/* Main grid */}
         <div className="grid lg:grid-cols-3 gap-8 mb-10">
-          {/* LEFT COLUMN */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Scenario */}
             <Card>
               <CardHeader>
                 <CardTitle>
@@ -385,7 +374,6 @@ export default function ConsultingTaskPage() {
               </CardContent>
             </Card>
 
-            {/* Reference document dropdown */}
             {referenceText && (
               <Card>
                 <CardHeader>
@@ -406,7 +394,6 @@ export default function ConsultingTaskPage() {
               </Card>
             )}
 
-            {/* 5D LIVE FIRE TEMPLATE */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl font-bold text-white">
@@ -448,10 +435,7 @@ export default function ConsultingTaskPage() {
                               placeholder="Write your single executive sentence for this phase…"
                               value={fiveD[row.key as PhaseKey]}
                               onChange={(e) =>
-                                handlePhaseChange(
-                                  row.key as PhaseKey,
-                                  e.target.value
-                                )
+                                handlePhaseChange(row.key as PhaseKey, e.target.value)
                               }
                             />
                           </td>
@@ -461,7 +445,6 @@ export default function ConsultingTaskPage() {
                   </table>
                 </div>
 
-                {/* Scoring legend + controls */}
                 <div className="mt-6 space-y-4">
                   <div>
                     <h4 className="text-sm font-semibold text-white mb-1">
@@ -507,7 +490,6 @@ export default function ConsultingTaskPage() {
                     )}
                   </div>
 
-                  {/* Score block */}
                   {score !== null && (
                     <div className="mt-4 p-4 rounded-lg bg-black/40 border border-white/10">
                       <p className="text-lg font-bold text-primary">
@@ -528,7 +510,6 @@ export default function ConsultingTaskPage() {
               </CardContent>
             </Card>
 
-            {/* Answer Key (only after submit + toggle) */}
             {hasSubmittedFiveD && showAnswerKey && (
               <Card className="bg-black/40 border border-yellow-500/30 backdrop-blur-xl">
                 <CardHeader>
@@ -580,9 +561,7 @@ export default function ConsultingTaskPage() {
             )}
           </div>
 
-          {/* RIGHT COLUMN */}
           <div className="space-y-6">
-            {/* Instructions */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 !text-2xl !font-bold text-white">
@@ -609,7 +588,6 @@ export default function ConsultingTaskPage() {
               </CardContent>
             </Card>
 
-            {/* Complete Task */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl font-bold text-white">

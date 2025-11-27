@@ -45,7 +45,7 @@ export default function Header({ className = '' }: HeaderProps) {
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-background/10 backdrop-blur-sm border-b border-border ${className}`}
+      className={`sticky top-0 z-50 bg-background/40 backdrop-blur-sm border-b border-border ${className}`}
     >
       <nav className="theme-container">
         <div className="flex items-center justify-between h-16">

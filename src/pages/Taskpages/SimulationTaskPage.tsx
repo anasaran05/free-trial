@@ -1,7 +1,9 @@
+'use client';
+
 import { useEffect, useState, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { fetchTasks, organizeTasks, findTask, Task } from "@/lib/csv";
-
+import { getCourseBySlug } from '@/lib/csv';
 import Card, { CardHeader, CardTitle, CardContent } from "@/components/Card";
 import { GlowButton } from "@/components/Button";
 
@@ -13,7 +15,12 @@ const CSV_URL =
   "https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv";
 
 export default function SimulationTaskPage() {
-  const { courseId, chapterId, taskId } = useParams();
+  // Now using courseSlug instead of courseId
+  const { courseSlug, chapterId, taskId } = useParams<{
+    courseSlug: string;
+    chapterId: string;
+    taskId: string;
+  }>();
   const navigate = useNavigate();
 
   const [task, setTask] = useState<Task | null>(null);
@@ -23,35 +30,31 @@ export default function SimulationTaskPage() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showOutcome, setShowOutcome] = useState(false);
 
-  // ⬇️ DEBUG LOG HERE
+  // Resolve courseId from slug (needed for findTask)
+  const course = useMemo(() => {
+    if (!courseSlug) return null;
+    return getCourseBySlug(courseSlug);
+  }, [courseSlug]);
+
+  const courseId = course?.id;
+
   useEffect(() => {
-    if (!task) return;
-
-    console.log("=== Simulation Debug ===");
-    console.log("Raw task object:", task);
-
-    console.log("---- RAW PDF URL TEXT (from CSV) ----");
-    console.log(task?.resources?.pdfs?.[0]);
-
-    console.log("---- LENGTH OF PDF TEXT ----");
-    console.log(task?.resources?.pdfs?.[0]?.length);
-
-    console.log("---- SPLIT LINES ----");
-    console.log(task?.resources?.pdfs?.[0]?.split("\n"));
-  }, [task]);
-  
-  
-  useEffect(() => {
-    loadTask();
+    if (courseId) {
+      loadTask();
+    }
   }, [courseId, chapterId, taskId]);
 
   const loadTask = async () => {
+    if (!courseId) return;
+
     try {
       setLoading(true);
+      setError(null);
 
       const rows = await fetchTasks(CSV_URL);
       const structured = organizeTasks(rows);
-      const found = findTask(structured, courseId!, chapterId!, taskId!);
+
+      const found = findTask(structured, courseId, chapterId!, taskId!);
 
       if (!found) {
         setError("Task not found");
@@ -59,8 +62,8 @@ export default function SimulationTaskPage() {
       }
 
       setTask(found);
-      
     } catch (err) {
+      console.error(err);
       setError("Failed to load task");
     } finally {
       setLoading(false);
@@ -70,10 +73,10 @@ export default function SimulationTaskPage() {
   // Scenario text
   const scenarioText = task?.scenario || "";
 
-  // Reference text from pdfUrls (first entry, treated as text)
+  // Reference text from first PDF field
   const referenceText = task?.resources?.pdfs?.[0] || "";
 
-  // Options parsed from tallyUrls (forms[0])
+  // Options parsed from forms[0]
   const options = useMemo(() => {
     if (!task?.resources?.forms?.[0]) return [];
 
@@ -84,7 +87,7 @@ export default function SimulationTaskPage() {
     const chunks = block.split(/Option\s+/i).filter(Boolean);
 
     chunks.forEach((chunk) => {
-      const key = chunk.trim().charAt(0); // A / B / C
+      const key = chunk.trim().charAt(0).toUpperCase(); // A / B / C
       const rest = chunk.substring(1).trim();
 
       const titleLine = rest.split("\n")[0].trim();
@@ -109,10 +112,7 @@ export default function SimulationTaskPage() {
     const out: Record<string, string> = {};
 
     ["A", "B", "C"].forEach((key) => {
-      const regex = new RegExp(
-        `If you chose ${key}[\\s\\S]*?(?=If you chose [ABC]|$)`,
-        "i"
-      );
+      const regex = new RegExp(`If you chose ${key}[\\s\\S]*?(?=If you chose [ABC]|$)`, "i");
       const match = text.match(regex);
       if (match) out[key] = match[0].trim();
     });
@@ -126,7 +126,8 @@ export default function SimulationTaskPage() {
   };
 
   const completeSimulation = () => {
-    navigate("/cta", { state: { courseId } });
+    // Use courseSlug for navigation (same as regular TaskPage)
+    navigate("/cta", { state: { courseSlug } });
   };
 
   if (loading) {
@@ -142,21 +143,20 @@ export default function SimulationTaskPage() {
     );
   }
 
-  if (error || !task) {
+  if (error || !task || !courseSlug) {
     return (
       <div className="min-h-screen p-20 text-center text-red-400 text-xl">
-        {error}
+        {error || "Simulation not found"}
       </div>
     );
   }
 
-  const selectedOutcome =
-    selectedOption && showOutcome ? outcomes[selectedOption] : "";
+  const selectedOutcome = selectedOption && showOutcome ? outcomes[selectedOption] : "";
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-12">
-        {/* Breadcrumb */}
+        {/* Breadcrumb – now uses courseSlug */}
         <nav className="mb-8">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Link to="/courses" className="hover:text-foreground">
@@ -164,14 +164,14 @@ export default function SimulationTaskPage() {
             </Link>
             <ChevronRight className="w-4 h-4" />
             <Link
-              to={`/courses/${courseId}`}
+              to={`/courses/${courseSlug}`}
               className="hover:text-foreground"
             >
               Course
             </Link>
             <ChevronRight className="w-4 h-4" />
             <Link
-              to={`/courses/${courseId}/chapters/${chapterId}`}
+              to={`/courses/${courseSlug}/chapters/${chapterId}`}
               className="hover:text-foreground"
             >
               Chapter
@@ -181,7 +181,7 @@ export default function SimulationTaskPage() {
           </div>
         </nav>
 
-        {/* Top header (title + XP) */}
+        {/* Top header */}
         <div className="mb-10">
           <div className="flex items-start gap-6 mb-6">
             <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center">
@@ -204,16 +204,14 @@ export default function SimulationTaskPage() {
           </div>
         </div>
 
-        {/* Main Grid: Scenario + Instructions side by side */}
+        {/* Main Grid */}
         <div className="grid lg:grid-cols-3 gap-8 mb-10">
-          {/* Left: Scenario + Reference + Options + Outcome (mobile) */}
+          {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Scenario Card */}
+            {/* Scenario */}
             <Card>
               <CardHeader>
-                <p className="text-4xl font-semibold text-white">
-                  Scenario
-               </p> 
+                <p className="text-4xl font-semibold text-white">Scenario</p>
               </CardHeader>
               <CardContent>
                 <p className="text-foreground leading-relaxed whitespace-pre-line">
@@ -222,7 +220,7 @@ export default function SimulationTaskPage() {
               </CardContent>
             </Card>
 
-            {/* Reference Document Dropdown (same width as Scenario) */}
+            {/* Reference Document */}
             {referenceText && (
               <Card>
                 <CardHeader>
@@ -235,15 +233,15 @@ export default function SimulationTaskPage() {
                     <summary className="text-lg font-semibold text-white cursor-pointer">
                       View Reference Details
                     </summary>
-                   <div className="mt-4 text-gray-300 whitespace-pre-line max-h-80 overflow-y-auto pr-2">
-  {referenceText}
-</div>
+                    <div className="mt-4 text-gray-300 whitespace-pre-line max-h-80 overflow-y-auto pr-2">
+                      {referenceText}
+                    </div>
                   </details>
                 </CardContent>
               </Card>
             )}
 
-            {/* Options (same width as Scenario) */}
+            {/* Options */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-blue-400 text-2xl font-bold">
@@ -281,7 +279,7 @@ export default function SimulationTaskPage() {
               </CardContent>
             </Card>
 
-            {/* Outcome card for mobile (below options) */}
+            {/* Outcome – Mobile */}
             {selectedOutcome && (
               <div className="block lg:hidden">
                 <Card className="bg-black/40 border border-yellow-500/20 backdrop-blur-xl">
@@ -307,13 +305,13 @@ export default function SimulationTaskPage() {
             )}
           </div>
 
-          {/* Right: Instructions + Outcome (desktop) */}
+          {/* Right Column – Desktop only */}
           <div className="space-y-6">
-            {/* Instructions Card (side by side with Scenario) */}
+            {/* Instructions */}
             <Card>
               <CardHeader>
                 <p className="flex items-center gap-2 text-2xl font-bold text-white">
-                  <FileText className="text-3xl w-5 h-5" /> Instructions
+                  <FileText className="w-5 h-5" /> Instructions
                 </p>
               </CardHeader>
               <CardContent>
@@ -338,7 +336,7 @@ export default function SimulationTaskPage() {
               </CardContent>
             </Card>
 
-            {/* Outcome + Complete card (only after confirm, desktop only) */}
+            {/* Outcome – Desktop */}
             {selectedOutcome && (
               <Card className="hidden lg:block bg-black/40 border border-yellow-500/20 backdrop-blur-xl">
                 <CardHeader>
