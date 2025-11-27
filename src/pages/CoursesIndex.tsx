@@ -106,24 +106,48 @@ export default function CoursesIndex() {
     return courses.filter(c => (c.category || 'uncategorized') === selectedCategory);
   }, [courses, selectedCategory]);
 
-  const getCompletedTasks = (courseId: string): string[] => {
-    const key = `course_${courseId}_completed_tasks`;
+    const getCompletedTasks = (courseSlug: string): string[] => {
+    const key = `course_${courseSlug}_completed_tasks`;
     const stored = sessionStorage.getItem(key);
-    return stored ? JSON.parse(stored) : [];
+    try {
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
   };
 
   const getCourseStats = (course: Course) => {
-    const allTasks = course.chapters.flatMap(ch => ch.lessons.flatMap(l => l.tasks));
-    const completed = getCompletedTasks(course.id);
-    const progress = calculateProgress(allTasks, completed);
+    const allTasks = course.chapters
+      .flatMap(ch => ch.lessons)
+      .flatMap(l => l.tasks)
+      .map(t => t.id);
+
+    const completed = getCompletedTasks(course.slug || course.id); // fallback to id if slug missing
+    const completedTasks = allTasks.filter(id => completed.includes(id)).length;
+
+    const totalXP = course.chapters
+      .flatMap(ch => ch.lessons)
+      .flatMap(l => l.tasks)
+      .reduce((sum, t) => sum + (t.xp || 0), 0);
+
+    const earnedXP = course.chapters
+      .flatMap(ch => ch.lessons)
+      .flatMap(l => l.tasks)
+      .filter(t => completed.includes(t.id))
+      .reduce((sum, t) => sum + (t.xp || 0), 0);
+
+    const progressPercentage = allTasks.length > 0
+      ? Math.round((completedTasks / allTasks.length) * 100)
+      : 0;
+
     return {
       totalChapters: course.chapters.length,
       totalLessons: course.chapters.reduce((s, ch) => s + ch.lessons.length, 0),
-      totalTasks: progress.totalTasks,
-      completedTasks: progress.completedTasks,
-      progressPercentage: progress.completionPercentage,
-      totalXP: progress.totalXP,
-      earnedXP: progress.earnedXP,
+      totalTasks: allTasks.length,
+      completedTasks,
+      progressPercentage,
+      totalXP,
+      earnedXP,
     };
   };
 
