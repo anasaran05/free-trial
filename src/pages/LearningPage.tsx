@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Play, BookOpen, Award, ChevronRight } from "lucide-react";
+import { CheckCircle, Play, BookOpen, Award, ChevronRight, BookText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
@@ -463,8 +463,8 @@ const handleStartSimulation = async () => {
                   <Card data-tour="topics-sidebar">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <BookOpen className="h-5 w-5" />
-                        Topics ({topics.length})
+                        <BookText className="h-5 w-5" />
+                        Topics [{topics.length}]
                       </CardTitle>
                     </CardHeader>
                     <CardContent>

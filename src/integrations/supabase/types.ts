@@ -42,32 +42,54 @@ export type Database = {
   Relationships: []
 }
       profiles: {
-        Row: {
-          created_at: string
-          email: string
-          first_name: string | null
-          id: string
-          last_name: string | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          first_name?: string | null
-          id: string
-          last_name?: string | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          first_name?: string | null
-          id?: string
-          last_name?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
+  Row: {
+    email: string
+    full_name: string | null
+    phone_number: string | null
+    date_of_birth: string | null
+    avatar_url: string | null
+    created_at: string
+    updated_at: string
+
+    // NEW FIELDS — ADD THESE
+    professional_title: string | null
+    institution: string | null
+    years_experience: string | null
+    specialization: string | null
+    linked_in: string | null
+  }
+  Insert: {
+    email: string
+    full_name?: string | null
+    phone_number?: string | null
+    date_of_birth?: string | null
+    avatar_url?: string | null
+    created_at?: string
+    updated_at?: string
+
+    professional_title?: string | null
+    institution?: string | null
+    years_experience?: string | null
+    specialization?: string | null
+    linked_in?: string | null
+  }
+  Update: {
+    email?: string
+    full_name?: string | null
+    phone_number?: string | null
+    date_of_birth?: string | null
+    avatar_url?: string | null
+    created_at?: string
+    updated_at?: string
+
+    professional_title?: string | null
+    institution?: string | null
+    years_experience?: string | null
+    specialization?: string | null
+    linked_in?: string | null
+  }
+  Relationships: []
+}
             user_onboarding: {
         Row: {
           email: string

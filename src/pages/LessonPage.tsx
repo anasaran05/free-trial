@@ -209,7 +209,7 @@ export default function ChapterPage() {
                       <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4">
                         <div className="flex items-start gap-3 sm:gap-4 flex-1 w-full min-w-0">
                           <div className="flex-1 min-w-0">
-                            <CardTitle className="text-sm sm:text-base mb-2 leading-tight">
+                            <CardTitle className="text-lg mb-2 leading-tight">
                               {lesson.name}
                             </CardTitle>
                             <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4 leading-relaxed">

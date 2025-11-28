@@ -19,25 +19,28 @@ export default function SignIn() {
     setLoading(true);
     setError('');
 
-    // 1. Check in Supabase table
-    const { data } = await supabase
-      .from("form_users")
-      .select("email")
-      .eq("email", email.trim().toLowerCase())
-      .single();
+    try {
+      const { data, error: supabaseError } = await supabase
+        .from('form_users')
+        .select('email')
+        .eq('email', email.trim().toLowerCase())
+        .maybeSingle(); // Use maybeSingle() to avoid error when no row is found
 
-    // 2. If NOT found → send to Tally form
-    if (!data) {
-      window.location.href = "https://tally.so/r/RGG88K";
-      return;
+      // If email is found → grant access
+      if (data) {
+        localStorage.setItem('omega_access', 'yes');
+        localStorage.setItem('omega_email', email.trim().toLowerCase());
+        navigate('/dashboard');
+      } else {
+        // Email not found → show helpful message
+setError('We could not find this email in our system. Please verify the address entered.');
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      setError('Something went wrong. Please try again later.');
+    } finally {
+      setLoading(false);
     }
-
-    // 3. If found → mark access locally and navigate
-    localStorage.setItem("omega_access", "yes");
-    localStorage.setItem("omega_email", email.trim().toLowerCase());
-
-    navigate("/dashboard");
-    setLoading(false);
   };
 
   return (
@@ -59,9 +62,12 @@ export default function SignIn() {
 
           <form onSubmit={handleAccess} className="space-y-6">
             {error && (
-              <Alert variant="destructive" className="border-destructive/50">
+              <Alert variant="destructive" className="border-orange-500/50 bg-orange-50 dark:bg-orange-950/20">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription className="text-sm">
+                  {error}
+                  
+                </AlertDescription>
               </Alert>
             )}
 
@@ -99,7 +105,7 @@ export default function SignIn() {
           </form>
 
           <div className="mt-8 text-center text-sm text-muted-foreground">
-            Didn’t fill the onboarding form?
+            Didn’t receive access yet?
             <br />
             <a
               href="https://tally.so/r/RGG88K"
@@ -107,7 +113,7 @@ export default function SignIn() {
               rel="noopener noreferrer"
               className="text-primary font-medium hover:underline"
             >
-              Fill it to get access →
+              Join the waitlist / Fill the form →
             </a>
           </div>
         </div>

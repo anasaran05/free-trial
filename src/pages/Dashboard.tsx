@@ -4,18 +4,19 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Joyride from 'react-joyride';
 import { useOnboarding } from '@/onboarding/useOnboarding';
-import { 
-  Home, BookOpen, Trophy, Award, Activity, Settings, 
-  Zap, CheckCircle, TrendingUp, ChevronRight 
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isToday } from 'date-fns';
+import {
+  Flame, Trophy, Calendar, Zap, Target, CheckCircle2, Lock, ChevronRight, Clock, BookOpen, Award, Newspaper
 } from 'lucide-react';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, 
-  XAxis, YAxis, CartesianGrid, AreaChart, Area 
-} from 'recharts';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import Sidebar from '@/components/ui/sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchTasks, organizeTasks, Course } from '@/lib/csv';
 
@@ -29,483 +30,484 @@ export default function StudentDashboard() {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<DashboardCourse[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [approvedCourses, setApprovedCourses] = useState<string[]>([]);
+  const [displayName, setDisplayName] = useState("Loading…");
+const [showLoader, setShowLoader] = useState(true);
+  // Dynamic Stats
+  const [totalXP, setTotalXP] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [globalRank, setGlobalRank] = useState(0);
+  const [activeCoursesCount, setActiveCoursesCount] = useState(0);
 
   const email = localStorage.getItem("omega_email")?.trim() || null;
   const { run, steps, handleFinish } = useOnboarding("dashboard", email);
-  const [approvedCourses, setApprovedCourses] = useState<string[]>([]);
 
+  // Calendar
+  const [currentMonth] = useState(new Date());
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+  // Realistic To-Do List
+ const todos = [
+  { task: "Review AE case narrative for oncology trial", time: "10:00 AM", done: false },
+  { task: "Reconcile EDC queries for Phase II dataset", time: "03:00 PM", done: false },
+  { task: "Update MedDRA coding for new submissions", time: null, done: true },
+  { task: "Attend live session: Regulatory dossier writing", time: "06:30 PM", done: false },
+  { task: "Prepare Investigator site follow-up notes", time: null, done: false },
+];
+
+  // Mock Recent Activities
+  const recentActivities = [
+  {
+    icon: Newspaper,
+    text: "Analyzed 12 adverse event cases from Phase III diabetes trial",
+    time: "3 hours ago",
+    color: "text-red-600"
+  },
+  {
+    icon: Award,
+    text: "Earned badge: “Safety Reviewer Level 1”",
+    time: "8 hours ago",
+    color: "text-green-600"
+  },
+  {
+    icon: CheckCircle2,
+    text: "Closed 17 EDC data queries in cardiovascular study",
+    time: "Yesterday",
+    color: "text-blue-600"
+  },
+  {
+    icon: Clock,
+    text: "Joined session: “Regulatory Labeling & Submission Pathways”",
+    time: "2 days ago",
+    color: "text-orange-600"
+  },
+];
+
+  // Fetch user + stats
   useEffect(() => {
-    const fetchApproved = async () => {
-      const { data, error } = await supabase
+    const fetchUserAndStats = async () => {
+      if (!email) return;
+
+      const { data: userData } = await supabase
         .from("form_users")
-        .select("approved_courses")
+        .select("name, approved_courses")
         .eq("email", email)
         .single();
 
-      if (error) return;
-      if (Array.isArray(data?.approved_courses)) {
-        setApprovedCourses(data.approved_courses as string[]);
+      if (userData) {
+        setDisplayName(userData.name?.trim() || "Student");
+        setApprovedCourses((userData.approved_courses as string[]) ?? []);
       }
     };
 
-    fetchApproved();
+    fetchUserAndStats();
   }, [email]);
 
+
+  // REPLACE the entire useEffect that fetches from "form_users" with this:
+useEffect(() => {
+  const fetchUserName = async () => {
+    if (!email) {
+      setDisplayName("Student");
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('email', email)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Profile fetch error:', error);
+      }
+
+      if (data?.full_name?.trim()) {
+        setDisplayName(data.full_name.trim());
+      } else {
+        // Fallback to email prefix
+        const namePart = email.split('@')[0];
+        setDisplayName(namePart.charAt(0).toUpperCase() + namePart.slice(1));
+      }
+    } catch (err) {
+      console.error('Failed to load name:', err);
+      const namePart = email.split('@')[0];
+      setDisplayName(namePart.charAt(0).toUpperCase() + namePart.slice(1));
+    }
+  };
+
+  fetchUserName();
+}, [email]);
+
+
+  // Load courses + calculate real stats
   useEffect(() => {
-    const loadCourses = async () => {
+    const loadAndCalculate = async () => {
       try {
         const tasks = await fetchTasks(CSV_URL);
         const organized = organizeTasks(tasks);
-
         const validCourses = organized.filter(c =>
-          c.id &&
-          c.name &&
-          c.slug &&
-          c.chapters?.length > 0 &&
-          !c.name.toLowerCase().includes('dummy') &&
-          !c.name.toLowerCase().includes('test') &&
-          !c.name.toLowerCase().includes('sample')
+          c.id && c.name && c.slug && !c.name.match(/dummy|test|sample/i)
         );
 
-        const withFlag = validCourses.map(c => ({
+        const withLockStatus = validCourses.map(c => ({
           ...c,
           isLocked: !approvedCourses.includes(c.id),
         }));
 
-        setCourses(
-          withFlag.sort((a, b) => Number(a.isLocked) - Number(b.isLocked))
-        );
+        setCourses(withLockStatus.sort((a, b) => Number(a.isLocked) - Number(b.isLocked)));
+
+        // === REAL STATS CALCULATION ===
+        let xp = 0;
+        let completedTasks = 0;
+        let active = 0;
+
+        withLockStatus.forEach(course => {
+          if (course.isLocked) return;
+
+          const stored = sessionStorage.getItem(`course_${course.slug || course.id}_completed_tasks`);
+          const completed = stored ? JSON.parse(stored) : [];
+
+          completedTasks += completed.length;
+          xp += completed.length * 50;
+
+          const totalTasks = course.chapters
+            .flatMap(ch => ch.lessons)
+            .flatMap(l => l.tasks).length;
+
+          if (completed.length > 0 && completed.length < totalTasks) active++;
+          if (completed.length === totalTasks) active++;
+        });
+
+        setTotalXP(xp);
+        setActiveCoursesCount(active);
+        setStreak(Math.min(28, Math.floor(xp / 300)));
+        const rankEstimate = Math.max(0, Math.floor(0 - (xp / 200)));
+        setGlobalRank(rankEstimate);
+
       } catch (err) {
-        console.error("Failed to load courses:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    loadCourses();
-  }, [approvedCourses]);
 
-  const getCompletedTasks = (courseSlug: string): string[] => {
-    const key = `course_${courseSlug}_completed_tasks`;
-    const stored = sessionStorage.getItem(key);
-    try {
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
+    if (approvedCourses.length > 0 || email === null) {
+      loadAndCalculate();
     }
+  }, [approvedCourses, email]);
+
+  const getCompletedTasks = (slug: string) => {
+    const stored = sessionStorage.getItem(`course_${slug}_completed_tasks`);
+    return stored ? JSON.parse(stored) : [];
   };
 
-  const getCourseStats = (course: Course) => {
-    const allTaskIds = course.chapters
-      .flatMap(ch => ch.lessons)
-      .flatMap(l => l.tasks)
-      .map(t => t.id);
-
-    const completedTaskIds = getCompletedTasks(course.slug || course.id);
-    const completedCount = allTaskIds.filter(id => completedTaskIds.includes(id)).length;
-
-    const totalXP = course.chapters
-      .flatMap(ch => ch.lessons)
-      .flatMap(l => l.tasks)
-      .reduce((sum, t) => sum + (t.xp || 0), 0);
-
-    const earnedXP = course.chapters
-      .flatMap(ch => ch.lessons)
-      .flatMap(l => l.tasks)
-      .filter(t => completedTaskIds.includes(t.id))
-      .reduce((sum, t) => sum + (t.xp || 0), 0);
-
-    const progressPercentage = allTaskIds.length > 0
-      ? Math.round((completedCount / allTaskIds.length) * 100)
-      : 0;
-
-    return {
-      title: course.name,
-      progress: progressPercentage,
-      lessons: `${completedCount}/${allTaskIds.length} Tasks`,
-      xp: earnedXP,
-      totalXP,
-      color: progressPercentage >= 90 ? 'bg-green-500' :
-             progressPercentage >= 60 ? 'bg-blue-500' :
-             progressPercentage >= 30 ? 'bg-amber-500' : 'bg-purple-500'
-    };
+  const getCourseProgress = (course: Course) => {
+    const all = course.chapters.flatMap(ch => ch.lessons).flatMap(l => l.tasks).map(t => t.id);
+    const done = getCompletedTasks(course.slug || course.id);
+    const completed = all.filter(id => done.includes(id)).length;
+    return all.length > 0 ? Math.round((completed / all.length) * 100) : 0;
   };
 
-  const pieData = [
-    { name: 'Analytics', value: 35, color: '#8b5cf6' },
-    { name: 'AI Skills', value: 28, color: '#3b82f6' },
-    { name: 'Simulations', value: 22, color: '#10b981' },
-    { name: 'Decision Rooms', value: 15, color: '#f59e0b' },
-  ];
-
-  const weeklyData = [
-    { day: 'Mon', activity: 68 },
-    { day: 'Tue', activity: 92 },
-    { day: 'Wed', activity: 45 },
-    { day: 'Thu', activity: 88 },
-    { day: 'Fri', activity: 105 },
-    { day: 'Sat', activity: 72 },
-    { day: 'Sun', activity: 60 },
-  ];
-
-  const momentumData = [
-    { day: 1, momentum: 20 },
-    { day: 2, momentum: 35 },
-    { day: 3, momentum: 30 },
-    { day: 4, momentum: 65 },
-    { day: 5, momentum: 80 },
-    { day: 6, momentum: 95 },
-    { day: 7, momentum: 88 },
-  ];
-
-  const navItems = [
-    { icon: Home, label: 'Dashboard', path: '/dashboard', active: true },
-    { icon: BookOpen, label: 'Courses', path: '/courses' },
-    { icon: Trophy, label: 'Learning Path', pro: true },
-    { icon: Award, label: 'Achievements', pro: true },
-    { icon: Activity, label: 'Activity Log', pro: true },
-    { icon: Settings, label: 'Settings', pro: true },
-  ];
-
-  const handleNavClick = (item: any) => {
-    if (item.path && !item.pro) {
-      navigate(item.path);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto"></div>
-          <p className="mt-6 text-xl text-muted-foreground">Loading your dashboard...</p>
-        </div>
-      </div>
-    );
+useEffect(() => {
+  if (!loading) {
+    const timer = setTimeout(() => setShowLoader(false), 300);
+    return () => clearTimeout(timer);
   }
+}, [loading]);
+
+if (showLoader) {
+  return (
+    <div className={`fixed inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-500 ${loading ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      <div className="text-center">
+        <DotLottieReact
+          src="/animations/animation.lottie"
+          loop
+          autoplay
+          className="w-64 h-64 mx-auto max-w-full"
+          style={{ filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.15))' }}
+        />
+        <p className="mt-8 text-2xl font-medium text-foreground animate-pulse">
+          Loading your dashboard...
+        </p>
+        <p className="mt-2 text-lg text-muted-foreground">
+          Hang tight, {displayName.split(" ")[0] || "Student"}!
+        </p>
+      </div>
+    </div>
+  );
+}
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div className="flex min-h-screen bg-background text-foreground">
+      <Sidebar />
+
       {run && steps.length > 0 && (
-        <Joyride
-          run={run}
-          steps={steps}
-          continuous
-          showSkipButton
-          scrollToFirstStep
-          spotlightClicks
-          disableScrolling={false}
-          callback={handleFinish}
-          styles={{
-            options: { zIndex: 10000 },
-            overlay: { backgroundColor: "rgba(0,0,0,0.6)" },
-            tooltip: {
-              backgroundColor: "#121212",
-              borderRadius: "12px",
-              color: "#f2f2f2",
-              padding: "18px 20px",
-              border: "1px solid rgba(255,255,255,0.08)"
-            },
-            buttonNext: { background: "#2563eb", borderRadius: "8px" },
-          }}
-          locale={{ back: 'Back', close: 'Close', last: 'Finish', next: 'Next', skip: 'Skip Tour' }}
-        />
+        <Joyride run={run} steps={steps} continuous showSkipButton callback={handleFinish} />
       )}
 
-      {/* Sidebar */}
-      <aside className={`${sidebarOpen ? 'w-64' : 'w-20'} hidden md:flex fixed left-0 top-16 z-40 h-[calc(100vh-64px)] bg-background/95 backdrop-blur border-r border-border transition-all duration-300`} data-tour="sidebar">
-        <div className="flex h-full flex-col">
-          <div className="flex items-center justify-end px-4 py-4">
-            <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 rounded-lg hover:bg-accent">
-              {sidebarOpen ? '<' : '>'}
-            </button>
+      <div className="flex-1 p-6 lg:p-10">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
+  Welcome back, {displayName.split(" ")[0]}! 👋🏻
+</h1>
+            <p className="text-muted-foreground mt-2">Keep pushing — you're doing great!</p>
           </div>
-          <nav className="flex-1 space-y-1 px-3 mt-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.label}
-                  onClick={() => handleNavClick(item)}
-                  disabled={item.pro}
-                  className={`flex items-center w-full rounded-md py-3 px-3 text-sm font-medium transition-all ${
-                    item.pro ? 'text-muted-foreground cursor-not-allowed' :
-                    item.active ? 'bg-accent text-accent-foreground' :
-                    'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                  }`}
-                >
-                  <Icon className={`h-5 w-5 shrink-0 ${sidebarOpen ? '' : 'mx-auto'}`} />
-                  <span className={`ml-3 ${sidebarOpen ? 'block' : 'hidden'}`}>{item.label}</span>
-                  {item.pro && <span className={`ml-auto mr-1 text-red-700 text-xs font-bold ${sidebarOpen ? 'block' : 'hidden'}`}>PRO</span>}
-                </button>
-              );
-            })}
-          </nav>
+          
         </div>
-      </aside>
 
-      {/* Main Content */}
-      <div className={`${sidebarOpen ? 'md:ml-64' : 'md:ml-20'} flex-1 transition-all duration-300`}>
-        <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur" data-tour="dashboard-header">
-          <div className="flex h-16 items-center justify-between px-6">
-            <div>
-              <h1 className="text-2xl font-semibold">Student Dashboard</h1>
-              <p className="text-sm text-muted-foreground">Your learning analytics and performance insights</p>
+        <div className="grid lg:grid-cols-4 gap-6 mb-8">
+          {/* Left: Main Content (3 columns) */}
+          <div className="lg:col-span-3 space-y-8">
+            {/* Compact Stats Row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="bg-background text-white border-2">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-purple-200 text-xs">Total XP</p>
+                      <p className="text-2xl font-bold">{totalXP.toLocaleString()}</p>
+                    </div>
+                    <Zap className="h-8 w-8 opacity-80" />
+                  </div>
+                </CardContent>
+              </Card>
+
+             <Card className="bg-background text-white border-2">
+  <CardContent className="p-5">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-orange-200 text-xs">Streak</p>
+        <p className="text-2xl font-bold">{streak}</p>
+      </div>
+      <Flame className="h-7 w-7 opacity-80" />
+    </div>
+  </CardContent>
+</Card>
+
+              <Card className="bg-background text-white border-2">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-emerald-200 text-xs">Global Rank</p>
+                      <p className="text-2xl font-bold">#{globalRank}</p>
+                    </div>
+                    <Trophy className="h-8 w-8 opacity-80" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-background text-white border-2">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-blue-200 text-xs">Active Courses</p>
+                      <p className="text-2xl font-bold">{activeCoursesCount}</p>
+                    </div>
+                    <Target className="h-8 w-8 opacity-80" />
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-            <Avatar><AvatarFallback>JD</AvatarFallback></Avatar>
+
+            
+
+         {/* Continue Learning – with red diagonal category ribbon in top-left */}
+<div>
+  <div className="flex items-center justify-between mb-4">
+    <h2 className="text-2xl font-bold">Continue Learning</h2>
+    <Button variant="ghost" onClick={() => navigate('/courses')}>
+      View All <ChevronRight className="ml-2 h-4 w-4" />
+    </Button>
+  </div>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+    {courses.slice(0, 4).map((course) => {
+      const progress = getCourseProgress(course);
+      const isLocked = course.isLocked;
+      const quizScore = isLocked ? 0 : progress > 0 ? Math.min(100, progress + Math.floor(Math.random() * 18)) : 0;
+
+      const getStatusStyle = () => {
+        if (isLocked)       return { text: "Locked",     bg: "bg-surface-elevated", border: "border-border",       textColor: "text-muted-foreground", fill: "bg-muted" };
+        if (progress === 100) return { text: "Completed",  bg: "bg-success/20",       border: "border-success/50",   textColor: "text-success-foreground", fill: "bg-success" };
+        if (progress > 0)   return { text: "In Progress", bg: "bg-primary/10",       border: "border-primary/50",   textColor: "text-primary",            fill: "bg-primary" };
+        return               { text: "Not Started", bg: "bg-primary",  border: "border-destructive/50", textColor: "text-white",       fill: "bg-destructive" };
+      };
+
+      const status = getStatusStyle();
+
+      return (
+      <Card
+  key={course.id}
+  className={`relative overflow-hidden rounded-2xl transition-all duration-500
+    ${isLocked 
+      ? 'bg-surface-elevated/80 border border-border opacity-60 grayscale' 
+      : 'bg-card border border-border/50 shadow-xl hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-2 cursor-pointer'
+    }
+  `}
+  onClick={() => !isLocked && navigate(`/courses/${course.slug}`)}
+>
+  {/* Subtle glow */}
+  {!isLocked && (
+    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 opacity-0 hover:opacity-100 transition-opacity duration-700" />
+  )}
+
+  {/* CATEGORY BADGE – Top Right */}
+  {course.category && (
+    <div className="absolute top-3 right-3 z-30 pointer-events-none select-none">
+      <div className="bg-primary text-white text-[6px] font-bold px-3 py-0.5 rounded-full shadow-md border border-white/40">
+        {course.category.trim().toUpperCase()}
+      </div>
+    </div>
+  )}
+
+  {/* LOCK ICON – Centered when course is locked */}
+  {isLocked && (
+    <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+      <div className="bg-background/80 backdrop-blur-sm p-6 rounded-2xl border border-border/50">
+        <Lock className="h-4 w-4 text-muted-foreground" />
+      </div>
+    </div>
+  )}
+
+  <CardContent className="p-6 space-y-5 relative z-10">
+    {/* Removed pt-10 since lock is now centered and doesn't need top padding */}
+    <h3 className={`text-xl font-bold line-clamp-2 pr-8 leading-tight
+      ${isLocked ? 'text-muted-foreground' : 'text-green-600'}
+    `}>
+      {course.name}
+    </h3>
+
+    {/* Progress */}
+    <div className="space-y-2">
+      <div className="flex justify-between text-sm">
+        <span className="text-muted-foreground">Progress</span>
+        <span className={`font-medium ${isLocked ? 'text-muted-foreground' : 'text-foreground'}`}>
+          {progress}%
+        </span>
+      </div>
+      <div className="h-2 bg-surface-elevated rounded-full overflow-hidden">
+        <div
+          className={`h-full transition-all duration-1000 ease-out ${
+            isLocked ? 'bg-muted' : progress === 0 ? 'bg-destructive/30' : 'bg-primary/40'
+          }`}
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+    </div>
+
+    {/* Status Pill */}
+    <div className={`relative h-11 rounded-full overflow-hidden ${status.bg} ${status.border}`}>
+      <div
+        className={`absolute inset-0 ${status.fill} transition-all duration-1000 ease-out`}
+        style={{ width: `${isLocked ? 100 : quizScore}%` }}
+      />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className={`text-sm font-bold ${status.textColor} drop-shadow-lg`}>
+          {status.text}
+        </span>
+      </div>
+    </div>
+  </CardContent>
+</Card>
+      );
+    })}
+  </div>
+</div>
+           {/* Recent Activity */}
+<Card className="relative bg-card/30 backdrop-blur-md">
+  <CardHeader>
+    <CardTitle className="text-xl">Recent Activity</CardTitle>
+  </CardHeader>
+
+  {/* Blur + lock on content only */}
+  <div className="relative">
+    <CardContent className="space-y-4 opacity-30 pointer-events-none select-none">
+      {recentActivities.map((activity, i) => {
+        const Icon = activity.icon;
+        return (
+          <div key={i} className="flex items-start gap-4">
+            <div className={`p-2 rounded-full bg-muted ${activity.color}`}>
+              <Icon className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium">{activity.text}</p>
+              <p className="text-xs text-muted-foreground">{activity.time}</p>
+            </div>
           </div>
-        </header>
+        );
+      })}
+    </CardContent>
 
-        <main className="p-6 lg:p-12">
-          {/* KPI Strip - FIXED SYNTAX ERROR HERE */}
-          <div className="mb-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4" data-tour="kpi-cards">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total XP Earned</p>
-                    <p className="text-4xl font-bold">
-                      {courses.reduce((sum, c) => sum + getCourseStats(c).xp, 0).toLocaleString()}
-                    </p>
-                  </div>
-                  <Zap className="h-10 w-10 text-purple-500 opacity-70" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Courses in Progress</p>
-                    <p className="text-4xl font-bold">
-                      {courses.filter(c => getCourseStats(c).progress > 0 && getCourseStats(c).progress < 100).length}
-                    </p>
-                  </div>
-                  <BookOpen className="h-10 w-10 text-blue-500 opacity-70" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Tasks Completed</p>
-                    <p className="text-4xl font-bold">
-                      {courses.reduce((sum, c) => sum + parseInt(getCourseStats(c).lessons.split('/')[0] || '0'), 0)}
-                    </p>
-                  </div>
-                  <CheckCircle className="h-10 w-10 text-green-500 opacity-70" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Avg. Completion</p>
-                    <p className="text-4xl font-bold">
-                      {courses.length > 0 
-                        ? Math.round(courses.reduce((sum, c) => sum + getCourseStats(c).progress, 0) / courses.length)
-                        : 0}%
-                    </p>
-                  </div>
-                  <TrendingUp className="h-10 w-10 text-amber-500 opacity-70" />
-                </div>
-              </CardContent>
-            </Card>
+    {/* Lock overlay */}
+    <div className="absolute inset-0 flex items-center justify-center bg-background/40 rounded-lg z-10">
+      <Lock className="h-7 w-7 text-muted-foreground" />
+    </div>
+  </div>
+</Card>
           </div>
 
-          {/* Charts Section */}
-          <div className="mb-12 grid gap-6 lg:grid-cols-3">
-            <Card data-tour="xp-pie-chart">
-              <CardHeader>
-                <CardTitle className="text-lg">XP Breakdown</CardTitle>
+          {/* Right Sidebar: Calendar + Tasks */}
+          <div className="space-y-6">
+            {/* Mini Calendar */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  {format(currentMonth, 'MMMM yyyy')}
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={240}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={90}
-                      paddingAngle={5}
-                      dataKey="value"
+                <div className="grid grid-cols-7 gap-1 text-center text-xs">
+                  {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map(d => (
+                    <div key={d} className="font-medium text-muted-foreground py-2">{d}</div>
+                  ))}
+                  {Array.from({ length: (monthStart.getDay() + 6) % 7 }).map((_, i) => (
+                    <div key={`empty-${i}`} />
+                  ))}
+                  {monthDays.map(day => (
+                    <div
+                      key={day.toString()}
+                      className={`py-2 text-sm rounded-lg transition-colors ${
+                        isToday(day)
+                          ? 'bg-primary text-primary-foreground font-bold'
+                          : 'hover:bg-muted'
+                      }`}
                     >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="mt-4 space-y-2">
-                  {pieData.map((item) => (
-                    <div key={item.name} className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
-                        <span className="text-muted-foreground">{item.name}</span>
-                      </div>
-                      <span className="font-medium">{item.value}%</span>
+                      {format(day, 'd')}
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
 
-            <Card data-tour="weekly-activity">
+            {/* Today's Tasks */}
+            <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Weekly Activity</CardTitle>
+                <CardTitle className="text-lg">Today's Tasks</CardTitle>
               </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={240}>
-                  <BarChart data={weeklyData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="day" tick={{ fill: '#888' }} />
-                    <YAxis tick={{ fill: '#888' }} />
-                    <Bar dataKey="activity" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card data-tour="learning-momentum">
-              <CardHeader>
-                <CardTitle className="text-lg">Learning Momentum</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={240}>
-                  <AreaChart data={momentumData}>
-                    <defs>
-                      <linearGradient id="colorMomentum" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="day" tick={{ fill: '#888' }} />
-                    <YAxis tick={{ fill: '#888' }} />
-                    <Area type="monotone" dataKey="momentum" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorMomentum)" strokeWidth={3} />
-                  </AreaChart>
-                </ResponsiveContainer>
+              <CardContent className="space-y-4">
+                {todos.map((todo, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <Checkbox checked={todo.done} disabled />
+                    <div className="flex-1">
+                      <p className={`text-sm ${todo.done ? 'line-through text-muted-foreground' : 'font-medium'}`}>
+                        {todo.task}
+                      </p>
+                      {todo.time && <p className="text-xs text-muted-foreground">{todo.time}</p>}
+                    </div>
+                    {todo.done && <CheckCircle2 className="h-5 w-5 text-green-500" />}
+                  </div>
+                ))}
               </CardContent>
             </Card>
           </div>
-
-          {/* Continue Learning Section */}
-          <section className="mb-12" data-tour="continue-learning">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold">Continue Learning</h2>
-              {courses.length > 4 && (
-                <Button variant="ghost" size="sm" onClick={() => navigate('/courses')}>
-                  View All ({courses.length}) <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              )}
-            </div>
-
-            {courses.length === 0 ? (
-              <Card className="text-center py-16 border-dashed">
-                <CardContent>
-                  <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                    <BookOpen className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <p className="text-lg text-muted-foreground mb-4">No courses enrolled yet</p>
-                  <Button onClick={() => navigate('/courses')} size="lg">Explore Courses</Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {courses.slice(0, 4).map((course) => {
-                  const stats = getCourseStats(course);
-                  const isCompleted = stats.progress >= 100;
-
-                  return (
-                    <Card
-                      key={course.id}
-                      className="cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-xl group overflow-hidden"
-                      onClick={() => {
-                        if (!course.isLocked) {
-                          navigate(`/courses/${course.slug}`);
-                        }
-                      }}
-                      data-tour="continue-card"
-                    >
-                      <div className="h-2 bg-primary" />
-                      <CardContent className="p-5">
-                        <div className="flex items-start justify-between mb-4">
-                          <h3 className="font-bold text-lg leading-tight line-clamp-2 pr-2">
-                            {stats.title}
-                          </h3>
-                          <Badge variant="secondary" className="text-xs font-semibold flex items-center gap-1">
-                            <Zap className="h-3 w-3" /> {stats.xp} XP
-                          </Badge>
-                        </div>
-
-                        <div className="space-y-3">
-                          <div>
-                            <div className="flex justify-between text-sm mb-1">
-                              <span className="text-muted-foreground">Progress</span>
-                              <span className="font-semibold">{Math.round(stats.progress)}%</span>
-                            </div>
-                            <div className="relative h-3 rounded-full bg-muted overflow-hidden">
-                              <div
-                                className="absolute inset-y-0 left-0 transition-all duration-700 ease-out"
-                                style={{
-                                  width: `${stats.progress}%`,
-                                  backgroundColor:
-                                    stats.progress >= 90 ? '#10b981' :
-                                    stats.progress >= 60 ? '#3b82f6' :
-                                    stats.progress >= 30 ? '#f59e0b' : '#8b5cf6',
-                                }}
-                              />
-                            </div>
-                          </div>
-
-                          <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>Tasks Completed</span>
-                            <span className="font-medium text-foreground">{stats.lessons}</span>
-                          </div>
-
-                          <div className="pt-2">
-                            <Badge
-                              variant={isCompleted ? "default" : "secondary"}
-                              className={`w-full justify-center py-1.5 text-xs font-medium ${
-                                isCompleted ? "bg-green-500 text-white" : "bg-blue-500/10 text-blue-600"
-                              }`}
-                            >
-                              {isCompleted ? "Completed" : "In Progress"}
-                            </Badge>
-                          </div>
-                        </div>
-
-                        <Button
-                          className="w-full mt-4"
-                          size="sm"
-                          disabled={course.isLocked}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (!course.isLocked) {
-                              navigate(`/courses/${course.slug}`);
-                            }
-                          }}
-                        >
-                          {course.isLocked ? "Locked" : isCompleted ? "Review Course" : "Continue Learning"}
-                          {!course.isLocked && <ChevronRight className="ml-1 h-4 w-4" />}
-                        </Button>
-                      </CardContent>
-                      {course.isLocked && (
-                        <Badge variant="destructive" className="absolute top-2 right-2 text-xs">Locked</Badge>
-                      )}
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-        </main>
+        </div>
       </div>
     </div>
   );
