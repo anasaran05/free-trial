@@ -9,25 +9,22 @@ export default function Tutorial() {
   const videoId = "jGFy7n0O_E4";
 
   return (
-    <div className="min-h-screen flex justify-center px-4 pt-20 bg-gradient-to-b from-black via-[#0A0A0F] to-black text-white">
-      <div className="w-full max-w-4xl flex flex-col gap-16">
+    <div className="min-h-screen flex justify-center px-4 pt-14 bg-gradient-to-b from-black via-[#0A0A0F] to-black text-white">
+      <div className="w-full max-w-3xl flex flex-col gap-10">
 
         {/* Header */}
-        <div className="text-center space-y-6">
-         
-
-          <h1 className="text-5xl md:text-6xl font-semibold tracking-tight">
+        <div className="text-center space-y-4">
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
             Learn the Core Workflow
           </h1>
 
-          <p className="text-lg text-white/70 max-w-xl mx-auto leading-relaxed">
-            A short walkthrough demonstrating how to navigate missions, access tools,
-            and complete tasks inside Omega.
+          <p className="text-base text-white/70 max-w-md mx-auto leading-normal">
+            A concise walkthrough on navigating missions, accessing tools, and completing tasks inside Omega.
           </p>
         </div>
 
-        {/* Video Card */}
-        <div className="relative rounded-2xl overflow-hidden border border-white/15 shadow-[0_0_40px_-10px_rgba(255,0,0,0.35)]">
+        {/* Video */}
+        <div className="relative rounded-xl overflow-hidden border border-white/10 shadow-[0_0_25px_-10px_rgba(255,0,0,0.25)]">
           <div className="aspect-video w-full bg-black">
             <iframe
               className="absolute inset-0 w-full h-full"
@@ -40,16 +37,10 @@ export default function Tutorial() {
         </div>
 
         {/* CTA */}
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex justify-center">
           <Button
-            onClick={() => navigate("/signin")}
-            className="
-              px-12 py-4 text-lg font-medium rounded-lg
-              bg-[#EDEDED] text-black
-              hover:bg-white
-              hover:shadow-lg
-              transition-all
-            "
+            onClick={() => navigate("/dashboard")}
+            className="px-10 py-3 text-base font-medium rounded-md bg-[#EDEDED] text-black hover:bg-white"
           >
             Continue
           </Button>

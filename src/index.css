@@ -209,3 +209,16 @@
 .scrollbar-hide {
   scrollbar-width: none;
 }
+
+/* index.css or global.css */
+.xp-speed {
+  width: 0%;
+  animation: speedSweep 2.6s ease-out forwards;
+}
+
+@keyframes speedSweep {
+  0% { width: 0%; }
+  50% { width: 100%; }
+  85% { width: calc(var(--target) + 8%); }
+  100% { width: var(--target); }
+}

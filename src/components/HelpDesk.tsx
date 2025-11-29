@@ -45,21 +45,32 @@ export default function HelpDeskPage() {
                 <h1 className="text-4xl font-bold text-white">Get Fast Support</h1>
               </div>
 
-              {/* Quick Contacts Grid - Horizontal Layout */}
-              <div className="grid grid-cols-2 gap-3 w-full">
-                <Card className="bg-muted shadow-lg border border-border flex flex-col items-center justify-center p-4 cursor-pointer hover:shadow-xl transition-shadow" >
-                  <img src="https://img.icons8.com/color/480/whatsapp--v1.png" alt="WhatsApp" className="h-10 w-10 mb-2" />
-                  <div className="text-center">
-                    <h3 className="text-base font-medium text-foreground">WhatsApp</h3>
-                  </div>
-                </Card>
-                <Card className="bg-muted shadow-lg border border-border flex flex-col items-center justify-center p-4 cursor-pointer hover:shadow-xl transition-shadow" >
-                  <Phone className="h-10 w-10 text-blue-500 mb-2" />
-                  <div className="text-center">
-                    <h3 className="text-base font-medium text-foreground">Call Us</h3>
-                  </div>
-                </Card>
-              </div>
+           {/* Quick Contacts Grid */}
+<div className="grid grid-cols-2 gap-3 w-full">
+  <Card
+    onClick={handleWhatsAppClick}
+    className="bg-muted shadow-lg border border-border flex flex-col items-center justify-center p-4 cursor-pointer hover:shadow-xl transition-shadow"
+  >
+    <img
+      src="https://img.icons8.com/color/480/whatsapp--v1.png"
+      alt="WhatsApp"
+      className="h-10 w-10 mb-2"
+    />
+    <div className="text-center">
+      <h3 className="text-base font-medium text-foreground">WhatsApp</h3>
+    </div>
+  </Card>
+
+  <Card
+    onClick={handleCallClick}
+    className="bg-muted shadow-lg border border-border flex flex-col items-center justify-center p-4 cursor-pointer hover:shadow-xl transition-shadow"
+  >
+    <Phone className="h-10 w-10 text-blue-500 mb-2" />
+    <div className="text-center">
+      <h3 className="text-base font-medium text-foreground">Call Us</h3>
+    </div>
+  </Card>
+</div>
             </div>
 
             {/* Contact Form */}

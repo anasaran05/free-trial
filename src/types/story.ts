@@ -37,4 +37,5 @@ export interface Story {
   estimatedDuration: string;
   chapters: StoryChapter[];
   coverImage?: string;
+  courseId: string; //
 }

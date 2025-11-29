@@ -8,6 +8,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isToday } from 'da
 import {
   Flame, Trophy, Calendar, Zap, Target, CheckCircle2, Lock, ChevronRight, Clock, BookOpen, Award, Newspaper
 } from 'lucide-react';
+import { createIcons, icons } from 'lucide';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -19,6 +20,9 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import Sidebar from '@/components/sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchTasks, organizeTasks, Course } from '@/lib/csv';
+import GraphAnalytics from '@/components/dashboardComponents/GraphAnalytics';
+import Leaderboard from '@/components/dashboardComponents/Leaderboard';
+
 
 const CSV_URL = import.meta.env.VITE_CSV_URL || 'https://raw.githubusercontent.com/anasaran05/zane-omega/refs/heads/main/public/data/freetrail-task%20-%20Sheet1.csv';
 
@@ -47,6 +51,28 @@ const [showLoader, setShowLoader] = useState(true);
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+  
+
+
+// XP leveling system
+const xpPerLevel = 500;
+
+// current level integer
+const currentLevel = Math.floor(totalXP / xpPerLevel) + 1;
+
+// XP inside current level
+const currentXP = totalXP % xpPerLevel;
+
+// % progress toward next level in current band
+const levelPercent = Math.min(
+  100,
+  Math.round((currentXP / xpPerLevel) * 100)
+);
+
+// dynamic scale
+const levelStart = (currentLevel - 1) * xpPerLevel;
+const levelEnd = currentLevel * xpPerLevel;
 
   // Realistic To-Do List
  const todos = [
@@ -83,6 +109,43 @@ const [showLoader, setShowLoader] = useState(true);
     time: "2 days ago",
     color: "text-orange-600"
   },
+];
+const topUsers = [
+  { name: "Sophia Reed", country: "USA", flag: "🇺🇸", xp: 1310 },
+  { name: "Aisha Mansour", country: "Saudi", flag: "🇸🇦", xp: 930 },
+  { name: "Lucas Keller", country: "Germany", flag: "🇩🇪", xp: 1250 },
+  { name: "Omar Al-Farsi", country: "Dubai", flag: "🇦🇪", xp: 910 },
+  { name: "Noah Parker", country: "Canada", flag: "🇨🇦", xp: 1150 },
+  { name: "Mia Lawson", country: "Australia", flag: "🇦🇺", xp: 1190 },
+  { name: "Riya Patel", country: "India", flag: "🇮🇳", xp: 1180 },
+  { name: "Hannah Weiss", country: "Germany", flag: "🇩🇪", xp: 1170 },
+  { name: "Yousef Hassan", country: "Saudi", flag: "🇸🇦", xp: 1210 },
+  { name: "Layla Khan", country: "Dubai", flag: "🇦🇪", xp: 860 },
+  { name: "Jack Hughes", country: "Australia", flag: "🇦🇺", xp: 960 },
+  { name: "Emily Stone", country: "Canada", flag: "🇨🇦", xp: 940 },
+  { name: "Ananya Mehta", country: "India", flag: "🇮🇳", xp: 960 },
+  { name: "James Carter", country: "USA", flag: "🇺🇸", xp: 940 },
+  { name: "Harper Green", country: "Australia", flag: "🇦🇺", xp: 1040 },
+  { name: "Aarav Shah", country: "India", flag: "🇮🇳", xp: 1240 },
+  { name: "Leon Müller", country: "Germany", flag: "🇩🇪", xp: 1030 },
+  { name: "Chloe Daniels", country: "Canada", flag: "🇨🇦", xp: 1070 },
+  { name: "Abdulrahman Saleh", country: "Saudi", flag: "🇸🇦", xp: 990 },
+  { name: "Zara Al-Nuaimi", country: "Dubai", flag: "🇦🇪", xp: 980 },
+  { name: "Liam Voss", country: "Canada", flag: "🇨🇦", xp: 1010 },
+  { name: "Ethan Davis", country: "USA", flag: "🇺🇸", xp: 1205 },
+  { name: "Mia Fischer", country: "Germany", flag: "🇩🇪", xp: 930 },
+  { name: "Oliver Ward", country: "Australia", flag: "🇦🇺", xp: 1130 },
+  { name: "Ava Lopez", country: "USA", flag: "🇺🇸", xp: 1110 },
+  { name: "Karthik Rao", country: "India", flag: "🇮🇳", xp: 1090 },
+  { name: "Noura Talal", country: "Saudi", flag: "🇸🇦", xp: 1120 },
+  { name: "Hamad Saeed", country: "Dubai", flag: "🇦🇪", xp: 790 },
+];
+
+const analyticsData = [
+  { name: 'Pharmacovigilance', india: 230, usa: 190, eu: 155, aus: 89 },
+  { name: 'Regulatory Affairs', india: 210, usa: 240, eu: 120, aus: 76 },
+  { name: 'Clinical Trials', india: 310, usa: 280, eu: 245, aus: 132 },
+  { name: 'Medical Writing', india: 190, usa: 150, eu: 105, aus: 70 },
 ];
 
   // Fetch user + stats
@@ -315,6 +378,36 @@ if (showLoader) {
               </Card>
             </div>
 
+          {/* XP Spacebar */}
+<div className="mt-6">
+  <Card className="bg-background text-white border-2">
+    <CardContent className="pt-4">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <p className="text-red-200 text-lg font-bold">Level {currentLevel}</p>
+          <p className="text-sm text-muted-foreground">
+            {currentXP} / {xpPerLevel} XP to next level
+          </p>
+        </div>
+        <Award className="h-10 w-10 opacity-70" />
+      </div>
+
+      {/* Bar */}
+   <div className="h-3 w-full bg-gray-700 rounded-[999px] overflow-hidden">
+  <div
+    className="xp-speed h-full bg-primary"
+    style={{ "--target": `${levelPercent}%` } as React.CSSProperties}
+  />
+</div>
+
+      {/* Scale */}
+      <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+        <span>{levelStart} XP</span>
+        <span>{levelEnd} XP</span>
+      </div>
+    </CardContent>
+  </Card>
+</div>
             
 
          {/* Continue Learning – with red diagonal category ribbon in top-left */}
@@ -333,7 +426,7 @@ if (showLoader) {
       const quizScore = isLocked ? 0 : progress > 0 ? Math.min(100, progress + Math.floor(Math.random() * 18)) : 0;
 
       const getStatusStyle = () => {
-        if (isLocked)       return { text: "Locked",     bg: "bg-surface-elevated", border: "border-border",       textColor: "text-muted-foreground", fill: "bg-muted" };
+        if (isLocked)       return { text: "Locked",     bg: "bg-surface-elevated", border: "border-border",       textColor: "text-muted-foreground", fill: "bg-gray-600" };
         if (progress === 100) return { text: "Completed",  bg: "bg-success/20",       border: "border-success/50",   textColor: "text-success-foreground", fill: "bg-success" };
         if (progress > 0)   return { text: "In Progress", bg: "bg-primary/10",       border: "border-primary/50",   textColor: "text-primary",            fill: "bg-primary" };
         return               { text: "Not Started", bg: "bg-primary",  border: "border-destructive/50", textColor: "text-white",       fill: "bg-destructive" };
@@ -381,7 +474,14 @@ if (showLoader) {
       ${isLocked ? 'text-muted-foreground' : 'text-green-600'}
     `}>
       {course.name}
-    </h3>
+    </h3> 
+    {course.description && (
+    <p className={`text-sm line-clamp-2 leading-snug 
+      ${isLocked ? 'text-muted-foreground/70' : 'text-muted-foreground'}
+    `}>
+      {course.description}
+    </p>
+  )}
 
     {/* Progress */}
     <div className="space-y-2">
@@ -419,6 +519,12 @@ if (showLoader) {
     })}
   </div>
 </div>
+
+ <GraphAnalytics
+  data={analyticsData}
+  lastUpdated="2 minutes ago"
+/>
+
            {/* Recent Activity */}
 <Card className="relative bg-card/30 backdrop-blur-md">
   <CardHeader>
@@ -485,6 +591,9 @@ if (showLoader) {
                 </div>
               </CardContent>
             </Card>
+  
+ 
+<Leaderboard leaders={topUsers} rotateDelay={3500} />
 
             {/* Today's Tasks */}
             <Card>

@@ -13,7 +13,8 @@ import {
   PanelLeftOpen,
   PanelLeftClose,
   PanelLeftDashed,
-  Boxes
+  Boxes,
+  Globe
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -24,10 +25,11 @@ export default function Sidebar() {
     { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', isActive: location.pathname === '/dashboard' },
     { icon: LibraryBig, label: 'Courses', href: '/courses', isActive: location.pathname.startsWith('/courses') },
     { icon: Boxes, label: 'Playground', href: '/playground', isActive: location.pathname.startsWith('/playground') },
-    { icon: User, label: 'Profile', href: '/profile', isActive: location.pathname === '/profile' },
     { icon: Wrench, label: 'Tools', href: '/tools', isActive: location.pathname === '/tools' },
-    { icon: Inbox, label: 'Inbox', href: '/inbox', isActive: location.pathname === '/inbox' },
+    { icon: Globe, label: 'Community', href: '/sparc', isActive: location.pathname === '/sparc' },
     { icon: Calendar, label: 'Mentorship', href: '/mentorship', isActive: location.pathname === '/mentorship' },
+    { icon: Inbox, label: 'Inbox', href: '/inbox', isActive: location.pathname === '/inbox' },
+    { icon: User, label: 'Profile', href: '/profile', isActive: location.pathname === '/profile' },
     { icon: Headset, label: 'Help Desk', href: '/helpdesk', isActive: location.pathname === '/helpdesk' },
     
   ];

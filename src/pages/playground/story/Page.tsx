@@ -145,17 +145,19 @@ export default function NarrativeStoryPage() {
 
                 {/* CHARACTER QUOTE */}
                 {chapter.character && (
-                  <div className="border-l-4 border-primary bg-muted/30 p-6 mt-6 rounded-r-xl">
-                    <div className="flex gap-4">
-                      <User className="w-7 h-7 text-primary mt-0.5" />
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">{chapter.character}</p>
-                        <p className="text-xl italic leading-relaxed">
-                          “{chapter.characterQuote}”
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+               <div className="border-l-2 border-primary bg-muted/10 p-4 mt-4 rounded-r-md">
+  <div className="flex gap-2">
+    <User className="w-4 h-4 text-primary mt-[10px]" />
+    <div>
+      <p className="text-[11px] font-medium text-muted-foreground">
+        {chapter.character}
+      </p>
+      <p className="text-base italic leading-tight">
+        {chapter.characterQuote}
+      </p>
+    </div>
+  </div>
+</div>
                 )}
 
                 {/* NARRATIVE */}
@@ -183,7 +185,7 @@ export default function NarrativeStoryPage() {
                           }`}
                       >
                         <div className="flex gap-4 items-start">
-                          <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center
+                          <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center
                             ${selectedChoice === idx ? 'border-primary bg-primary' : 'border-muted-foreground/40'}
                           `}>
                             {selectedChoice === idx && (

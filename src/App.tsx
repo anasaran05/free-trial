@@ -5,7 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-
+import ZaneSparc from "./pages/ZaneSparc.tsx";
 // Your pages
 import Tutorial from "./pages/Tutorial";
 import Index from "./pages/Index";
@@ -70,6 +70,7 @@ function AppContent() {
         <Route path="/tools" element={<ProtectedRoute><ToolsPage /></ProtectedRoute>} />
         <Route path="/inbox" element={<InboxPage />} />
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/sparc" element={<ProtectedRoute><ZaneSparc /></ProtectedRoute>} />
 
         {/* STORY ROUTES — NOW WRAPPED IN StoryProvider BELOW */}
         <Route path="/playground" element={<ProtectedRoute><StoryLibraryPage /></ProtectedRoute>} />
