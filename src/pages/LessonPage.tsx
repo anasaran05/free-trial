@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Joyride from 'react-joyride'; // ← Added
-import { useOnboarding } from '@/onboarding/useOnboarding'; // ← Added
+import { useOnboarding } from '@/components/onboarding/useOnboarding'; // ← Added
 import { getCourseBySlug } from '@/lib/csv';
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/Card';
 import { PrimaryButton } from '@/components/Button';

@@ -1,15 +1,9 @@
 // src/types/story.ts
+
 export interface StoryChoice {
   text: string;
   nextChapter: string;
   consequence: string;
-}
-export interface Story {
-  id: string
-  title: string
-  description: string
-  chapters: StoryChapter[]
-  coverImage?: string
 }
 
 export interface StoryRewards {
@@ -30,5 +24,16 @@ export interface StoryChapter {
   emotionalTheme: string;
   timeToComplete: string;
   rewards: StoryRewards;
+
+  // Optional flags for special chapters
   isEnding?: boolean;
+  endingName?: string;        // Added for ending chapters
+}
+
+export interface Story {
+  id: string;
+  title: string;
+  description: string;
+  chapters: StoryChapter[];
+  coverImage?: string;
 }

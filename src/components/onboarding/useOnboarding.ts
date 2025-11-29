@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { CallBackProps } from "react-joyride";
 import { tutorialSteps } from "./tutorialSteps.tsx";
-import { getFlag, setFlag } from "../lib/userOnboardingFlags";
+import { getFlag, setFlag } from "../../lib/userOnboardingFlags.ts";
 
 const GLOBAL_TOUR_KEY = "full_onboarding";
 

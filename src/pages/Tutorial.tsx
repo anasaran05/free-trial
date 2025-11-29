@@ -3,75 +3,58 @@
 
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 
 export default function Tutorial() {
   const navigate = useNavigate();
   const videoId = "jGFy7n0O_E4";
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4">
-      <div className="flex flex-col items-center space-y-10 w-full max-w-4xl">
-        
-        <div className="text-center space-y-4">
-          <h1 className="text-5xl md:text-6xl font-semibold tracking-tight">
-            Platform Tutorial
+    <div className="min-h-screen bg-background text-white flex flex-col items-center px-4 pt-10">
+      <div className="w-full max-w-3xl flex flex-col space-y-10">
+
+       
+
+        {/* Header + context */}
+        <div className="text-center space-y-3">
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
+            Ωmega Tutorial
           </h1>
-          <p className="text-xl text-white/60">
-            Watch this short video to get started
+          <p className="text-base md:text-lg text-white/70 max-w-xl mx-auto">
+            This video walks you through essential features so you can begin using Ωmega confidently.
           </p>
         </div>
 
-        <div className="relative w-full rounded-xl overflow-hidden shadow-[0_0_40px_-10px_rgba(255,255,255,0.2)]">
-          <div className="aspect-video bg-black">
-            <iframe
-              className="absolute inset-0 w-full h-full"
-              src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&controls=1&fs=1`}
-              allowFullScreen
-            />
-          </div>
+        {/* Video container */}
+        <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 bg-black">
+          <iframe
+            className="absolute inset-0 w-full h-full"
+            src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&controls=1&fs=1`}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
         </div>
 
-        <Button
-  onClick={() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    setTimeout(() => navigate("/"), 400);
-  }}
-  className="
-    relative overflow-hidden
-    bg-white text-black text-lg px-20 py-5 rounded-full font-medium
-    border border-transparent hover:border-white hover:bg-black hover:text-white
-    transition-colors duration-300 ease-in-out group
-  "
->
-  <span
-    className="
-      block w-full h-full
-      transition-transform duration-500 ease-in-out
-      [transform-style:preserve-3d]
-      group-hover:[transform:rotateX(180deg)]
-    "
-  >
-    <span
-      className="
-        absolute inset-0 flex items-center justify-center
-        [backface-visibility:hidden]
-      "
-    >
-      Begin
-    </span>
+        {/* Actions */}
+        <div className="flex flex-col items-center space-y-4">
+          <Button
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              setTimeout(() => navigate("/dashboard"), 300);
+            }}
+            className="
+              w-full md:w-auto
+              bg-white text-black text-base px-10 py-3 rounded-full font-medium
+              hover:bg-black hover:text-white
+              transition-colors duration-200
+            "
+          >
+            Enter Omega
+          </Button>
 
-    <span
-      className="
-        absolute inset-0 flex items-center justify-center
-        [transform:rotateX(180deg)]
-        [backface-visibility:hidden]
-      "
-    >
-      Your Journey
-    </span>
-  </span>
-</Button>
+         
+        </div>
       </div>
     </div>
   );

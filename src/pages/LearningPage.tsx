@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Joyride from 'react-joyride';
-import { useOnboarding } from "@/onboarding/useOnboarding";
+import { useOnboarding } from "@/components/onboarding/useOnboarding";
 import { getCourseBySlug } from '@/lib/csv';
 
 import { Button } from "@/components/ui/button";

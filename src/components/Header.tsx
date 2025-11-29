@@ -111,9 +111,9 @@ export default function Header({ className = '' }: HeaderProps) {
   to="/"
   className="flex items-center flex-shrink-0 ml-2 sm:ml-3"
 >
-  <span className="font-heading font-bold text-2xl tracking-tight">
-    ZANE <span className="text-red-600">ΩMEGA</span>
-  </span>
+  <span className="font-heading font-semibold text-lg sm:text-xl lg:text-2xl">
+              ZANE <span style={{ color: "#ff0000" }}>ΩMEGA</span>
+            </span>
 </Link>
 
           {/* Desktop: Only Profile + Avatar (minimal) */}

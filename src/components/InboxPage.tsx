@@ -1,6 +1,6 @@
 // src/pages/Inbox.tsx  (or .tsx)
 import React, { useState } from 'react';
-import Sidebar from '@/components/ui/sidebar';
+import Sidebar from '@/components/sidebar';
 import { Inbox, Search, Filter, Archive, Trash2, Reply, Forward, MoreVertical, Paperclip, Star } from 'lucide-react';
 import { format } from 'date-fns';
 

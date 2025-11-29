@@ -3,21 +3,41 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Clock, Trophy, ArrowRight } from 'lucide-react';
 import { useStory } from '@/context/StoryContext';
-import { storyChapters } from '@/components/data/storyData';
+import { storyChapters as guardianChapters } from '@/components/data/Stories/guardianStory';
+import { storyChapters as neuraBioChapters } from '@/components/data/Stories/neuraBioStory';
+import { storyChapters as fracturedConsentChapters } from '@/components/data/Stories/fractured-consent';
 import type { Story } from '@/types/story';
-import Sidebar from '@/components/ui/sidebar';
+import Sidebar from '@/components/sidebar';
 import Card, { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/Card';
 import { InteractiveHoverButton } from '@/components/Buttons/interactive-hover-button';
-
 const guardiansJourney: Story = {
   id: 'guardians-journey',
   title: "The Guardian's Journey",
-  description: 'From nervous trainee to global safety leader — an emotional, branching narrative about mastering pharmacovigilance.',
-  chapters: storyChapters,
-  coverImage: 'https://www.shutterstock.com/image-vector/bottle-medicine-target-blue-syringe-600nw-2602511367.jpg',
+  description: 'From nervous trainee to global safety leader',
+  chapters: guardianChapters,
+  coverImage:
+    'https://www.shutterstock.com/image-vector/bottle-medicine-target-blue-syringe-600nw-2602511367.jpg',
 };
 
-const availableStories: Story[] = [guardiansJourney];
+const neuraBio: Story = {
+  id: 'neurabio',
+  title: 'NeuraBio: The Price of Innovation',
+  description: 'Inside a biotech startup racing against ethics and science',
+  chapters: neuraBioChapters,
+  coverImage: 'https://cdn.mos.cms.futurecdn.net/H2K5LjsrakLauPmnZxYddF.jpg',
+};
+
+const fracturedConsent: Story = {
+  id: 'fractured-consent',
+  title: 'Fractured Consent',
+  description: 'Some patients never truly said yes',
+  chapters: fracturedConsentChapters,
+  coverImage:
+    'https://lawwire.in/wp-content/uploads/2023/11/WhatsApp-Image-2023-11-29-at-5.04.49-PM.webp',
+  
+};
+
+const availableStories: Story[] = [guardiansJourney, neuraBio, fracturedConsent];
 
 export default function StoryLibraryPage() {
   const { setStory } = useStory();
@@ -85,7 +105,7 @@ export default function StoryLibraryPage() {
         <div className="text-muted-foreground">Duration</div>
         <div className="font-semibold flex items-center justify-center gap-1">
           <Clock className="w-4 h-4" />
-          ~12h
+          ~1h
         </div>
       </div>
       <div>

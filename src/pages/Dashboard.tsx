@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Joyride from 'react-joyride';
-import { useOnboarding } from '@/onboarding/useOnboarding';
+import { useOnboarding } from '@/components/onboarding/useOnboarding';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isToday } from 'date-fns';
 import {
   Flame, Trophy, Calendar, Zap, Target, CheckCircle2, Lock, ChevronRight, Clock, BookOpen, Award, Newspaper
@@ -16,7 +16,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import Sidebar from '@/components/ui/sidebar';
+import Sidebar from '@/components/sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchTasks, organizeTasks, Course } from '@/lib/csv';
 
@@ -402,7 +402,7 @@ if (showLoader) {
     </div>
 
     {/* Status Pill */}
-    <div className={`relative h-11 rounded-full overflow-hidden ${status.bg} ${status.border}`}>
+    <div className={`relative h-9 rounded-full overflow-hidden ${status.bg} ${status.border}`}>
       <div
         className={`absolute inset-0 ${status.fill} transition-all duration-1000 ease-out`}
         style={{ width: `${isLocked ? 100 : quizScore}%` }}

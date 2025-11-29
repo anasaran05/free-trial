@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Joyride, { Step } from 'react-joyride';
-import { useTaskOnboarding } from "@/onboarding/useTaskOnboarding";
+import { useTaskOnboarding } from "@/components/onboarding/useTaskOnboarding";
 import Card, { CardContent, CardHeader, CardTitle } from '@/components/Card';
 import { PrimaryButton, GlowButton } from '@/components/Button';
 import TaskResourceButton from '@/components/TaskResourceButton';

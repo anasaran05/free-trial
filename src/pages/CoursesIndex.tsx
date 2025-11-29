@@ -8,7 +8,7 @@ import { BookOpen, Clock, Award, Lock } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { InteractiveHoverButton } from "../components/Buttons/interactive-hover-button";
 import { supabase } from '@/integrations/supabase/client';
-import Sidebar from '@/components/ui/sidebar'; // ← Your existing sidebar
+import Sidebar from '@/components/sidebar'; // ← Your existing sidebar
 
 const CSV_URL =
   import.meta.env.VITE_CSV_URL ||
