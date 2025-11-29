@@ -360,7 +360,7 @@ if (showLoader) {
   {/* CATEGORY BADGE – Top Right */}
   {course.category && (
     <div className="absolute top-3 right-3 z-30 pointer-events-none select-none">
-      <div className="bg-primary text-white text-[6px] font-bold px-3 py-0.5 rounded-full shadow-md border border-white/40">
+      <div className="bg-primary text-white text-[6px] font-bold px-3 py-0.5 rounded-sm shadow-md border border-white/40">
         {course.category.trim().toUpperCase()}
       </div>
     </div>
@@ -402,7 +402,7 @@ if (showLoader) {
     </div>
 
     {/* Status Pill */}
-    <div className={`relative h-9 rounded-full overflow-hidden ${status.bg} ${status.border}`}>
+    <div className={`relative h-9 rounded-lg overflow-hidden ${status.bg} ${status.border}`}>
       <div
         className={`absolute inset-0 ${status.fill} transition-all duration-1000 ease-out`}
         style={{ width: `${isLocked ? 100 : quizScore}%` }}
@@ -489,7 +489,7 @@ if (showLoader) {
             {/* Today's Tasks */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Today's Tasks</CardTitle>
+                <CardTitle className="text-lg">To-Do List</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {todos.map((todo, i) => (
@@ -499,7 +499,7 @@ if (showLoader) {
                       <p className={`text-sm ${todo.done ? 'line-through text-muted-foreground' : 'font-medium'}`}>
                         {todo.task}
                       </p>
-                      {todo.time && <p className="text-xs text-muted-foreground">{todo.time}</p>}
+                     
                     </div>
                     {todo.done && <CheckCircle2 className="h-5 w-5 text-green-500" />}
                   </div>

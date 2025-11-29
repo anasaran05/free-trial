@@ -217,7 +217,7 @@ export default function CoursesIndex() {
                       >
                         {locked && (
                           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                            <div className="bg-background/80 backdrop-blur-sm rounded-full p-6">
+                            <div className="bg-background/10 backdrop-blur-sm rounded-full p-6">
                               <Lock className="w-16 h-16 text-destructive" />
                             </div>
                           </div>
@@ -234,10 +234,19 @@ export default function CoursesIndex() {
                             </div>
                           </div>
 
-                          <CardTitle className={locked ? 'text-white' : 'text-green-600 dark:text-green-400'}>
-                            {course.name}
-                          </CardTitle>
-                          <CardDescription>{course.description || "No description."}</CardDescription>
+                         <CardTitle
+  className={
+    `${locked ? 'text-white' : 'text-green-600 dark:text-green-400'} 
+     line-clamp-2 text-lg leading-tight h-[48px]`
+  }
+>
+  {course.name}
+</CardTitle>
+                          <CardDescription
+  className="line-clamp-2 text-sm text-muted-foreground h-[50px] pt-2"
+>
+  {course.description || "No description."}
+</CardDescription>
                         </CardHeader>
 
                         <CardContent className="space-y-6">
