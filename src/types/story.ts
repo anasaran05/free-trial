@@ -34,6 +34,7 @@ export interface Story {
   id: string;
   title: string;
   description: string;
+  estimatedDuration: string;
   chapters: StoryChapter[];
   coverImage?: string;
 }
