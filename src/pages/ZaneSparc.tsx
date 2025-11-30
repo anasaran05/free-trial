@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from '@/components/sidebar';
-import { X, Calendar, Users, Beaker, FileText, TrendingUp, CheckCircle2, Lock } from 'lucide-react';
+import { X, Calendar, Users, Beaker, FileText, TrendingUp, CheckCircle2, Lock, Sprout,  Newspaper, Hammer } from 'lucide-react';
 
 // Types
 interface PremiumMember {
@@ -23,6 +23,7 @@ interface ResearchEntry {
   abstract: string;
   publishedAt: string;
   mentorVerified: boolean;
+  upgraded?: boolean;
 }
 
 interface OngoingProject {
@@ -33,6 +34,7 @@ interface OngoingProject {
   progress: number;
   description: string;
   team: string[];
+
 }
 
 interface BlogPost {
@@ -43,6 +45,7 @@ interface BlogPost {
   author: string;
   createdAt: string;
   excerpt: string;
+  upgraded?: boolean;
 }
 
 export default function SparcOverview() {
@@ -125,7 +128,8 @@ export default function SparcOverview() {
       thumbnail: 'https://www.qad.com/blog/wp-content/uploads/2018/11/CEBOS_Migration_Images_Risks_of_no_QMS.png',
       abstract: 'Zero-shot deviation clustering achieving 93.4% alignment with senior QA experts across three global manufacturers. CAPA acceptance rate: 87%.',
       publishedAt: '2025-11-18',
-      mentorVerified: true
+      mentorVerified: true,
+      upgraded: true
     },
     {
       id: 'r2',
@@ -134,7 +138,8 @@ export default function SparcOverview() {
       thumbnail: 'https://www.drugdiscoverytrends.com/wp-content/uploads/2019/09/ddd1708_clinical_research.jpg',
       abstract: 'Mixture cure model improves long-term OS prediction by 41% vs standard methods. Validated on 12 Phase II/III datasets.',
       publishedAt: '2025-10-29',
-      mentorVerified: true
+      mentorVerified: true,
+      upgraded: true
     },
     {
       id: 'r3',
@@ -143,7 +148,8 @@ export default function SparcOverview() {
       thumbnail: 'https://engineering.fb.com/wp-content/uploads/2019/05/grid-AI.jpg',
       abstract: 'BioLinkBERT fine-tuned on 1.2M narratives → F1 0.943, reducing manual coding workload by 83%.',
       publishedAt: '2025-10-12',
-      mentorVerified: true
+      mentorVerified: true,
+      upgraded: true
     },
     {
       id: 'r4',
@@ -152,7 +158,8 @@ export default function SparcOverview() {
       thumbnail: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=1200&q=80',
       abstract: 'Real-time CQA prediction with <1% deviation from physical sensors across tablet compression lines.',
       publishedAt: '2025-09-27',
-      mentorVerified: true
+      mentorVerified: true,
+      upgraded: true
     }
   ];
 
@@ -203,36 +210,40 @@ export default function SparcOverview() {
       title: 'Why FDA’s New AI/ML Guidance Changes Everything in 2025',
       category: 'Regulatory',
       thumbnail: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80',
-      author: 'Aisha Rahman',
+      author: 'Aishwarya Rohan',
       createdAt: '2025-11-20',
-      excerpt: 'Deep dive into FDA’s final AI/ML-based SaMD guidance — what’s enforceable and how to future-proof your submission.'
+      excerpt: 'Deep dive into FDA’s final AI/ML-based SaMD guidance — what’s enforceable and how to future-proof your submission.',
+      upgraded: true
     },
     {
       id: 'b2',
       title: 'Building GMP-Compliant Data Pipelines: A Practitioner’s Guide',
       category: 'QA/GMP',
       thumbnail: 'https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?auto=format&fit=crop&w=1200&q=80',
-      author: 'Alan Chen',
+      author: 'Gayathri',
       createdAt: '2025-11-10',
-      excerpt: 'From raw sensor data to validated training sets — audit-ready pipelines that pass BSI inspections.'
+      excerpt: 'From raw sensor data to validated training sets — audit-ready pipelines that pass BSI inspections.',
+      upgraded: true
     },
     {
       id: 'b3',
       title: 'The Rise of Foundation Models in Drug Safety',
       category: 'Pharmacovigilance',
-      thumbnail: 'https://images.unsplash.com/photo-1576091160550-2179a5c7e2f3?auto=format&fit=crop&w=1200&q=80',
-      author: 'Maya Patel',
+      thumbnail: 'https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41591-024-03233-x/MediaObjects/41591_2024_3233_Fig1_HTML.png',
+      author: 'Hanish',
       createdAt: '2025-10-28',
-      excerpt: 'How instruction-tuned LLMs reduce MedDRA coding time from days to minutes — real results from top-20 pharma.'
+      excerpt: 'How instruction-tuned LLMs reduce MedDRA coding time from days to minutes — real results from top-20 pharma.',
+      upgraded: true
     },
     {
       id: 'b4',
       title: 'From Prototype to Production: Deploying Clinical AI in 2025',
       category: 'MLOps',
-      thumbnail: 'https://images.unsplash.com/photo-1517180102446-f3ece451e9a7?auto=format&fit=crop&w=1200&q=80',
-      author: 'Rohan Desai',
+      thumbnail: 'https://www.biopharmaservices.com/wp-content/uploads/2024/02/The-Role-of-AI-in-Clinical-Trials-blog-image.png',
+      author: 'Raashik',
       createdAt: '2025-10-15',
-      excerpt: 'The unspoken challenges of taking a Jupyter notebook to a locked-down, validated GxP system.'
+      excerpt: 'The unspoken challenges of taking a Jupyter notebook to a locked-down, validated GxP system.',
+      upgraded: true
     }
   ];
 
@@ -261,10 +272,10 @@ export default function SparcOverview() {
 
   <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-6">
     {[
-      { icon: Users, label: "Members", value: heroStats.Members, color: "from-blue-500 to-cyan-400", suffix: "+" },
-      { icon: Beaker, label: "Research Published", value: heroStats.researchPublished, color: "from-purple-500 to-pink-400" },
-      { icon: TrendingUp, label: "Ongoing Projects", value: heroStats.ongoingProjects, color: "from-emerald-500 to-teal-400" },
-      { icon: FileText, label: "Active Domains", value: heroStats.activeDomains, color: "from-orange-500 to-red-400" },
+      { icon: Users, label: "Members", value: heroStats.Members, color: "from-blue-500 to-cyan-400" },
+      { icon: Newspaper, label: "Research Published", value: heroStats.researchPublished, color: "from-purple-500 to-pink-400" },
+      { icon: Hammer, label: "Ongoing Projects", value: heroStats.ongoingProjects, color: "from-emerald-500 to-teal-400" },
+      { icon: Sprout, label: "Seeded Ventures", value: heroStats.activeDomains, color: "from-orange-500 to-red-400" },
     ].map((stat, i) => (
       <motion.div
         key={stat.label}
@@ -277,7 +288,7 @@ export default function SparcOverview() {
           <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-10 group-hover:opacity-20 transition-opacity`} />
           <stat.icon className="w-10 h-10 mb-4 text-zinc-400 group-hover:scale-110 transition-transform" />
           <div className="text-4xl font-bold">
-            {stat.value}{stat.suffix || ""}
+            {stat.value}+
           </div>
           <div className="text-sm text-zinc-500 mt-2">{stat.label}</div>
         </div>
@@ -290,7 +301,7 @@ export default function SparcOverview() {
          <Section title="Premium Members" subtitle="Leaders driving innovation">
   <div className="relative">
     {/* blurred card grid */}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-30 pointer-events-none">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pointer-events-none">
       {premiumMembers.map((m, i) => (
        <Card key={m.id} delay={i * 0.1}>
   <div className="flex items-start gap-5">
@@ -357,14 +368,23 @@ export default function SparcOverview() {
     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
 
     <div className="relative p-5">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-[10px] px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full">{r.division}</span>
-        {r.mentorVerified && (
-          <span className="text-[10px] flex items-center gap-1 text-emerald-400">
-            <CheckCircle2 className="w-3 h-3" /> Verified
-          </span>
-        )}
-      </div>
+     <div className="flex items-center gap-2 mb-2">
+  <span className="text-[10px] px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded-full">
+    {r.division}
+  </span>
+
+  {r.mentorVerified && (
+    <span className="text-[10px] flex items-center gap-1 text-emerald-400">
+      <CheckCircle2 className="w-3 h-3" /> Verified
+    </span>
+  )}
+
+  {r.upgraded && (
+    <span className="text-[10px] px-2 py-0.5 bg-blue-600/25 text-blue-300 rounded-full">
+      Upgrade
+    </span>
+  )}
+</div>
 
       <h3 className="text-lg font-semibold leading-snug line-clamp-1">{r.title}</h3>
       <p className="mt-2 text-zinc-400 text-sm line-clamp-2">{r.abstract}</p>
@@ -467,12 +487,23 @@ export default function SparcOverview() {
               <img src={modalResearch.thumbnail} alt={modalResearch.title} className="w-full h-80 object-cover rounded-2xl" loading="lazy" />
               <div className="mt-8">
                 <h2 className="text-3xl font-bold">{modalResearch.title}</h2>
-                <div className="flex items-center gap-4 mt-3 text-zinc-400">
-                  <span>{modalResearch.division}</span>
-                  <span>•</span>
-                  <span>{new Date(modalResearch.publishedAt).toLocaleDateString()}</span>
-                  {modalResearch.mentorVerified && <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 className="w-5 h-5" /> Mentor Verified</span>}
-                </div>
+               <div className="flex items-center gap-4 mt-3 text-zinc-400">
+  <span>{modalResearch.division}</span>
+  <span>•</span>
+  <span>{new Date(modalResearch.publishedAt).toLocaleDateString()}</span>
+
+  {modalResearch.mentorVerified && (
+    <span className="flex items-center gap-1 text-emerald-400">
+      <CheckCircle2 className="w-5 h-5" /> Mentor Verified
+    </span>
+  )}
+
+  {modalResearch.upgraded && (
+    <span className="text-xs px-2 py-0.5 bg-blue-600/25 text-blue-300 rounded-full">
+      Upgrade
+    </span>
+  )}
+</div>
                 <p className="mt-6 text-zinc-300 leading-relaxed">{modalResearch.abstract}</p>
               </div>
             </motion.div>
@@ -499,13 +530,19 @@ export default function SparcOverview() {
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}>
               <img src={modalBlog.thumbnail} alt={modalBlog.title} className="w-full h-64 object-cover rounded-2xl" loading="lazy" />
               <h2 className="mt-8 text-3xl font-bold">{modalBlog.title}</h2>
-              <div className="mt-4 flex items-center gap-4 text-zinc-400">
-                <span>{modalBlog.category}</span>
-                <span>•</span>
-                <span>{modalBlog.author}</span>
-                <span>•</span>
-                <span>{new Date(modalBlog.createdAt).toLocaleDateString()}</span>
-              </div>
+             <div className="mt-4 flex items-center gap-4 text-zinc-400">
+  <span>{modalBlog.category}</span>
+  <span>•</span>
+  <span>{modalBlog.author}</span>
+  <span>•</span>
+  <span>{new Date(modalBlog.createdAt).toLocaleDateString()}</span>
+
+  {modalBlog.upgraded && (
+    <span className="text-xs px-2 py-0.5 bg-blue-600/25 text-blue-300 rounded-full">
+      Upgrade
+    </span>
+  )}
+</div>
               <p className="mt-8 text-lg leading-relaxed text-zinc-300">{modalBlog.excerpt}</p>
             </motion.div>
           </Modal>

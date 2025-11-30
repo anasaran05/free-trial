@@ -155,16 +155,16 @@ export default function StoryLibraryPage() {
                       <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center">
                         <div className="text-center">
                           <Lock className="w-12 h-12 text-destructive mx-auto mb-3" />
-                          <p className="text-sm font-medium text-foreground">Course Required</p>
+                          <p className="text-sm font-medium text-white">Course Required</p>
                           <a
                             href={`https://wa.me/919342205876?text=${encodeURIComponent(
                               `Hi! Please unlock access to "${story.title}" story for me!`
                             )}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 mt-3 text-xs text-primary hover:underline"
+                            className="inline-flex items-center gap-2 mt-3 text-xs text-white hover:underline"
                           >
-                            <MessageCircle className="w-4 h-4" />
+                            <MessageCircle className="w-4 h-4 text-blue-300" />
                             Contact to Unlock
                           </a>
                         </div>
